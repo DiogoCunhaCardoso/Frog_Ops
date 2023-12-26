@@ -17,4 +17,8 @@ function renderGameMode(mode) {
   };
 }
 
-startingMenu.init();
+window.onload = function () {
+  startingMenu.init();
+};
+
+// check if font is loaded and then init (to do)
