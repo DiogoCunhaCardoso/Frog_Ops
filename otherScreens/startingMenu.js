@@ -4,7 +4,7 @@ const startingMenu = (function () {
    */
 
   const options = ["CARDIO", "AGILITY", "STRENGTH"];
-  let selectedIndex = -1; // none selected
+  let selectedIndex = 0; // none selected
   const rectangles = []; // to interact with
   let plaqueBounds = {};
   const c_gray = "#C9C9C9";
@@ -26,27 +26,60 @@ const startingMenu = (function () {
 
     //
     if (isBgLoaded == true) {
-      animateSquare();
       drawGameName();
       drawOptions();
       drawPlaque();
+      if (selectedIndex == 0) {
+        animate(4, 24);
+        spriteImage.src = "../images/startingMenu/cardioSprite.svg";
+      }
+      if (selectedIndex == 1) {
+        spriteImage.src = "../images/startingMenu/agilitySprite.svg";
+        animate(9, 30);
+      }
+      if (selectedIndex == 2) {
+        spriteImage.src = "../images/startingMenu/strengthSprite.svg";
+        animate(10, 30);
+      }
     }
     //
 
     canvas.addEventListener("click", handleClick);
   }
 
-  let squareY = 0;
-  function animateSquare() {
-    const squareSize = 50;
-    const squareSpeed = 2;
+  //
+  //
+  //
 
-    ctx.fillStyle = "red";
-    ctx.fillRect(400 - squareSize / 2, squareY, squareSize, squareSize);
+  const spriteImage = new Image();
+  const spriteSize = 32;
+  let currentFrame = 0;
+  let spriteFrame = 0;
 
-    squareY += squareSpeed;
-    if (squareY > H) squareY = -squareSize;
+  function animate(lastFrame, staggerFrames) {
+    /* ctx.drawImage(spriteImage, sx, sy, sw, sh, dx, dy, dw, dh); */
+    ctx.drawImage(
+      spriteImage,
+      currentFrame * spriteSize,
+      0,
+      spriteSize,
+      spriteSize,
+      W / 6,
+      H - spriteSize - 280,
+      spriteSize * 10,
+      spriteSize * 10
+    );
+    if (spriteFrame % staggerFrames == 0) {
+      if (currentFrame < lastFrame - 1) currentFrame++;
+      else currentFrame = 0;
+    }
+
+    spriteFrame++;
   }
+
+  //
+  //
+  //
 
   function drawBgImage() {
     if (!isBgLoaded) {

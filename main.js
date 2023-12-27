@@ -57,7 +57,6 @@ function checkOrientation() {
 //
 function render() {
   window.requestAnimationFrame(render);
-  ctx.clearRect(0, 0, W, H);
   startingMenu.init();
 }
 
