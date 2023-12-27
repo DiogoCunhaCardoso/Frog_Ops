@@ -1,25 +1,73 @@
-// main.js
+/* import { startingMenu } from "./otherScreens/startingMenu"; */
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
-const H = (canvas.height = window.innerHeight);
-const W = (canvas.width = window.innerWidth);
+let H, W;
 
-const GameModes = {};
+/* Ensures the canvas is always
+   with the correct Ratio of 16/9 */
 
-function renderGameMode(mode) {
-  const script = document.createElement("script");
-  script.src = `gameModes/${mode}.js`;
-  document.head.appendChild(script);
+function setCanvasSize() {
+  const aspectRatioWidth = 16;
+  const aspectRatioHeight = 9;
 
-  script.onload = function () {
-    GameModes[mode].init();
+  let windowWidth = window.innerWidth;
+  let windowHeight = window.innerHeight;
+
+  if (windowHeight < windowWidth * (aspectRatioHeight / aspectRatioWidth)) {
+    canvas.height = windowHeight;
+    canvas.width = canvas.height * (aspectRatioWidth / aspectRatioHeight);
+  } else {
+    canvas.width = windowWidth;
+    canvas.height = canvas.width * (aspectRatioHeight / aspectRatioWidth);
+  }
+
+  H = canvas.height;
+  W = canvas.width;
+
+  render();
+}
+
+/* Delays the execution of a function until after a period of
+   inactivity, reduces unnecessary function calls,
+   improves performance, and enhances user experience */
+
+function debounce(func, timeout = 200) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
   };
 }
 
-window.onload = function () {
+/* Checks if it is in portrait mode so it gives
+   an alert to rotate into landscape mode*/
+
+function checkOrientation() {
+  if (window.innerWidth < window.innerHeight) {
+    alert(
+      "Please rotate your device to landscape mode for the best experience."
+    );
+  }
+}
+
+//
+function render() {
+  window.requestAnimationFrame(render);
+  ctx.clearRect(0, 0, W, H);
   startingMenu.init();
+}
+
+/* render(); */
+
+window.onload = function () {
+  setCanvasSize();
+  render();
+  checkOrientation();
 };
 
-// check if font is loaded and then init (to do)
+const debouncedResize = debounce(() => setCanvasSize());
+window.addEventListener("resize", debouncedResize, checkOrientation);

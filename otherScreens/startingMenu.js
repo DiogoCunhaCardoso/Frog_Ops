@@ -4,78 +4,96 @@ const startingMenu = (function () {
    */
 
   const options = ["CARDIO", "AGILITY", "STRENGTH"];
-  let selectedIndex = -1; // -1 means, none selected
-  const rectangles = []; // all rectangles
-  let plaqueBounds = {}; // plaque area
+  let selectedIndex = -1; // none selected
+  const rectangles = []; // to interact with
+  let plaqueBounds = {};
   const c_gray = "#C9C9C9";
   const c_darkGray = "#939393";
 
+  // Images
+  let isBgLoaded = false;
+  let backgroundImage = null;
+
+  /* Initializes other functions
+  all in one place to be called as 'init' */
+
   function init() {
+    //Clear canvas after each frame
     ctx.clearRect(0, 0, W, H);
-    drawBgImage(() => {
-      // Options placement & proportions
-      const rectHeights = 50;
-      const rectPosYOffsets = [-100, 0, 100];
-      const rectWidths = [180, 205, 250];
 
-      // Draw rectangles
-      for (let i = 0; i < options.length; i++) {
-        const posY = H / 2 - rectHeights / 2 + rectPosYOffsets[i];
-        const rectWidth = rectWidths[i];
-        const rectPosX = W - W / 4 - rectWidth / 2 - 40;
+    //Draw background Image
+    drawBgImage();
 
-        rectangles[i] = {
-          x: rectPosX,
-          y: posY,
-          width: rectWidth,
-          height: rectHeights,
-        };
-
-        drawTextAndRect(i); // Initial drawing of rectangles
-      }
-
+    //
+    if (isBgLoaded == true) {
+      animateSquare();
       drawGameName();
-      handlePlaque();
-      /*  */
-      /*  */
-    });
+      drawOptions();
+      drawPlaque();
+    }
+    //
 
     canvas.addEventListener("click", handleClick);
   }
 
-  function drawBgImage(onLoadCallback) {
-    const backgroundImage = new Image();
-    backgroundImage.src = "../images/startingMenu/bg.png";
+  let squareY = 0;
+  function animateSquare() {
+    const squareSize = 50;
+    const squareSpeed = 2;
 
-    backgroundImage.onload = function () {
-      ctx.drawImage(backgroundImage, 0, 0, W, H);
-      onLoadCallback(); // callback when image is loaded
-    };
+    ctx.fillStyle = "red";
+    ctx.fillRect(400 - squareSize / 2, squareY, squareSize, squareSize);
+
+    squareY += squareSpeed;
+    if (squareY > H) squareY = -squareSize;
   }
 
-  function handlePlaque() {
-    const backgroundImage = new Image();
-    backgroundImage.src = "../images/startingMenu/plaque.png";
+  function drawBgImage() {
+    if (!isBgLoaded) {
+      backgroundImage = new Image();
+      backgroundImage.src = "../images/startingMenu/bg.png";
+
+      backgroundImage.onload = function () {
+        ctx.drawImage(backgroundImage, 0, 0, W, H);
+        isBgLoaded = true;
+      };
+    } else {
+      ctx.drawImage(backgroundImage, 0, 0, W, H);
+    }
+  }
+
+  /* Loads and draws the plaque image, sets the plaqueBounds to
+  be used for interaction detection in other parts of the code. */
+
+  function drawPlaque() {
+    const plaqueImage = new Image(); // Renamed variable
+    plaqueImage.src = "../images/startingMenu/plaque.png";
     let scale = 0.5;
 
-    backgroundImage.onload = function () {
-      // Set plaqueBounds here
+    plaqueImage.onload = function () {
       plaqueBounds = {
         x: W - 240,
         y: H - H / 4.75,
-        width: backgroundImage.width * scale,
-        height: backgroundImage.height * scale,
+        width: plaqueImage.width * scale,
+        height: plaqueImage.height * scale,
       };
 
       ctx.drawImage(
-        backgroundImage,
+        plaqueImage,
         plaqueBounds.x,
         plaqueBounds.y,
         plaqueBounds.width,
         plaqueBounds.height
       );
     };
+
+    plaqueImage.onerror = function () {
+      console.error("Failed to load plaque image.");
+    };
   }
+
+  /* Draws the text of the game name 
+   using shadow effects for the look */
 
   function drawGameName() {
     const shadowOffsets = [
@@ -96,18 +114,21 @@ const startingMenu = (function () {
     shadowOffsets.forEach((offset) => {
       ctx.shadowOffsetX = offset.x;
       ctx.shadowOffsetY = offset.y;
-      ctx.fillText("FROG", 92, 50);
+      ctx.fillText("FROG", 96, 60);
     });
 
     // Draw "OPS"
     shadowOffsets.forEach((offset) => {
       ctx.shadowOffsetX = offset.x;
       ctx.shadowOffsetY = offset.y;
-      ctx.fillText("OPS", 76, 110);
+      ctx.fillText("OPS", 80, 110);
     });
   }
 
-  function drawTextAndRect(index, color, borderColor) {
+  /* Draws the text and its corresponding 
+   invisible hitbox for menu options. */
+
+  function drawTextAndHitbox(index, color, borderColor) {
     const rect = rectangles[index];
     const text = options[index];
 
@@ -115,7 +136,6 @@ const startingMenu = (function () {
     ctx.shadowColor = "transparent";
     ctx.fillStyle = "transparent";
     ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
-
     // Text style settings
     ctx.fillStyle = index === selectedIndex ? color : c_gray;
     ctx.font = "40px RetroGaming";
@@ -125,14 +145,41 @@ const startingMenu = (function () {
     ctx.shadowColor = index === selectedIndex ? borderColor : c_darkGray;
     ctx.shadowOffsetY = 4;
     ctx.shadowOffsetX = 2;
-
     // Calculate text position
     const textX = rect.x + rect.width / 2;
     const textY = rect.y + rect.height / 2;
-
     // Draw text
     ctx.fillText(text, textX, textY);
   }
+
+  /* Uses 'drawTextAndHitbox' to draw the interactive menu options.
+  Sets up positioning and dimensions for each option. */
+
+  function drawOptions() {
+    // Options placement & proportions
+    const rectHeights = 50;
+    const rectPosYOffsets = [-100, 0, 100];
+    const rectWidths = [180, 205, 250];
+
+    // Draw Interactive Elements
+    for (let i = 0; i < options.length; i++) {
+      const posY = H / 2 - rectHeights / 2 + rectPosYOffsets[i];
+      const rectWidth = rectWidths[i];
+      const rectPosX = W - W / 4 - rectWidth / 2 - 40;
+
+      rectangles[i] = {
+        x: rectPosX,
+        y: posY,
+        width: rectWidth,
+        height: rectHeights,
+      };
+
+      drawTextAndHitbox(i); // Initial drawing of rectangles
+    }
+  }
+
+  /* Handles mouse click events, managing game option selections
+  and plaque clicks to redirect to specified destination. */
 
   function handleClick(event) {
     const mouseX = event.clientX - canvas.getBoundingClientRect().left;
@@ -160,7 +207,7 @@ const startingMenu = (function () {
       ) {
         // Non selected properties
         if (selectedIndex >= 0) {
-          drawTextAndRect(selectedIndex, c_gray, c_darkGray);
+          drawTextAndHitbox(selectedIndex, c_gray, c_darkGray);
         }
 
         // Update the selected index
@@ -169,7 +216,7 @@ const startingMenu = (function () {
 
         // Selected properties
 
-        drawTextAndRect(i, "#FFD43E", "#2A2900");
+        drawTextAndHitbox(i, "#FFD43E", "#2A2900");
 
         // Example: renderGameMode(options[i].toLowerCase());
         return;
