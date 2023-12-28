@@ -1,4 +1,4 @@
-GameModes.strength = (function () {
+const strength = (function () {
   "use strict";
 
   function init() {

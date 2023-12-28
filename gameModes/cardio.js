@@ -1,4 +1,4 @@
-GameModes.cardio = (function () {
+const cardio = (function () {
   "use strict";
 
   function init() {

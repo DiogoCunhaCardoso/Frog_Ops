@@ -1,5 +1,3 @@
-/* import { startingMenu } from "./otherScreens/startingMenu"; */
-
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -54,17 +52,31 @@ function checkOrientation() {
   }
 }
 
-//
+/* Selection of which mode to init */
+
+let currentMode = {
+  mode: 0, // Default
+  modes: [
+    startingMenu.init, // 0
+    cardio.init, // 1
+    agility.init, // 2
+    strength.init, // 3
+    gems.init, // 4
+  ],
+  run: function () {
+    this.modes[this.mode]();
+  },
+};
+
 function render() {
   window.requestAnimationFrame(render);
-  startingMenu.init();
+  currentMode.run();
+  console.log(currentMode.mode);
 }
 
-/* render(); */
-
 window.onload = function () {
-  setCanvasSize();
   render();
+  setCanvasSize();
   checkOrientation();
 };
 

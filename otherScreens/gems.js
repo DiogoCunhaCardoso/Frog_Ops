@@ -1,9 +1,9 @@
-const agility = (function () {
+const gems = (function () {
   "use strict";
 
   function init() {
     ctx.clearRect(0, 0, W, H);
-    drawCenteredText("Agility");
+    drawCenteredText("GEMS");
   }
 
   function drawCenteredText(text) {
