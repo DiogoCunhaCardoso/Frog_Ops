@@ -52,6 +52,14 @@ function checkOrientation() {
   }
 }
 
+/* check if the mode is active */
+
+/* export let isStartingMenuActive = true; // starts with this
+export let isCardioActive = false;
+export let isAgilityActive = false;
+export let isStrengthActive = false;
+export let isGemsActive = false; */
+
 /* Selection of which mode to init */
 
 let currentMode = {
@@ -71,7 +79,6 @@ let currentMode = {
 function render() {
   window.requestAnimationFrame(render);
   currentMode.run();
-  console.log(currentMode.mode);
 }
 
 window.onload = function () {

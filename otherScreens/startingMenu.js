@@ -1,3 +1,5 @@
+let isStartingMenuActive = true;
+
 const startingMenu = (function () {
   ("use strict");
   /*
@@ -34,7 +36,7 @@ const startingMenu = (function () {
     if (isBgLoaded == true) {
       drawGameName();
       drawOptions(); // not working
-      drawPlaques(
+      drawPlaque(
         gemsPlaqueImage,
         "../images/startingMenu/plaqueGems.svg",
         4,
@@ -42,7 +44,7 @@ const startingMenu = (function () {
         gemsPlaqueBounds
       );
 
-      drawPlaques(
+      drawPlaque(
         plaqueImage,
         "../images/startingMenu/plaque.png",
         0.5,
@@ -123,31 +125,6 @@ const startingMenu = (function () {
     }
   }
 
-  /* Loads and draws the plaques images, sets the plaqueBounds to
-  be used for interaction detection in other parts of the code. 
-   */
-
-  function drawPlaques(image, imageSrc, scale, position, bounds) {
-    // Only set the source if it hasn't been set yet
-    if (!image.src) {
-      image.src = imageSrc;
-
-      image.onload = () => {
-        // Set bounds dimensions based on image size and scale factor
-        bounds.x = position.x;
-        bounds.y = position.y;
-        bounds.width = image.width * scale;
-        bounds.height = image.height * scale;
-
-        // Draw the image
-        ctx.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height);
-      };
-    } else {
-      // If image already loaded, draw the image directly
-      ctx.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height);
-    }
-  }
-
   /* Draws the text of the game name 
    using shadow effects for the look */
 
@@ -158,6 +135,8 @@ const startingMenu = (function () {
       { x: -3, y: -3 },
       { x: 4, y: -3 },
     ];
+
+    ctx.save();
 
     // Common Styles
     ctx.font = "40px RetroGaming";
@@ -170,15 +149,17 @@ const startingMenu = (function () {
     shadowOffsets.forEach((offset) => {
       ctx.shadowOffsetX = offset.x;
       ctx.shadowOffsetY = offset.y;
-      ctx.fillText("FROG", 96, 60);
+      ctx.fillText("FROG", 40, 60);
     });
 
     // Draw "OPS"
     shadowOffsets.forEach((offset) => {
       ctx.shadowOffsetX = offset.x;
       ctx.shadowOffsetY = offset.y;
-      ctx.fillText("OPS", 80, 110);
+      ctx.fillText("OPS", 40, 110);
     });
+
+    ctx.restore();
   }
 
   /* Draws the text and its corresponding 
@@ -187,6 +168,8 @@ const startingMenu = (function () {
   function setTextAndHitboxProperties(index, color, borderColor) {
     const rect = rectangles[index];
     const text = options[index];
+
+    ctx.save();
 
     // Disable properties on rectangle & draw it
     ctx.shadowColor = "transparent";
@@ -205,51 +188,31 @@ const startingMenu = (function () {
     const textY = rect.y + rect.height / 2;
     // Draw text
     ctx.fillText(text, textX, textY);
+    ctx.restore();
   }
 
   /* Uses 'setTextAndHitboxProperties' to draw the interactive menu options.
   Sets up positioning and dimensions for each option. */
 
   function drawOptions() {
-    // Options placement & proportions
-    const rectHeights = 50;
-    const rectPosYOffsets = [-100, 0, 100];
-
     ctx.font = "40px RetroGaming";
-
-    // Draw Interactive Elements
     for (let i = 0; i < options.length; i++) {
-      const posY = H / 2 - rectHeights / 2 + rectPosYOffsets[i];
-
+      const posY = H / 2 - 50 / 2 + [-100, 0, 100][i];
       const textWidth = ctx.measureText(options[i]).width;
       const rectWidth = textWidth;
-
       const rectPosX = W - W / 4 - rectWidth / 2 - 40;
 
       rectangles[i] = {
         x: rectPosX,
         y: posY,
         width: rectWidth,
-        height: rectHeights,
+        height: 50,
       };
 
-      setTextAndHitboxProperties(i); // Initial drawing of rectangles
+      const color = i === selectedIndex ? "#FFD43E" : c_gray;
+      const borderColor = i === selectedIndex ? "#2A2900" : c_darkGray;
+      setTextAndHitboxProperties(i, color, borderColor);
     }
-  }
-
-  /* Draws the opacity rectangle with the 
-  variable to be changed later with GSAP */
-
-  const overlay = {
-    opacity: 0,
-  };
-
-  function applyCanvasOpacity() {
-    ctx.save();
-    ctx.globalAlpha = overlay.opacity;
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, W, H);
-    ctx.restore();
   }
 
   /* Handles mouse click events */
@@ -275,17 +238,8 @@ const startingMenu = (function () {
         mouseY >= rect.y &&
         mouseY <= rect.y + rect.height
       ) {
-        // Non-selected properties
-        if (selectedIndex >= 0) {
-          setTextAndHitboxProperties(selectedIndex, c_gray, c_darkGray);
-        }
-
-        // Update the selected index
-        selectedIndex = i;
-
-        // Selected properties
-        setTextAndHitboxProperties(i, "#FFD43E", "#2A2900");
-
+        selectedIndex = i; // Update the selected index
+        drawOptions(); // Redraw options with the new selection
         return;
       }
     }
@@ -296,6 +250,9 @@ const startingMenu = (function () {
   or the gems page */
 
   function handlePlaqueClick(mouseX, mouseY) {
+    if (!isStartingMenuActive) {
+      return;
+    }
     if (
       mouseX >= plaqueBounds.x &&
       mouseX <= plaqueBounds.x + plaqueBounds.width &&
@@ -310,6 +267,8 @@ const startingMenu = (function () {
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
             currentMode.mode = selectedIndex + 1;
+            isStartingMenuActive = false;
+            overlay.opacity = 0;
           },
         });
       }
@@ -329,6 +288,8 @@ const startingMenu = (function () {
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
             currentMode.mode = 4;
+            isStartingMenuActive = false;
+            overlay.opacity = 0;
           },
         });
       }
