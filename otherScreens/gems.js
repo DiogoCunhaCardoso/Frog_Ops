@@ -1,15 +1,14 @@
 const gems = (function () {
   ("use strict");
 
-  let scale = 4.5;
   let hasGems = {
-    cardioGem: true,
-    agilityGem: true,
-    strengthGem: true,
+    cardioGem: hasGem("cardioGem"),
+    agilityGem: hasGem("agilityGem"),
+    strengthGem: hasGem("strengthGem"),
   };
   const modes = ["CARDIO", "AGILITY", "STRENGTH"];
-  const gemsPlaqueImage = new Image();
-  let gemsPlaqueBounds = {};
+  const goBackPlaque = new Image();
+  let backPlaqueBounds = {};
 
   function init() {
     ctx.clearRect(0, 0, W, H);
@@ -17,14 +16,27 @@ const gems = (function () {
     ctx.fillRect(0, 0, W, H);
     drawGemsAndText();
     drawPlaque(
-      gemsPlaqueImage,
-      "../images/startingMenu/plaque_back.svg",
-      4,
-      { x: 50, y: 0 },
-      gemsPlaqueBounds
+      goBackPlaque,
+      "../images/gems/plaque_back.svg",
+      { x: 0, y: 0 },
+      backPlaqueBounds,
+      () => {
+        backPlaqueBounds.x = backPlaqueBounds.width / 2;
+        backPlaqueBounds.y = 0;
+      }
     );
     canvas.addEventListener("click", handleClick);
   }
+
+  function hasGem(gemName) {
+    return localStorage.getItem(gemName) !== null;
+  }
+
+  // will be used when you finish a game in the future
+  /*   function NewGemAquired(gem) {
+    localStorage.setItem(gem, true);
+  }
+  NewGemAquired("agilityGem"); */
 
   function drawGemsAndText() {
     const gemImages = {
@@ -34,10 +46,12 @@ const gems = (function () {
       inactiveGem: "../images/gems/gem_inactive.svg",
     };
 
-    const rectPosXOffsets = [-340, 0, 340];
+    const rectPosXOffsets = [-70 * scaleFactor, 0, 70 * scaleFactor];
+
+    ctx.save();
 
     // Set font for text
-    ctx.font = "40px RetroGaming"; // Adjust font size and style as needed
+    ctx.font = `${7 * scaleFactor}px RetroGaming`; // Adjust font size and style as needed
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -72,22 +86,26 @@ const gems = (function () {
       // Set the fill style for the text
       ctx.fillStyle = textColor;
 
-      const gemX = W / 2 - (gemImage.width * scale) / 2 + rectPosXOffsets[i];
-      const gemY = H / 2 - (gemImage.height * scale) / 2 - 25;
+      const gemX =
+        W / 2 - (gemImage.width * scaleFactor) / 2 + rectPosXOffsets[i];
+      const gemY =
+        H / 2 - (gemImage.height * scaleFactor) / 2 - 7 * scaleFactor; // half of 14
 
       // Draw the gem image
       ctx.drawImage(
         gemImage,
         gemX,
         gemY,
-        gemImage.width * scale,
-        gemImage.height * scale
+        gemImage.width * scaleFactor,
+        gemImage.height * scaleFactor
       );
 
       // Draw the text under the gem
-      const textY = gemY + gemImage.height * scale + 50; // Adjust 30 to position text below the gem
-      ctx.fillText(modes[i], gemX + (gemImage.width * scale) / 2, textY);
+      const textY = gemY + gemImage.height * scaleFactor + 14 * scaleFactor; // 14 = separation from image
+      ctx.fillText(modes[i], gemX + (gemImage.width / 2) * scaleFactor, textY);
     }
+
+    ctx.restore();
   }
 
   function handleClick(event) {
@@ -98,11 +116,14 @@ const gems = (function () {
   }
 
   function handlePlaqueClick(mouseX, mouseY) {
+    if (!isGemsInitActive) {
+      return;
+    }
     if (
-      mouseX >= gemsPlaqueBounds.x &&
-      mouseX <= gemsPlaqueBounds.x + gemsPlaqueBounds.width &&
-      mouseY >= gemsPlaqueBounds.y &&
-      mouseY <= gemsPlaqueBounds.y + gemsPlaqueBounds.height
+      mouseX >= backPlaqueBounds.x &&
+      mouseX <= backPlaqueBounds.x + backPlaqueBounds.width &&
+      mouseY >= backPlaqueBounds.y &&
+      mouseY <= backPlaqueBounds.y + backPlaqueBounds.height
     ) {
       gsap.to(overlay, {
         opacity: 1,
@@ -111,6 +132,7 @@ const gems = (function () {
         onComplete: () => {
           currentMode.mode = 0;
           isStartingMenuActive = true;
+          isGemsInitActive = false;
           overlay.opacity = 0;
         },
       });

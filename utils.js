@@ -5,24 +5,32 @@
 /* Loads and draws the plaques images, sets the plaqueBounds to
   be used for interaction detection in other parts of the code. */
 
-function drawPlaque(image, imageSrc, scale, position, bounds) {
+function drawPlaque(image, imageSrc, position, bounds, callback) {
   // Only set the source if it hasn't been set yet
   if (!image.src) {
     image.src = imageSrc;
 
     image.onload = () => {
       // Set bounds dimensions based on image size and scale factor
+      bounds.width = (image.width * scaleFactor) / 1.4;
+      bounds.height = (image.height * scaleFactor) / 1.4;
       bounds.x = position.x;
-      bounds.y = position.y;
-      bounds.width = image.width * scale;
-      bounds.height = image.height * scale;
+      bounds.y = position.y - bounds.height; // Adjust Y position based on image height
 
       // Draw the image
       ctx.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height);
+
+      // Call the callback function
+      if (callback) {
+        callback();
+      }
     };
   } else {
     // If image already loaded, draw the image directly
     ctx.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height);
+    if (callback) {
+      callback();
+    }
   }
 }
 

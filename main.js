@@ -3,6 +3,17 @@ const ctx = canvas.getContext("2d");
 
 let H, W;
 
+/* Flags to disable or able 'pages' */
+
+let isStartingMenuActive = true;
+let isGemsInitActive = false;
+
+/* Scale factor, things are written as for 320px wide
+   screen and they have times scale factor for every size */
+
+let baseWidth = 320;
+let scaleFactor = window.innerWidth / baseWidth;
+
 /* Ensures the canvas is always
    with the correct Ratio of 16/9 */
 
@@ -46,21 +57,9 @@ function debounce(func, timeout = 200) {
 
 function checkOrientation() {
   if (window.innerWidth < window.innerHeight) {
-    alert(
-      "Please rotate your device to landscape mode for the best experience."
-    );
+    currentMode.mode = 5;
   }
 }
-
-/* check if the mode is active */
-
-/* export let isStartingMenuActive = true; // starts with this
-export let isCardioActive = false;
-export let isAgilityActive = false;
-export let isStrengthActive = false;
-export let isGemsActive = false; */
-
-/* Selection of which mode to init */
 
 let currentMode = {
   mode: 0, // Default
@@ -70,6 +69,7 @@ let currentMode = {
     agility.init, // 2
     strength.init, // 3
     gems.init, // 4
+    portrait.init, // 5
   ],
   run: function () {
     this.modes[this.mode]();
@@ -87,5 +87,11 @@ window.onload = function () {
   checkOrientation();
 };
 
-const debouncedResize = debounce(() => setCanvasSize());
+const debouncedResize = debounce(() => {
+  setCanvasSize();
+  scaleFactor = window.innerWidth / baseWidth;
+  currentMode.run();
+  checkOrientation();
+}, 200);
+
 window.addEventListener("resize", debouncedResize, checkOrientation);

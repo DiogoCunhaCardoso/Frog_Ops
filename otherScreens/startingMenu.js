@@ -1,5 +1,3 @@
-let isStartingMenuActive = true;
-
 const startingMenu = (function () {
   ("use strict");
   /*
@@ -8,7 +6,7 @@ const startingMenu = (function () {
 
   const options = ["CARDIO", "AGILITY", "STRENGTH"];
   let selectedIndex = 0; // none selected
-  const rectangles = []; // to interact with
+  let rectangles = []; // to interact with
   const c_gray = "#C9C9C9";
   const c_darkGray = "#939393";
 
@@ -39,17 +37,22 @@ const startingMenu = (function () {
       drawPlaque(
         gemsPlaqueImage,
         "../images/startingMenu/plaqueGems.svg",
-        4,
-        { x: W / 16, y: H - H / 4.44 },
-        gemsPlaqueBounds
+        { x: 14 * scaleFactor, y: 0 }, // y is temporary
+        gemsPlaqueBounds,
+        () => {
+          gemsPlaqueBounds.y = H - gemsPlaqueBounds.height - 10 * scaleFactor;
+        }
       );
 
       drawPlaque(
         plaqueImage,
-        "../images/startingMenu/plaque.png",
-        0.5,
-        { x: W - 240, y: H - H / 4.75 },
-        plaqueBounds
+        "../images/startingMenu/plaque.svg",
+        { x: 0 * scaleFactor, y: 0 },
+        plaqueBounds,
+        () => {
+          plaqueBounds.x = W - plaqueBounds.width - 20 * scaleFactor;
+          plaqueBounds.y = H - plaqueBounds.height - 10 * scaleFactor;
+        }
       );
       updateSpriteAndAnimation();
     }
@@ -75,10 +78,10 @@ const startingMenu = (function () {
       0,
       sprite.size,
       sprite.size,
-      W / 6,
-      H - sprite.size - 280,
-      sprite.size * 10,
-      sprite.size * 10
+      40 * scaleFactor + sprite.size, // X position
+      H - sprite.size * scaleFactor * 2.4, // Y position
+      sprite.size * scaleFactor * 2.4,
+      sprite.size * scaleFactor * 2.4
     );
     if (sprite.frameCount % staggerFrames == 0) {
       if (sprite.currentFrame < lastFrame - 1) sprite.currentFrame++;
@@ -139,8 +142,8 @@ const startingMenu = (function () {
     ctx.save();
 
     // Common Styles
-    ctx.font = "40px RetroGaming";
-    ctx.lineWidth = 1;
+    ctx.font = `${32}px RetroGaming`; // CHECK
+    ctx.lineWidth = 32;
     ctx.fillStyle = "#4683DF"; // Text color
     ctx.strokeStyle = "#DCEAFF"; // Border color
     ctx.shadowColor = "#DCEAFF"; // Shadow color
@@ -149,14 +152,14 @@ const startingMenu = (function () {
     shadowOffsets.forEach((offset) => {
       ctx.shadowOffsetX = offset.x;
       ctx.shadowOffsetY = offset.y;
-      ctx.fillText("FROG", 40, 60);
+      ctx.fillText("FROG", 40, 60 + scaleFactor);
     });
 
     // Draw "OPS"
     shadowOffsets.forEach((offset) => {
       ctx.shadowOffsetX = offset.x;
       ctx.shadowOffsetY = offset.y;
-      ctx.fillText("OPS", 40, 110);
+      ctx.fillText("OPS", 40, 120 + scaleFactor);
     });
 
     ctx.restore();
@@ -195,12 +198,13 @@ const startingMenu = (function () {
   Sets up positioning and dimensions for each option. */
 
   function drawOptions() {
-    ctx.font = "40px RetroGaming";
+    ctx.save();
+    ctx.font = `${10 * scaleFactor}px RetroGaming`;
     for (let i = 0; i < options.length; i++) {
-      const posY = H / 2 - 50 / 2 + [-100, 0, 100][i];
+      const posY = H / 2 - 50 / 2 + [-24 * scaleFactor, 0, 24 * scaleFactor][i];
       const textWidth = ctx.measureText(options[i]).width;
       const rectWidth = textWidth;
-      const rectPosX = W - W / 4 - rectWidth / 2 - 40;
+      const rectPosX = W - W / 3 - textWidth / 2; // SETS THE TEXT TO 2/3 OF THE SCREEN
 
       rectangles[i] = {
         x: rectPosX,
@@ -213,6 +217,7 @@ const startingMenu = (function () {
       const borderColor = i === selectedIndex ? "#2A2900" : c_darkGray;
       setTextAndHitboxProperties(i, color, borderColor);
     }
+    ctx.restore();
   }
 
   /* Handles mouse click events */
@@ -289,6 +294,7 @@ const startingMenu = (function () {
           onComplete: () => {
             currentMode.mode = 4;
             isStartingMenuActive = false;
+            isGemsInitActive = true;
             overlay.opacity = 0;
           },
         });
@@ -300,3 +306,7 @@ const startingMenu = (function () {
     init: init,
   };
 })();
+
+/* window.addEventListener("resize", function () {
+  scaleFactor = window.innerWidth / baseWidth;
+}); */
