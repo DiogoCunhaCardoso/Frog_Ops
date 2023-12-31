@@ -1,16 +1,22 @@
 const portrait = (function () {
   ("use strict");
 
+  const spaceBetween = 12;
+
   function init() {
     ctx.fillStyle = "#EDEDED";
     ctx.fillRect(0, 0, W, H);
+    drawImage();
     drawText();
   }
 
   function drawText() {
     ctx.save();
 
-    const posYOffsets = [0, 12 * scaleFactor];
+    const posYOffsets = [
+      spaceBetween * scaleFactor,
+      spaceBetween * 2 * scaleFactor,
+    ];
     const textLines = ["PLEASE ROTATE", "YOUR DEVICE"];
 
     for (let i = 0; i < textLines.length; i++) {
@@ -28,10 +34,27 @@ const portrait = (function () {
       const y = H / 2 + posYOffsets[i];
 
       // Draw the text
-      ctx.fillText(textLines[i], x, y);
+      ctx.fillText(textLines[i], x, y + rotateImage.height / 2);
     }
 
     ctx.restore();
+  }
+
+  let rotateImage = new Image();
+  rotateImage.src = "../images/portrait/rotatePhone.svg";
+
+  function drawImage() {
+    const x = (W - rotateImage.width * scaleFactor) / 2;
+    const y =
+      H / 2 - rotateImage.height * scaleFactor + spaceBetween * scaleFactor;
+
+    ctx.drawImage(
+      rotateImage,
+      x,
+      y,
+      rotateImage.width * scaleFactor,
+      rotateImage.height * scaleFactor
+    );
   }
 
   return {

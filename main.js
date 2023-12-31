@@ -18,22 +18,32 @@ let scaleFactor = window.innerWidth / baseWidth;
    with the correct Ratio of 16/9 */
 
 function setCanvasSize() {
-  const aspectRatioWidth = 16;
-  const aspectRatioHeight = 9;
-
-  let windowWidth = window.innerWidth;
-  let windowHeight = window.innerHeight;
-
-  if (windowHeight < windowWidth * (aspectRatioHeight / aspectRatioWidth)) {
-    canvas.height = windowHeight;
-    canvas.width = canvas.height * (aspectRatioWidth / aspectRatioHeight);
+  if (currentMode.mode === 5) {
+    // In portrait mode, occupy the full screen
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
   } else {
-    canvas.width = windowWidth;
-    canvas.height = canvas.width * (aspectRatioHeight / aspectRatioWidth);
+    // For other modes, maintain a 16:9 aspect ratio
+    const aspectRatioWidth = 16;
+    const aspectRatioHeight = 9;
+
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+
+    if (windowHeight < windowWidth * (aspectRatioHeight / aspectRatioWidth)) {
+      canvas.height = windowHeight;
+      canvas.width = canvas.height * (aspectRatioWidth / aspectRatioHeight);
+    } else {
+      canvas.width = windowWidth;
+      canvas.height = canvas.width * (aspectRatioHeight / aspectRatioWidth);
+    }
   }
 
   H = canvas.height;
   W = canvas.width;
+
+  // Scale factor update might be necessary if you rely on it elsewhere
+  scaleFactor = W / baseWidth;
 
   render();
 }
@@ -55,9 +65,18 @@ function debounce(func, timeout = 200) {
 /* Checks if it is in portrait mode so it gives
    an alert to rotate into landscape mode*/
 
+let storedMode; // store mode before changing
+
 function checkOrientation() {
-  if (window.innerWidth < window.innerHeight) {
+  if (window.innerWidth < window.innerHeight && currentMode.mode !== 5) {
+    storedMode = currentMode.mode; // Store current mode only when not already in portrait mode
+
     currentMode.mode = 5;
+  } else if (
+    window.innerWidth >= window.innerHeight &&
+    currentMode.mode === 5
+  ) {
+    currentMode.mode = storedMode !== undefined ? storedMode : 0; // Return to the previous mode or default if not set
   }
 }
 
@@ -72,6 +91,7 @@ let currentMode = {
     portrait.init, // 5
   ],
   run: function () {
+    4;
     this.modes[this.mode]();
   },
 };
@@ -88,10 +108,10 @@ window.onload = function () {
 };
 
 const debouncedResize = debounce(() => {
-  setCanvasSize();
   scaleFactor = window.innerWidth / baseWidth;
-  currentMode.run();
   checkOrientation();
+  setCanvasSize();
+  currentMode.run();
 }, 200);
 
-window.addEventListener("resize", debouncedResize, checkOrientation);
+window.addEventListener("resize", debouncedResize);
