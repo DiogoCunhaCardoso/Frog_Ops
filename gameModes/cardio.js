@@ -74,6 +74,59 @@ const cardio = (function () {
     }
   }
 
+  window.addEventListener("keydown", (e) => {
+    // rotate
+    if (e.code === "KeyR") {
+      player.isRotating = !player.isRotating;
+    }
+
+    // jump
+    if (player.isInAir === false) {
+      switch (e.code) {
+        case "Digit1":
+        case "Numpad1":
+          player.jump(-3);
+          break;
+        case "Digit2":
+        case "Numpad2":
+          player.jump(-5);
+          break;
+        case "Digit3":
+        case "Numpad3":
+          player.jump(-6);
+          break;
+        case "Digit4":
+        case "Numpad4":
+          player.jump(-7);
+          break;
+        case "Digit5":
+        case "Numpad5":
+          player.jump(-9);
+          break;
+        case "Digit6":
+        case "Numpad6":
+          player.jump(-10);
+          break;
+        case "Digit7":
+        case "Numpad7":
+          player.jump(-11);
+          break;
+        case "Digit8":
+        case "Numpad8":
+          player.jump(-12);
+          break;
+        case "Digit9":
+        case "Numpad9":
+          player.jump(-13);
+          break;
+        case "Digit0":
+        case "Numpad0":
+          player.jump(-14);
+          break;
+      }
+    }
+  });
+
   return {
     init: init,
   };
