@@ -255,6 +255,8 @@ const startingMenu = (function () {
   or the gems page */
 
   function handlePlaqueClick(mouseX, mouseY) {
+    // plaque for game modes
+
     if (!isStartingMenuActive) {
       return;
     }
@@ -271,6 +273,14 @@ const startingMenu = (function () {
           duration: 1, // duration of the fade in seconds
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
+            if (selectedIndex === 0) {
+              isCardioInitActive = true;
+            } else if (selectedIndex === 1) {
+              isAgilityInitActive = true;
+            } else if (selectedIndex === 2) {
+              isStrengthInitActive = true;
+            }
+
             currentMode.mode = selectedIndex + 1;
             isStartingMenuActive = false;
             overlay.opacity = 0;
@@ -278,6 +288,8 @@ const startingMenu = (function () {
         });
       }
     }
+
+    // plaque for gems
 
     if (
       mouseX >= gemsPlaqueBounds.x &&

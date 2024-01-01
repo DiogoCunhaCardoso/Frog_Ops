@@ -48,3 +48,12 @@ function applyCanvasOpacity() {
   ctx.fillRect(0, 0, W, H);
   ctx.restore();
 }
+
+function isClickWithinBounds(mouseX, mouseY, bounds) {
+  return (
+    mouseX >= bounds.x &&
+    mouseX <= bounds.x + bounds.width &&
+    mouseY >= bounds.y &&
+    mouseY <= bounds.y + bounds.height
+  );
+}

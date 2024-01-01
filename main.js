@@ -7,6 +7,9 @@ let H, W;
 
 let isStartingMenuActive = true;
 let isGemsInitActive = false;
+let isCardioInitActive = false;
+let isAgilityInitActive = false;
+let isStrengthInitActive = false;
 
 /* Scale factor, things are written as for 320px wide
    screen and they have times scale factor for every size */
@@ -81,7 +84,7 @@ function checkOrientation() {
 }
 
 let currentMode = {
-  mode: 0, // Default
+  mode: 1, // Default
   modes: [
     startingMenu.init, // 0
     cardio.init, // 1
