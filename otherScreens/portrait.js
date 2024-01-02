@@ -1,7 +1,9 @@
-const portrait = (function () {
+import { ctx, W, H, scaleFactor } from "../main.js";
+
+export let portrait = (function () {
   ("use strict");
 
-  const spaceBetween = 12;
+  let spaceBetween = 12;
 
   function init() {
     ctx.fillStyle = "#EDEDED";
@@ -13,14 +15,14 @@ const portrait = (function () {
   function drawText() {
     ctx.save();
 
-    const posYOffsets = [
+    let posYOffsets = [
       spaceBetween * scaleFactor,
       spaceBetween * 2 * scaleFactor,
     ];
-    const textLines = ["PLEASE ROTATE", "YOUR DEVICE"];
+    let textLines = ["PLEASE ROTATE", "YOUR DEVICE"];
 
     for (let i = 0; i < textLines.length; i++) {
-      const fontSize = 8 * scaleFactor;
+      let fontSize = 8 * scaleFactor;
 
       // Set font size and style
       ctx.font = `${fontSize}px RetroGaming`;
@@ -30,8 +32,8 @@ const portrait = (function () {
       ctx.fillStyle = "#5F5F5F";
 
       // Center the text horizontally and vertically
-      const x = W / 2;
-      const y = H / 2 + posYOffsets[i];
+      let x = W / 2;
+      let y = H / 2 + posYOffsets[i];
 
       // Draw the text
       ctx.fillText(textLines[i], x, y + rotateImage.height / 2);
@@ -44,8 +46,8 @@ const portrait = (function () {
   rotateImage.src = "../images/portrait/rotatePhone.svg";
 
   function drawImage() {
-    const x = (W - rotateImage.width * scaleFactor) / 2;
-    const y =
+    let x = (W - rotateImage.width * scaleFactor) / 2;
+    let y =
       H / 2 - rotateImage.height * scaleFactor + spaceBetween * scaleFactor;
 
     ctx.drawImage(

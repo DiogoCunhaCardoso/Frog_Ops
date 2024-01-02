@@ -1,19 +1,29 @@
-const startingMenu = (function () {
+import {
+  ctx,
+  W,
+  H,
+  scaleFactor,
+  canvas,
+  ActiveInits,
+  currentMode,
+} from "../main.js";
+import { drawPlaque, overlay, applyCanvasOpacity } from "../utils.js";
+export let startingMenu = (function () {
   ("use strict");
   /*
    * Global Variables
    */
 
-  const options = ["CARDIO", "AGILITY", "STRENGTH"];
+  let options = ["CARDIO", "AGILITY", "STRENGTH"];
   let selectedIndex = 0; // none selected
   let rectangles = []; // to interact with
-  const c_gray = "#C9C9C9";
-  const c_darkGray = "#939393";
+  let c_gray = "#C9C9C9";
+  let c_darkGray = "#939393";
 
   // PLAQUES
-  const gemsPlaqueImage = new Image();
+  let gemsPlaqueImage = new Image();
   let gemsPlaqueBounds = {};
-  const plaqueImage = new Image();
+  let plaqueImage = new Image();
   let plaqueBounds = {};
 
   // BACKGROUND
@@ -64,7 +74,7 @@ const startingMenu = (function () {
   /* Animates the sprite by drawing frames in a sequence.
   Gives num of frames & speed of frames as params */
 
-  const sprite = {
+  let sprite = {
     image: new Image(),
     size: 32,
     currentFrame: 0,
@@ -132,7 +142,7 @@ const startingMenu = (function () {
    using shadow effects for the look */
 
   function drawGameName() {
-    const shadowOffsets = [
+    let shadowOffsets = [
       { x: 4, y: 4 },
       { x: -3, y: 4 },
       { x: -3, y: -3 },
@@ -169,8 +179,8 @@ const startingMenu = (function () {
    invisible hitbox for menu options. */
 
   function setTextAndHitboxProperties(index, color, borderColor) {
-    const rect = rectangles[index];
-    const text = options[index];
+    let rect = rectangles[index];
+    let text = options[index];
 
     ctx.save();
 
@@ -187,8 +197,8 @@ const startingMenu = (function () {
     ctx.shadowOffsetY = 4;
     ctx.shadowOffsetX = 2;
     // Calculate text position
-    const textX = rect.x + rect.width / 2;
-    const textY = rect.y + rect.height / 2;
+    let textX = rect.x + rect.width / 2;
+    let textY = rect.y + rect.height / 2;
     // Draw text
     ctx.fillText(text, textX, textY);
     ctx.restore();
@@ -201,10 +211,10 @@ const startingMenu = (function () {
     ctx.save();
     ctx.font = `${10 * scaleFactor}px RetroGaming`;
     for (let i = 0; i < options.length; i++) {
-      const posY = H / 2 - 50 / 2 + [-24 * scaleFactor, 0, 24 * scaleFactor][i];
-      const textWidth = ctx.measureText(options[i]).width;
-      const rectWidth = textWidth;
-      const rectPosX = W - W / 3 - textWidth / 2; // SETS THE TEXT TO 2/3 OF THE SCREEN
+      let posY = H / 2 - 50 / 2 + [-24 * scaleFactor, 0, 24 * scaleFactor][i];
+      let textWidth = ctx.measureText(options[i]).width;
+      let rectWidth = textWidth;
+      let rectPosX = W - W / 3 - textWidth / 2; // SETS THE TEXT TO 2/3 OF THE SCREEN
 
       rectangles[i] = {
         x: rectPosX,
@@ -213,8 +223,8 @@ const startingMenu = (function () {
         height: 50,
       };
 
-      const color = i === selectedIndex ? "#FFD43E" : c_gray;
-      const borderColor = i === selectedIndex ? "#2A2900" : c_darkGray;
+      let color = i === selectedIndex ? "#FFD43E" : c_gray;
+      let borderColor = i === selectedIndex ? "#2A2900" : c_darkGray;
       setTextAndHitboxProperties(i, color, borderColor);
     }
     ctx.restore();
@@ -223,8 +233,8 @@ const startingMenu = (function () {
   /* Handles mouse click events */
 
   function handleClick(event) {
-    const mouseX = event.clientX - canvas.getBoundingClientRect().left;
-    const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    let mouseX = event.clientX - canvas.getBoundingClientRect().left;
+    let mouseY = event.clientY - canvas.getBoundingClientRect().top;
 
     handlePlaqueClick(mouseX, mouseY);
     handleRectangleClick(mouseX, mouseY);
@@ -236,7 +246,7 @@ const startingMenu = (function () {
 
   function handleRectangleClick(mouseX, mouseY) {
     for (let i = 0; i < rectangles.length; i++) {
-      const rect = rectangles[i];
+      let rect = rectangles[i];
       if (
         mouseX >= rect.x &&
         mouseX <= rect.x + rect.width &&
@@ -257,7 +267,7 @@ const startingMenu = (function () {
   function handlePlaqueClick(mouseX, mouseY) {
     // plaque for game modes
 
-    if (!isStartingMenuActive) {
+    if (!ActiveInits.isStartingMenuActive) {
       return;
     }
     if (
@@ -274,15 +284,15 @@ const startingMenu = (function () {
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
             if (selectedIndex === 0) {
-              isCardioInitActive = true;
+              ActiveInits.isCardioActive = true;
             } else if (selectedIndex === 1) {
-              isAgilityInitActive = true;
+              ActiveInits.isAgilityActive = true;
             } else if (selectedIndex === 2) {
-              isStrengthInitActive = true;
+              ActiveInits.isStrengthActive = true;
             }
 
             currentMode.mode = selectedIndex + 1;
-            isStartingMenuActive = false;
+            ActiveInits.isStartingMenuActive = false;
             overlay.opacity = 0;
           },
         });
@@ -305,8 +315,8 @@ const startingMenu = (function () {
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
             currentMode.mode = 4;
-            isStartingMenuActive = false;
-            isGemsInitActive = true;
+            ActiveInits.isStartingMenuActive = false;
+            ActiveInits.isGemsActive = true;
             overlay.opacity = 0;
           },
         });

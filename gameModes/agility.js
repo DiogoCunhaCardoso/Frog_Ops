@@ -1,8 +1,11 @@
-const agility = (function () {
+import { ctx, W, H } from "../main.js";
+
+export let agility = (function () {
   "use strict";
 
   function init() {
     ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "white";
     drawCenteredText("Agility");
   }
 

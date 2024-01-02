@@ -1,4 +1,15 @@
-const gems = (function () {
+import {
+  ctx,
+  canvas,
+  W,
+  H,
+  scaleFactor,
+  ActiveInits,
+  currentMode,
+} from "../main.js";
+import { overlay, applyCanvasOpacity, drawPlaque } from "../utils.JS";
+
+export let gems = (function () {
   ("use strict");
 
   let hasGems = {
@@ -6,8 +17,8 @@ const gems = (function () {
     agilityGem: hasGem("agilityGem"),
     strengthGem: hasGem("strengthGem"),
   };
-  const modes = ["CARDIO", "AGILITY", "STRENGTH"];
-  const goBackPlaque = new Image();
+  let modes = ["CARDIO", "AGILITY", "STRENGTH"];
+  let goBackPlaque = new Image();
   let backPlaqueBounds = {};
 
   function init() {
@@ -39,14 +50,14 @@ const gems = (function () {
   NewGemAquired("agilityGem"); */
 
   function drawGemsAndText() {
-    const gemImages = {
+    let gemImages = {
       cardioGem: "../images/gems/gem_cardio.svg",
       agilityGem: "../images/gems/gem_agility.svg",
       strengthGem: "../images/gems/gem_strength.svg",
       inactiveGem: "../images/gems/gem_inactive.svg",
     };
 
-    const rectPosXOffsets = [-70 * scaleFactor, 0, 70 * scaleFactor];
+    let rectPosXOffsets = [-70 * scaleFactor, 0, 70 * scaleFactor];
 
     ctx.save();
 
@@ -86,10 +97,9 @@ const gems = (function () {
       // Set the fill style for the text
       ctx.fillStyle = textColor;
 
-      const gemX =
+      let gemX =
         W / 2 - (gemImage.width * scaleFactor) / 2 + rectPosXOffsets[i];
-      const gemY =
-        H / 2 - (gemImage.height * scaleFactor) / 2 - 7 * scaleFactor; // half of 14
+      let gemY = H / 2 - (gemImage.height * scaleFactor) / 2 - 7 * scaleFactor; // half of 14
 
       // Draw the gem image
       ctx.drawImage(
@@ -101,7 +111,7 @@ const gems = (function () {
       );
 
       // Draw the text under the gem
-      const textY = gemY + gemImage.height * scaleFactor + 14 * scaleFactor; // 14 = separation from image
+      let textY = gemY + gemImage.height * scaleFactor + 14 * scaleFactor; // 14 = separation from image
       ctx.fillText(modes[i], gemX + (gemImage.width / 2) * scaleFactor, textY);
     }
 
@@ -109,14 +119,14 @@ const gems = (function () {
   }
 
   function handleClick(event) {
-    const mouseX = event.clientX - canvas.getBoundingClientRect().left;
-    const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    let mouseX = event.clientX - canvas.getBoundingClientRect().left;
+    let mouseY = event.clientY - canvas.getBoundingClientRect().top;
 
     handlePlaqueClick(mouseX, mouseY);
   }
 
   function handlePlaqueClick(mouseX, mouseY) {
-    if (!isGemsInitActive) {
+    if (!ActiveInits.isGemsActive) {
       return;
     }
     if (
@@ -131,8 +141,8 @@ const gems = (function () {
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
           currentMode.mode = 0;
-          isStartingMenuActive = true;
-          isGemsInitActive = false;
+          ActiveInits.isStartingMenuActive = true;
+          ActiveInits.isGemsActive = false;
           overlay.opacity = 0;
         },
       });

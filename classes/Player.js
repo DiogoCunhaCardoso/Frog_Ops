@@ -1,6 +1,8 @@
-const gravity = 0.1;
+import { ctx, W, H } from "../main.js";
 
-class Player {
+let gravity = 0.1;
+
+export class Player {
   constructor(position) {
     this.position = position;
     this.velocity = {
@@ -17,6 +19,18 @@ class Player {
 
     this.isInAir = true;
   }
+
+  // SETTERS AND GETTERS
+
+  setIsInAir(value) {
+    this.isInAir = value;
+  }
+
+  getIsInAir() {
+    return this.isInAir;
+  }
+
+  //
 
   draw() {
     ctx.save(); // Save state
@@ -55,7 +69,7 @@ class Player {
   //
 
   rotatePlayer() {
-    const step = 1;
+    let step = 1;
     if (this.rotation < -45 || this.rotation > 45) {
       this.rotationDirection *= -1;
     }

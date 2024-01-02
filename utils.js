@@ -1,3 +1,4 @@
+import { ctx, W, H, scaleFactor } from "./main.js";
 // for functions used in multiple places
 //
 //
@@ -5,7 +6,7 @@
 /* Loads and draws the plaques images, sets the plaqueBounds to
   be used for interaction detection in other parts of the code. */
 
-function drawPlaque(image, imageSrc, position, bounds, callback) {
+export function drawPlaque(image, imageSrc, position, bounds, callback) {
   // Only set the source if it hasn't been set yet
   if (!image.src) {
     image.src = imageSrc;
@@ -37,11 +38,11 @@ function drawPlaque(image, imageSrc, position, bounds, callback) {
 /* Draws the opacity rectangle with the 
   variable to be changed later with GSAP */
 
-const overlay = {
+export let overlay = {
   opacity: 0,
 };
 
-function applyCanvasOpacity() {
+export function applyCanvasOpacity() {
   ctx.save();
   ctx.globalAlpha = overlay.opacity;
   ctx.fillStyle = "black";
@@ -55,5 +56,14 @@ function isClickWithinBounds(mouseX, mouseY, bounds) {
     mouseX <= bounds.x + bounds.width &&
     mouseY >= bounds.y &&
     mouseY <= bounds.y + bounds.height
+  );
+}
+
+function collision({ object1, object2 }) {
+  return (
+    object1.position.y + object1.height >= object2.position.y &&
+    object1.position.y <= object2.position.y + object2.height &&
+    object1.position.x <= object2.position.x + object2.width &&
+    object1.position.x + object1.width >= object2.position.x
   );
 }

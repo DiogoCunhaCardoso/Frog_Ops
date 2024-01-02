@@ -1,15 +1,23 @@
-const cardio = (function () {
-  ("use strict");
+import { ctx, canvas, H, W, ActiveInits, currentMode } from "../main.js";
+import { overlay, applyCanvasOpacity, drawPlaque } from "../utils.js";
+import { Player } from "../classes/Player.js";
+import { CollisionBlock } from "../classes/CollisionBlock.js";
 
-  const goBackPlaque = new Image();
+export let cardio = (function () {
+  ("use strict");
+  let allPlatforms = [];
+
+  let goBackPlaque = new Image();
   let backPlaqueBounds = {};
 
-  const player = new Player({
-    x: 75,
-    y: 0,
-  });
+  let player;
 
   function init() {
+    player = new Player({
+      x: 75,
+      y: 0,
+    });
+
     ctx.clearRect(0, 0, W, H);
     drawBgImage();
     drawPlaque(
@@ -23,6 +31,7 @@ const cardio = (function () {
       }
     );
     player.update();
+
     canvas.addEventListener("click", handleClick);
   }
 
@@ -43,15 +52,42 @@ const cardio = (function () {
     }
   }
 
+  function getRandomBlockX() {
+    return Math.round(
+      Math.random() * (H - CollisionBlock.height - 2 * 100) + 100
+    );
+  }
+
+  function createRandomPlatforms() {
+    createRandomPlatforms();
+    allPlatforms.push(
+      new CollisionBlock({
+        x: getRandomBlockX(),
+        y: 50,
+      })
+    );
+    setTimeout(createRandomPlatforms, 2000);
+  }
+
+  function updatePlatforms() {
+    allPlatforms.forEach((platform, i) => {
+      platform.update();
+
+      if (platform.position.y > 642 - platform.height * 2) {
+        allPlatforms.splice(i, 1);
+      }
+    });
+  }
+
   function handleClick(event) {
-    const mouseX = event.clientX - canvas.getBoundingClientRect().left;
-    const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    let mouseX = event.clientX - canvas.getBoundingClientRect().left;
+    let mouseY = event.clientY - canvas.getBoundingClientRect().top;
 
     handlePlaqueClick(mouseX, mouseY);
   }
 
   function handlePlaqueClick(mouseX, mouseY) {
-    if (!isCardioInitActive) {
+    if (!ActiveInits.isCardioActive) {
       return;
     }
     if (
@@ -66,8 +102,8 @@ const cardio = (function () {
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
           currentMode.mode = 0;
-          isStartingMenuActive = true;
-          isCardioInitActive = false;
+          ActiveInits.isStartingMenuActive = true;
+          ActiveInits.isCardioActive = false;
           overlay.opacity = 0;
         },
       });
@@ -76,12 +112,13 @@ const cardio = (function () {
 
   window.addEventListener("keydown", (e) => {
     // rotate
+
     if (e.code === "KeyR") {
       player.isRotating = !player.isRotating;
     }
 
     // jump
-    if (player.isInAir === false) {
+    if (player.getIsInAir === false) {
       switch (e.code) {
         case "Digit1":
         case "Numpad1":

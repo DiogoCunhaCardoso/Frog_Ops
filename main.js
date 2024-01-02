@@ -1,21 +1,34 @@
-const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
+import { startingMenu } from "./otherScreens/startingMenu.js";
+import { cardio } from "./gameModes/cardio.js";
+import { agility } from "./gameModes/agility.js";
+import { strength } from "./gameModes/strength.js";
+import { gems } from "./otherScreens/gems.js";
+import { portrait } from "./otherScreens/portrait.js";
 
-let H, W;
+export const canvas = document.querySelector("canvas");
+export const ctx = canvas.getContext("2d");
+
+export let H, W;
 
 /* Flags to disable or able 'pages' */
 
-let isStartingMenuActive = true;
-let isGemsInitActive = false;
-let isCardioInitActive = false;
-let isAgilityInitActive = false;
-let isStrengthInitActive = false;
+export const ActiveInits = {
+  isStartingMenuActive: true,
+  isGemsActive: false,
+  isCardioActive: false,
+  isAgilityActive: false,
+  isStrengthActive: false,
+};
+
+/* export function inverseVariable() {
+  isStartingMenuActive = !isStartingMenuActive;
+} */
 
 /* Scale factor, things are written as for 320px wide
    screen and they have times scale factor for every size */
 
 let baseWidth = 320;
-let scaleFactor = window.innerWidth / baseWidth;
+export let scaleFactor = window.innerWidth / baseWidth;
 
 /* Ensures the canvas is always
    with the correct Ratio of 16/9 */
@@ -83,32 +96,37 @@ function checkOrientation() {
   }
 }
 
-let currentMode = {
-  mode: 1, // Default
-  modes: [
+export let currentMode = {
+  mode: 0, // Default
+  modes: [],
+  run: function () {
+    this.modes[this.mode]();
+  },
+};
+
+// Dynamically set the mode functions
+function setModeFunctions() {
+  currentMode.modes = [
     startingMenu.init, // 0
     cardio.init, // 1
     agility.init, // 2
     strength.init, // 3
     gems.init, // 4
     portrait.init, // 5
-  ],
-  run: function () {
-    4;
-    this.modes[this.mode]();
-  },
+  ];
+}
+
+window.onload = function () {
+  setModeFunctions();
+  render();
+  setCanvasSize();
+  checkOrientation();
 };
 
 function render() {
   window.requestAnimationFrame(render);
   currentMode.run();
 }
-
-window.onload = function () {
-  render();
-  setCanvasSize();
-  checkOrientation();
-};
 
 const debouncedResize = debounce(() => {
   scaleFactor = window.innerWidth / baseWidth;
