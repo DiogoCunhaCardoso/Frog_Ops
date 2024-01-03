@@ -27,12 +27,12 @@ export let cardio = (function () {
     // defining player here
     players.push(
       new Player({
-        x: 0,
-        y: 75,
+        position: { x: 400, y: 75 },
+        allPlatforms,
       })
     );
 
-    players[0].position.x = 0 + players[0].width / 2;
+    /* players[0].position.x = 0 + players[0].width / 2; */
     /* player.position.y = H - player.height; */
 
     drawBgImage();

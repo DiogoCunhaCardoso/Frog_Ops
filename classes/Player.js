@@ -1,9 +1,10 @@
 import { ctx, W, H, scaleFactor } from "../main.js";
+import { collision } from "../utils.js";
 
 let gravity = 0.1;
 
 export class Player {
-  constructor(position) {
+  constructor({ position, allPlatforms }) {
     this.position = position;
     this.velocity = {
       x: 0,
@@ -18,6 +19,9 @@ export class Player {
     this.rotation = 0;
 
     this.isInAir = true;
+
+    // for collision
+    this.allPlatforms = allPlatforms;
   }
 
   draw() {
@@ -51,7 +55,10 @@ export class Player {
     if (this.isRotating) {
       this.rotatePlayer();
     }
+    this.checkForCanvasCollision();
+    this.checkForHorizontalCollisions();
     this.gravityAndHitGround();
+    this.checkForVerticalCollisions();
   }
 
   //
@@ -64,6 +71,38 @@ export class Player {
     this.rotation += step * this.rotationDirection;
   }
 
+  checkForCanvasCollision() {
+    if (this.position.x <= 0) {
+      this.position.x = W - this.width;
+    } else if (this.position.x >= W - this.width) {
+      this.position.x = 0;
+    }
+  }
+
+  checkForHorizontalCollisions() {
+    for (let i = 0; i < this.allPlatforms.length; i++) {
+      const platform = this.allPlatforms[i];
+
+      if (
+        collision({
+          object1: this,
+          object2: platform,
+        })
+      ) {
+        if (this.velocity.x > 0) {
+          this.velocity.x = 0;
+          this.position.x = platform.position.x - this.width - 0.01;
+          break;
+        }
+        if (this.velocity.x < 0) {
+          this.velocity.x = 0;
+          this.position.x = platform.position.x + platform.width + 0.01;
+          break;
+        }
+      }
+    }
+  }
+
   gravityAndHitGround() {
     this.position.y += this.velocity.y;
     if (this.position.y + this.height + this.velocity.y < H) {
@@ -74,6 +113,30 @@ export class Player {
       this.velocity.y = 0;
       this.velocity.x = 0;
       this.isInAir = false;
+    }
+  }
+
+  checkForVerticalCollisions() {
+    for (let i = 0; i < this.allPlatforms.length; i++) {
+      const platform = this.allPlatforms[i];
+
+      if (
+        collision({
+          object1: this,
+          object2: platform,
+        })
+      ) {
+        if (this.velocity.y > 0) {
+          this.velocity.y = 0;
+          this.position.y = platform.position.y - this.height - 0.01;
+          break;
+        }
+        if (this.velocity.y < 0) {
+          this.velocity.y = 0;
+          this.position.y = platform.position.y + platform.height + 0.01;
+          break;
+        }
+      }
     }
   }
 
