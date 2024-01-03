@@ -1,15 +1,35 @@
-import { ctx, W, H } from "../main.js";
+import { ctx, canvas, W, H, ActiveInits, currentMode } from "../main.js";
+import { overlay, applyCanvasOpacity, drawPlaque } from "../utils.js";
 
 export let strength = (function () {
-  "use strict";
+  ("use strict");
+
+  // for drawPlaque()
+  let goBackPlaque = new Image();
+  let backPlaqueBounds = {};
 
   function init() {
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = "white";
-    drawCenteredText("Strength");
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "black";
+    drawCenteredText("Strength Soon");
+
+    drawPlaque(
+      goBackPlaque,
+      "../images/gems/plaque_back.svg",
+      { x: 0, y: 0 },
+      backPlaqueBounds,
+      () => {
+        backPlaqueBounds.x = backPlaqueBounds.width / 2;
+        backPlaqueBounds.y = 0;
+      }
+    );
+    canvas.addEventListener("click", handleClick);
   }
 
   function drawCenteredText(text) {
+    ctx.save();
     ctx.font = "30px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -18,6 +38,38 @@ export let strength = (function () {
     let centerY = H / 2;
 
     ctx.fillText(text, centerX, centerY);
+    ctx.restore();
+  }
+
+  function handleClick(event) {
+    let mouseX = event.clientX - canvas.getBoundingClientRect().left;
+    let mouseY = event.clientY - canvas.getBoundingClientRect().top;
+
+    handlePlaqueClick(mouseX, mouseY);
+  }
+
+  function handlePlaqueClick(mouseX, mouseY) {
+    if (!ActiveInits.isStrengthActive) {
+      return;
+    }
+    if (
+      mouseX >= backPlaqueBounds.x &&
+      mouseX <= backPlaqueBounds.x + backPlaqueBounds.width &&
+      mouseY >= backPlaqueBounds.y &&
+      mouseY <= backPlaqueBounds.y + backPlaqueBounds.height
+    ) {
+      gsap.to(overlay, {
+        opacity: 1,
+        duration: 1, // duration of the fade in seconds
+        onUpdate: applyCanvasOpacity,
+        onComplete: () => {
+          currentMode.mode = 0;
+          ActiveInits.isStartingMenuActive = true;
+          ActiveInits.isStrengthActive = false;
+          overlay.opacity = 0;
+        },
+      });
+    }
   }
 
   return {

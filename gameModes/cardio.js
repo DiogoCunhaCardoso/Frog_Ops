@@ -1,24 +1,40 @@
-import { ctx, canvas, H, W, ActiveInits, currentMode } from "../main.js";
+import { ctx, canvas, W, H, ActiveInits, currentMode } from "../main.js";
 import { overlay, applyCanvasOpacity, drawPlaque } from "../utils.js";
 import { Player } from "../classes/Player.js";
 import { CollisionBlock } from "../classes/CollisionBlock.js";
 
 export let cardio = (function () {
   ("use strict");
-  let allPlatforms = [];
 
+  // for player.update()
+  let players = [];
+
+  // for createRandomPlatforms()
+  let allPlatforms = [];
+  let lastPlatformCreationTime = Date.now();
+  const PLATFORM_CREATION_INTERVAL = 2000;
+
+  // for drawPlaque()
   let goBackPlaque = new Image();
   let backPlaqueBounds = {};
 
-  let player;
+  // for drawBgImage()
+  let isBgLoaded = false;
+  let backgroundImage = null;
 
   function init() {
-    player = new Player({
-      x: 75,
-      y: 0,
-    });
-
     ctx.clearRect(0, 0, W, H);
+    // defining player here
+    players.push(
+      new Player({
+        x: 0,
+        y: 75,
+      })
+    );
+
+    players[0].position.x = 0 + players[0].width / 2;
+    /* player.position.y = H - player.height; */
+
     drawBgImage();
     drawPlaque(
       goBackPlaque,
@@ -30,14 +46,47 @@ export let cardio = (function () {
         backPlaqueBounds.y = 0;
       }
     );
-    player.update();
+    // player
+    players[0].update();
+    // platforms
+    createRandomPlatforms();
+    updatePlatforms();
 
     canvas.addEventListener("click", handleClick);
   }
 
-  // BACKGROUND
-  let isBgLoaded = false;
-  let backgroundImage = null;
+  function getRandomBlockX() {
+    let block = new CollisionBlock({ x: 0, y: 0 });
+    return (
+      Math.round(Math.random() * (W - block.width - block.width * 2)) +
+      block.width
+    );
+  }
+
+  function createRandomPlatforms() {
+    let block = new CollisionBlock({ x: 0, y: 0 });
+    const currentTime = Date.now();
+    if (currentTime - lastPlatformCreationTime > PLATFORM_CREATION_INTERVAL) {
+      allPlatforms.push(
+        new CollisionBlock({
+          x: getRandomBlockX(),
+          y: 0 - block.height,
+        })
+      );
+      lastPlatformCreationTime = currentTime;
+    }
+  }
+
+  function updatePlatforms() {
+    allPlatforms.forEach((platform, i) => {
+      platform.update();
+
+      if (platform.position.y > H) {
+        allPlatforms.splice(i, 1);
+      }
+    });
+  }
+
   function drawBgImage() {
     if (!isBgLoaded) {
       backgroundImage = new Image();
@@ -50,33 +99,6 @@ export let cardio = (function () {
     } else {
       ctx.drawImage(backgroundImage, 0, 0, W, H);
     }
-  }
-
-  function getRandomBlockX() {
-    return Math.round(
-      Math.random() * (H - CollisionBlock.height - 2 * 100) + 100
-    );
-  }
-
-  function createRandomPlatforms() {
-    createRandomPlatforms();
-    allPlatforms.push(
-      new CollisionBlock({
-        x: getRandomBlockX(),
-        y: 50,
-      })
-    );
-    setTimeout(createRandomPlatforms, 2000);
-  }
-
-  function updatePlatforms() {
-    allPlatforms.forEach((platform, i) => {
-      platform.update();
-
-      if (platform.position.y > 642 - platform.height * 2) {
-        allPlatforms.splice(i, 1);
-      }
-    });
   }
 
   function handleClick(event) {
@@ -114,51 +136,51 @@ export let cardio = (function () {
     // rotate
 
     if (e.code === "KeyR") {
-      player.isRotating = !player.isRotating;
+      players[0].isRotating = !players[0].isRotating;
     }
 
     // jump
-    if (player.getIsInAir === false) {
+    if (players[0].isInAir === false) {
       switch (e.code) {
         case "Digit1":
         case "Numpad1":
-          player.jump(-3);
+          players[0].jump(-3);
           break;
         case "Digit2":
         case "Numpad2":
-          player.jump(-5);
+          players[0].jump(-5);
           break;
         case "Digit3":
         case "Numpad3":
-          player.jump(-6);
+          players[0].jump(-6);
           break;
         case "Digit4":
         case "Numpad4":
-          player.jump(-7);
+          players[0].jump(-7);
           break;
         case "Digit5":
         case "Numpad5":
-          player.jump(-9);
+          players[0].jump(-9);
           break;
         case "Digit6":
         case "Numpad6":
-          player.jump(-10);
+          players[0].jump(-10);
           break;
         case "Digit7":
         case "Numpad7":
-          player.jump(-11);
+          players[0].jump(-11);
           break;
         case "Digit8":
         case "Numpad8":
-          player.jump(-12);
+          players[0].jump(-12);
           break;
         case "Digit9":
         case "Numpad9":
-          player.jump(-13);
+          players[0].jump(-13);
           break;
         case "Digit0":
         case "Numpad0":
-          player.jump(-14);
+          players[0].jump(-14);
           break;
       }
     }

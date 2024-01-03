@@ -142,6 +142,7 @@ export let startingMenu = (function () {
    using shadow effects for the look */
 
   function drawGameName() {
+    ctx.save();
     let shadowOffsets = [
       { x: 4, y: 4 },
       { x: -3, y: 4 },

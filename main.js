@@ -118,9 +118,9 @@ function setModeFunctions() {
 
 window.onload = function () {
   setModeFunctions();
-  render();
   setCanvasSize();
   checkOrientation();
+  render();
 };
 
 function render() {

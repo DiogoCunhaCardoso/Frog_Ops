@@ -1,4 +1,4 @@
-import { ctx, W, H } from "../main.js";
+import { ctx, W, H, scaleFactor } from "../main.js";
 
 let gravity = 0.1;
 
@@ -9,8 +9,8 @@ export class Player {
       x: 0,
       y: 1,
     };
-    this.height = 50;
-    this.width = 50;
+    this.height = 30 * scaleFactor;
+    this.width = 25 * scaleFactor;
 
     // rotating
     this.isRotating = false;
@@ -19,18 +19,6 @@ export class Player {
 
     this.isInAir = true;
   }
-
-  // SETTERS AND GETTERS
-
-  setIsInAir(value) {
-    this.isInAir = value;
-  }
-
-  getIsInAir() {
-    return this.isInAir;
-  }
-
-  //
 
   draw() {
     ctx.save(); // Save state
@@ -50,7 +38,7 @@ export class Player {
     this.position.x += this.velocity.x;
 
     // Draw the rectangle around the new origin
-    ctx.fillStyle = "red";
+    ctx.fillStyle = "purple";
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
 
     ctx.restore(); // Restore original state

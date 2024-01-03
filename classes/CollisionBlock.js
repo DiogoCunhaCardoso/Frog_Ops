@@ -1,4 +1,4 @@
-import { ctx } from "../main.js";
+import { ctx, scaleFactor } from "../main.js";
 
 export class CollisionBlock {
   constructor(position) {
@@ -6,8 +6,8 @@ export class CollisionBlock {
     this.velocity = {
       y: 1,
     };
-    this.height = 50;
-    this.width = 150;
+    this.height = 16 * scaleFactor;
+    this.width = 44 * scaleFactor;
   }
 
   draw() {
