@@ -4,14 +4,14 @@ export class CollisionBlock {
   constructor(position) {
     this.position = position;
     this.velocity = {
-      y: 1,
+      y: 0.15 * scaleFactor,
     };
     this.height = 16 * scaleFactor;
     this.width = 44 * scaleFactor;
   }
 
   draw() {
-    ctx.fillStyle = "red";
+    ctx.fillStyle = "white";
     ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 

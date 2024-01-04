@@ -97,7 +97,7 @@ function checkOrientation() {
 }
 
 export let currentMode = {
-  mode: 1, // Default
+  mode: 0, // Default
   modes: [],
   run: function () {
     this.modes[this.mode]();

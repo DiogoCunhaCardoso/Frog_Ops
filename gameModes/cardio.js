@@ -1,4 +1,12 @@
-import { ctx, canvas, W, H, ActiveInits, currentMode } from "../main.js";
+import {
+  ctx,
+  canvas,
+  W,
+  H,
+  ActiveInits,
+  currentMode,
+  scaleFactor,
+} from "../main.js";
 import { overlay, applyCanvasOpacity, drawPlaque } from "../utils.js";
 import { Player } from "../classes/Player.js";
 import { CollisionBlock } from "../classes/CollisionBlock.js";
@@ -12,7 +20,7 @@ export let cardio = (function () {
   // for createRandomPlatforms()
   let allPlatforms = [];
   let lastPlatformCreationTime = Date.now();
-  const PLATFORM_CREATION_INTERVAL = 2000;
+  const PLATFORM_CREATION_INTERVAL = 1500;
 
   // for drawPlaque()
   let goBackPlaque = new Image();
@@ -25,15 +33,16 @@ export let cardio = (function () {
   function init() {
     ctx.clearRect(0, 0, W, H);
     // defining player here
+    let player = new Player({ x: 0, y: 0 });
     players.push(
       new Player({
-        position: { x: 400, y: 75 },
+        position: {
+          x: 24 * scaleFactor - player.width / 2,
+          y: 0 + player.height,
+        },
         allPlatforms,
       })
     );
-
-    /* players[0].position.x = 0 + players[0].width / 2; */
-    /* player.position.y = H - player.height; */
 
     drawBgImage();
     drawPlaque(
@@ -51,9 +60,83 @@ export let cardio = (function () {
     // platforms
     createRandomPlatforms();
     updatePlatforms();
+    renderUI();
 
     canvas.addEventListener("click", handleClick);
   }
+
+  // U.I.
+  let movingRectWidth = 45 / 2;
+  let directionInc = -0.25;
+
+  function renderUI() {
+    ctx.save();
+    ctx.fillStyle = "#2A2900";
+    const FontSize = 7 * scaleFactor;
+    ctx.font = `${FontSize}px RetroGaming`;
+    ctx.textAlign = "right";
+
+    //
+    const padding = 8 * scaleFactor;
+    const rectWidth = 45 * scaleFactor;
+    const rectHeight = 6 * scaleFactor;
+
+    // Calculate and draw Score
+    const scoreText = "SCORE " + players[0].score;
+    const scoreTextWidth = ctx.measureText(scoreText).width;
+    ctx.fillText(
+      scoreText,
+      W - padding * 2,
+      padding + rectHeight / 2 + FontSize
+    );
+
+    const rectangleXPosition = W - padding * 3 - scoreTextWidth - rectWidth;
+    const rectangleyPosition = padding + FontSize / 2 + 1 * scaleFactor;
+
+    // Draw lightColor Rect
+    ctx.fillStyle = "#FFF8E0";
+    ctx.fillRect(rectangleXPosition, rectangleyPosition, rectWidth, rectHeight);
+
+    // Draw Moving Rectangle
+    ctx.fillStyle = "#FFD43E";
+    ctx.fillRect(
+      rectangleXPosition,
+      rectangleyPosition,
+      movingRectWidth * scaleFactor,
+      rectHeight
+    );
+
+    // Draw border of rectangle
+    ctx.strokeStyle = "#2A2900";
+    ctx.lineWidth = 1 * scaleFactor;
+    ctx.strokeRect(
+      rectangleXPosition,
+      rectangleyPosition,
+      rectWidth,
+      rectHeight
+    );
+
+    // Calculate and draw Rotation
+    ctx.fillStyle = "#2A2900";
+    const rotationText = "ROT. " + Math.round(players[0].rotation);
+    ctx.fillText(
+      rotationText,
+      W - scoreTextWidth - rectWidth - padding * 3 - padding / 2, // x
+      padding + rectHeight / 2 + FontSize // y
+    );
+
+    if (players[0].isRotating) {
+      movingRectWidth += directionInc;
+
+      // Reverse the change direction at limits
+      if (movingRectWidth <= 0 || movingRectWidth >= 45) {
+        directionInc *= -1;
+      }
+    }
+    ctx.restore();
+  }
+
+  //
 
   function getRandomBlockX() {
     let block = new CollisionBlock({ x: 0, y: 0 });
@@ -137,6 +220,11 @@ export let cardio = (function () {
 
     if (e.code === "KeyR") {
       players[0].isRotating = !players[0].isRotating;
+      if (!players[0].isRotating) {
+        players[0].rotation = 0;
+        players[0].rotationDirection = -1;
+        movingRectWidth = 45 / 2;
+      }
     }
 
     // jump

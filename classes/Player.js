@@ -15,13 +15,16 @@ export class Player {
 
     // rotating
     this.isRotating = false;
-    this.rotationDirection = 1;
+    this.rotationDirection = -1;
     this.rotation = 0;
 
     this.isInAir = true;
 
     // for collision
     this.allPlatforms = allPlatforms;
+
+    // for points
+    this.score = 0;
   }
 
   draw() {
@@ -46,8 +49,6 @@ export class Player {
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
 
     ctx.restore(); // Restore original state
-    ctx.font = "48px serif";
-    ctx.fillText(`${this.rotation}`, W - 100, 50);
   }
 
   update() {
@@ -64,7 +65,7 @@ export class Player {
   //
 
   rotatePlayer() {
-    let step = 1;
+    let step = 0.5;
     if (this.rotation < -45 || this.rotation > 45) {
       this.rotationDirection *= -1;
     }
@@ -105,7 +106,7 @@ export class Player {
 
   gravityAndHitGround() {
     this.position.y += this.velocity.y;
-    if (this.position.y + this.height + this.velocity.y < H) {
+    if (this.position.y + this.height + this.velocity.y < H - 6 * scaleFactor) {
       this.velocity.y += gravity;
       this.isInAir = true;
       this.rotation = 0; // reset rotation after jump
@@ -128,7 +129,9 @@ export class Player {
       ) {
         if (this.velocity.y > 0) {
           this.velocity.y = 0;
+          this.velocity.x = 0;
           this.position.y = platform.position.y - this.height - 0.01;
+          this.score++;
           break;
         }
         if (this.velocity.y < 0) {
