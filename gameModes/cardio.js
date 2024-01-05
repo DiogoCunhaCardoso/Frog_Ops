@@ -140,22 +140,31 @@ export let cardio = (function () {
 
   function getRandomBlockX() {
     let block = new CollisionBlock({ x: 0, y: 0 });
-    return (
-      Math.round(Math.random() * (W - block.width - block.width * 2)) +
-      block.width
-    );
+    let xRange =
+      Math.random() * (W - block.width - block.width * 2) + block.width;
+    return Math.round(xRange);
   }
 
   function createRandomPlatforms() {
     let block = new CollisionBlock({ x: 0, y: 0 });
     const currentTime = Date.now();
+
     if (currentTime - lastPlatformCreationTime > PLATFORM_CREATION_INTERVAL) {
-      allPlatforms.push(
-        new CollisionBlock({
-          x: getRandomBlockX(),
-          y: 0 - block.height,
-        })
-      );
+      let newX;
+
+      if (allPlatforms.length > 0) {
+        let lastPlatform = allPlatforms[allPlatforms.length - 1];
+        let minRange = lastPlatform.position.x - block.width;
+        let maxRange = lastPlatform.position.x + block.width;
+
+        do {
+          newX = getRandomBlockX();
+        } while (newX >= minRange && newX <= maxRange);
+      } else {
+        newX = getRandomBlockX(); // For the first platform
+      }
+
+      allPlatforms.push(new CollisionBlock({ x: newX, y: 0 - block.height }));
       lastPlatformCreationTime = currentTime;
     }
   }
@@ -215,20 +224,31 @@ export let cardio = (function () {
     }
   }
 
+  /* Used to change rectSize from Player.js page */
+  function setMovingRectWidthToHalf() {
+    movingRectWidth = 45 / 2;
+  }
+
+  function resetRotation() {
+    players[0].rotation = 0;
+    players[0].rotationDirection = -1;
+    movingRectWidth = 45 / 2;
+  }
+
   window.addEventListener("keydown", (e) => {
     // rotate
 
     if (e.code === "KeyR") {
       players[0].isRotating = !players[0].isRotating;
+
+      // reset position when stopping to rotate
       if (!players[0].isRotating) {
-        players[0].rotation = 0;
-        players[0].rotationDirection = -1;
-        movingRectWidth = 45 / 2;
+        resetRotation();
       }
     }
 
     // jump
-    if (players[0].isInAir === false) {
+    if (players[0]?.isInAir === false) {
       switch (e.code) {
         case "Digit1":
         case "Numpad1":
@@ -276,5 +296,6 @@ export let cardio = (function () {
 
   return {
     init: init,
+    setMovingRectWidthToHalf: setMovingRectWidthToHalf,
   };
 })();

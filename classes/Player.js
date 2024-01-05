@@ -1,5 +1,6 @@
 import { ctx, W, H, scaleFactor } from "../main.js";
 import { collision } from "../utils.js";
+import { cardio } from "../gameModes/cardio.js";
 
 let gravity = 0.1;
 
@@ -25,6 +26,7 @@ export class Player {
 
     // for points
     this.score = 0;
+    this.hasScored = false;
   }
 
   draw() {
@@ -56,7 +58,7 @@ export class Player {
     if (this.isRotating) {
       this.rotatePlayer();
     }
-    this.checkForCanvasCollision();
+    this.screenWrapAroundCanvas();
     this.checkForHorizontalCollisions();
     this.gravityAndHitGround();
     this.checkForVerticalCollisions();
@@ -72,7 +74,10 @@ export class Player {
     this.rotation += step * this.rotationDirection;
   }
 
-  checkForCanvasCollision() {
+  /* Enables an object to reappear on the opposite
+  side of the canvas when it moves off one side. */
+
+  screenWrapAroundCanvas() {
     if (this.position.x <= 0) {
       this.position.x = W - this.width;
     } else if (this.position.x >= W - this.width) {
@@ -80,7 +85,13 @@ export class Player {
     }
   }
 
+  /* Checks for horizontal collisions between the player and each platform.
+   - On leftward collision: stops leftward motion, positions player to the right of the platform.
+   - On rightward collision: stops rightward motion, positions player to the left of the platform. */
+
   checkForHorizontalCollisions() {
+    const bounceBack = 1 * scaleFactor;
+
     for (let i = 0; i < this.allPlatforms.length; i++) {
       const platform = this.allPlatforms[i];
 
@@ -91,13 +102,15 @@ export class Player {
         })
       ) {
         if (this.velocity.x > 0) {
+          // hit left
           this.velocity.x = 0;
-          this.position.x = platform.position.x - this.width - 0.01;
+          this.position.x = platform.position.x - this.width - bounceBack;
           break;
         }
         if (this.velocity.x < 0) {
+          // hit right
           this.velocity.x = 0;
-          this.position.x = platform.position.x + platform.width + 0.01;
+          this.position.x = platform.position.x + platform.width + bounceBack;
           break;
         }
       }
@@ -108,14 +121,17 @@ export class Player {
     this.position.y += this.velocity.y;
     if (this.position.y + this.height + this.velocity.y < H - 6 * scaleFactor) {
       this.velocity.y += gravity;
-      this.isInAir = true;
-      this.rotation = 0; // reset rotation after jump
     } else {
+      // hit ground
+      this.isInAir = false;
       this.velocity.y = 0;
       this.velocity.x = 0;
-      this.isInAir = false;
     }
   }
+
+  /* Checks for vertical collisions between the player and each platform.
+   - On top collision: stops downward and horizontal motion, places player on platform & increments score.
+   - On bottom collision: stops upward motion, positions player below the platform so he can go back down. */
 
   checkForVerticalCollisions() {
     for (let i = 0; i < this.allPlatforms.length; i++) {
@@ -128,15 +144,24 @@ export class Player {
         })
       ) {
         if (this.velocity.y > 0) {
+          // hit top
+          this.isInAir = false;
           this.velocity.y = 0;
           this.velocity.x = 0;
-          this.position.y = platform.position.y - this.height - 0.01;
-          this.score++;
+          this.position.y =
+            platform.position.y - this.height - 0.01 * scaleFactor;
+          if (!this.hasScored) {
+            // Increment score only if not already landed
+            this.score++;
+            this.hasScored = true; // Set the flag to true
+          }
           break;
         }
         if (this.velocity.y < 0) {
+          // hit bottom
           this.velocity.y = 0;
-          this.position.y = platform.position.y + platform.height + 0.01;
+          this.position.y =
+            platform.position.y + platform.height + 1 * scaleFactor; // avoid overlapping
           break;
         }
       }
@@ -144,9 +169,12 @@ export class Player {
   }
 
   jump(speed) {
+    this.hasScored = false; // used for scoring
     this.isRotating = false;
     this.isInAir = true;
-    this.velocity.y = speed;
+    this.velocity.y = speed; /* scaleFactor */
     this.velocity.x = this.rotation / 10; // divide so it moves slower
+    this.rotation = 0;
+    cardio.setMovingRectWidthToHalf();
   }
 }
