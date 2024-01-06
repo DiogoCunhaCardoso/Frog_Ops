@@ -4,6 +4,7 @@ import { agility } from "./gameModes/agility.js";
 import { strength } from "./gameModes/strength.js";
 import { gems } from "./otherScreens/gems.js";
 import { portrait } from "./otherScreens/portrait.js";
+/* import { restart } from "./otherScreens/restart.js"; */
 
 export const canvas = document.querySelector("canvas");
 export const ctx = canvas.getContext("2d");
@@ -97,7 +98,7 @@ function checkOrientation() {
 }
 
 export let currentMode = {
-  mode: 0, // Default
+  mode: 1, // Default
   modes: [],
   run: function () {
     this.modes[this.mode]();
@@ -113,6 +114,7 @@ function setModeFunctions() {
     strength.init, // 3
     gems.init, // 4
     portrait.init, // 5
+    /* restart.init, // 6 */
   ];
 }
 

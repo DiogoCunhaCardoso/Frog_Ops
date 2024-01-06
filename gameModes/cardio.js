@@ -22,6 +22,11 @@ export let cardio = (function () {
   let lastPlatformCreationTime = Date.now();
   const PLATFORM_CREATION_INTERVAL = 1500;
 
+  //for createRandomBirds()
+  let allBirds = [];
+  let lastBirdCreationTime = Date.now();
+  const BIRD_CREATION_INTERVAL = 3000;
+
   // for drawPlaque()
   let goBackPlaque = new Image();
   let backPlaqueBounds = {};
@@ -41,6 +46,7 @@ export let cardio = (function () {
           y: 0 + player.height,
         },
         allPlatforms,
+        allBirds,
       })
     );
 
@@ -60,7 +66,12 @@ export let cardio = (function () {
     // platforms
     createRandomPlatforms();
     updatePlatforms();
+    // birds
+    createRandomBirds();
+    updateBirds();
     renderUI();
+
+    // console.log(allPlatforms.map((platform) => platform.id));
 
     canvas.addEventListener("click", handleClick);
   }
@@ -136,7 +147,7 @@ export let cardio = (function () {
     ctx.restore();
   }
 
-  //
+  // FOR PLATFORMS
 
   function getRandomBlockX() {
     let block = new CollisionBlock({ x: 0, y: 0 });
@@ -164,7 +175,12 @@ export let cardio = (function () {
         newX = getRandomBlockX(); // For the first platform
       }
 
-      allPlatforms.push(new CollisionBlock({ x: newX, y: 0 - block.height }));
+      allPlatforms.push(
+        new CollisionBlock(
+          { position: { x: newX, y: 0 - block.height } },
+          "platform"
+        )
+      );
       lastPlatformCreationTime = currentTime;
     }
   }
@@ -178,6 +194,55 @@ export let cardio = (function () {
       }
     });
   }
+
+  // FOR BIRDS
+
+  function getRandomBirdY() {
+    let bird = new CollisionBlock({ x: 0, y: 0 });
+    let yRange =
+      Math.random() * (H - bird.height - bird.height * 2) + bird.height;
+    return Math.round(yRange);
+  }
+
+  function createRandomBirds() {
+    let bird = new CollisionBlock({ x: 0, y: 0 });
+    const currentTime = Date.now();
+
+    if (currentTime - lastBirdCreationTime > BIRD_CREATION_INTERVAL) {
+      let newY;
+
+      if (allBirds.length > 0) {
+        let lastBird = allBirds[allBirds.length - 1];
+        let minRange = lastBird.position.y - lastBird.height;
+        let maxRange = lastBird.position.y + lastBird.height;
+
+        do {
+          newY = getRandomBirdY();
+        } while (newY >= minRange && newY <= maxRange);
+      } else {
+        newY = getRandomBirdY(); // For the first bird
+      }
+
+      allBirds.push(
+        new CollisionBlock({ position: { x: 0 - bird.width, y: newY } }, "bird")
+      );
+      lastBirdCreationTime = currentTime;
+    }
+  }
+
+  function updateBirds() {
+    allBirds.forEach((bird, i) => {
+      bird.update();
+
+      if (bird.position.x > W) {
+        allBirds.splice(i, 1);
+      }
+    });
+  }
+
+  //
+  //
+  //
 
   function drawBgImage() {
     if (!isBgLoaded) {

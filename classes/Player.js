@@ -5,7 +5,7 @@ import { cardio } from "../gameModes/cardio.js";
 let gravity = 0.1;
 
 export class Player {
-  constructor({ position, allPlatforms }) {
+  constructor({ position, allPlatforms, allBirds }) {
     this.position = position;
     this.velocity = {
       x: 0,
@@ -22,7 +22,8 @@ export class Player {
     this.isInAir = true;
 
     // for collision
-    this.allPlatforms = allPlatforms;
+    this.allPlatforms = allPlatforms; // platforms
+    this.allBirds = allBirds; // birds
 
     // for points
     this.score = 0;
@@ -59,9 +60,10 @@ export class Player {
       this.rotatePlayer();
     }
     this.screenWrapAroundCanvas();
-    this.checkForHorizontalCollisions();
+    this.checkForHorizontalPlatformCollisions();
     this.gravityAndHitGround();
-    this.checkForVerticalCollisions();
+    this.checkForBirdCollisions();
+    this.checkForVerticalPlatformCollisions();
   }
 
   //
@@ -89,7 +91,7 @@ export class Player {
    - On leftward collision: stops leftward motion, positions player to the right of the platform.
    - On rightward collision: stops rightward motion, positions player to the left of the platform. */
 
-  checkForHorizontalCollisions() {
+  checkForHorizontalPlatformCollisions() {
     const bounceBack = 1 * scaleFactor;
 
     for (let i = 0; i < this.allPlatforms.length; i++) {
@@ -133,7 +135,7 @@ export class Player {
    - On top collision: stops downward and horizontal motion, places player on platform & increments score.
    - On bottom collision: stops upward motion, positions player below the platform so he can go back down. */
 
-  checkForVerticalCollisions() {
+  checkForVerticalPlatformCollisions() {
     for (let i = 0; i < this.allPlatforms.length; i++) {
       const platform = this.allPlatforms[i];
 
@@ -164,6 +166,21 @@ export class Player {
             platform.position.y + platform.height + 1 * scaleFactor; // avoid overlapping
           break;
         }
+      }
+    }
+  }
+
+  checkForBirdCollisions() {
+    for (let i = 0; i < this.allBirds.length; i++) {
+      const bird = this.allBirds[i];
+
+      if (
+        collision({
+          object1: this,
+          object2: bird,
+        })
+      ) {
+        console.log("colidiu");
       }
     }
   }
