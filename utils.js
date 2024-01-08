@@ -50,7 +50,7 @@ export function applyCanvasOpacity() {
   ctx.restore();
 }
 
-function isClickWithinBounds(mouseX, mouseY, bounds) {
+export function isClickWithinBounds(mouseX, mouseY, bounds) {
   return (
     mouseX >= bounds.x &&
     mouseX <= bounds.x + bounds.width &&

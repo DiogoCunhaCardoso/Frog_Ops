@@ -1,4 +1,5 @@
 import { ctx, W, H, scaleFactor } from "../main.js";
+import { colors } from "../style.js";
 
 export let portrait = (function () {
   ("use strict");
@@ -6,7 +7,7 @@ export let portrait = (function () {
   let spaceBetween = 12;
 
   function init() {
-    ctx.fillStyle = "#EDEDED";
+    ctx.fillStyle = colors.bg_light;
     ctx.fillRect(0, 0, W, H);
     drawImage();
     drawText();
@@ -29,7 +30,7 @@ export let portrait = (function () {
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "#5F5F5F";
+      ctx.fillStyle = colors.brown;
 
       // Center the text horizontally and vertically
       let x = W / 2;

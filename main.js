@@ -86,7 +86,10 @@ function debounce(func, timeout = 200) {
 let storedMode; // store mode before changing
 
 function checkOrientation() {
-  if (window.innerWidth < window.innerHeight && currentMode.mode !== 5) {
+  if (
+    window.innerWidth < window.innerHeight &&
+    currentMode.mode !== Modes.PORTRAIT
+  ) {
     storedMode = currentMode.mode; // Store current mode only when not already in portrait mode
 
     currentMode.mode = 5;
@@ -98,8 +101,18 @@ function checkOrientation() {
   }
 }
 
+export const Modes = {
+  STARTING_MENU: 0,
+  CARDIO: 1,
+  AGILITY: 2,
+  STRENGTH: 3,
+  GEMS: 4,
+  PORTRAIT: 5,
+  RESTART: 6,
+};
+
 export let currentMode = {
-  mode: 0, // Default
+  mode: Modes.STARTING_MENU, // Default
   modes: [],
   run: function () {
     this.modes[this.mode]();
@@ -109,13 +122,13 @@ export let currentMode = {
 // Dynamically set the mode functions
 function setModeFunctions() {
   currentMode.modes = [
-    startingMenu.init, // 0
-    cardio.init, // 1
-    agility.init, // 2
-    strength.init, // 3
-    gems.init, // 4
-    portrait.init, // 5
-    restart.init, // 6
+    startingMenu.init,
+    cardio.init,
+    agility.init,
+    strength.init,
+    gems.init,
+    portrait.init,
+    restart.init,
   ];
 }
 

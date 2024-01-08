@@ -6,19 +6,26 @@ import {
   canvas,
   ActiveInits,
   currentMode,
+  Modes,
 } from "../main.js";
-import { drawPlaque, overlay, applyCanvasOpacity } from "../utils.js";
+import {
+  drawPlaque,
+  overlay,
+  applyCanvasOpacity,
+  isClickWithinBounds,
+} from "../utils.js";
+import { colors, texts } from "../style.js";
+
 export let startingMenu = (function () {
   ("use strict");
-  /*
-   * Global Variables
-   */
 
-  let options = ["CARDIO", "AGILITY", "STRENGTH"];
-  let selectedIndex = 0; // none selected
+  /* 
+  Global Variables
+  */
+
+  const options = ["CARDIO", "AGILITY", "STRENGTH"];
+  let selectedIndex = 0;
   let rectangles = []; // to interact with
-  let c_gray = "#C9C9C9";
-  let c_darkGray = "#939393";
 
   // PLAQUES
   let gemsPlaqueImage = new Image();
@@ -30,20 +37,25 @@ export let startingMenu = (function () {
   let isBgLoaded = false;
   let backgroundImage = null;
 
+  let sprite = {
+    image: new Image(),
+    size: 32,
+    currentFrame: 0,
+    frameCount: 0,
+  };
+
   /* Initializes other functions
   all in one place to be called as 'init' */
 
   function init() {
     //Clear canvas after each frame
     ctx.clearRect(0, 0, W, H);
-
     //Draw background Image
     drawBgImage();
-
     //
     if (isBgLoaded == true) {
       drawGameName();
-      drawOptions(); // not working
+      drawOptions();
       drawPlaque(
         gemsPlaqueImage,
         "../images/startingMenu/plaqueGems.svg",
@@ -53,7 +65,6 @@ export let startingMenu = (function () {
           gemsPlaqueBounds.y = H - gemsPlaqueBounds.height - 10 * scaleFactor;
         }
       );
-
       drawPlaque(
         plaqueImage,
         "../images/startingMenu/plaque.svg",
@@ -71,15 +82,9 @@ export let startingMenu = (function () {
     canvas.addEventListener("click", handleClick);
   }
 
-  /* Animates the sprite by drawing frames in a sequence.
-  Gives num of frames & speed of frames as params */
-
-  let sprite = {
-    image: new Image(),
-    size: 32,
-    currentFrame: 0,
-    frameCount: 0,
-  };
+  /* Animates the sprite by cycling through frames. The function draws a portion 
+   of the sprite image corresponding to the current frame, then advances 
+   the frame index at a rate controlled by 'staggerFrames'. */
 
   function spriteAnimation(lastFrame, staggerFrames) {
     ctx.drawImage(
@@ -121,8 +126,8 @@ export let startingMenu = (function () {
     }
   }
 
-  /* Ensures the image is completely loaded to be drawn only after 
-  and uses a flag to let other functions know */
+  /* Draws the background image. Loads the image if not already loaded, 
+   and sets a flag once the image is available for rendering. */
 
   function drawBgImage() {
     if (!isBgLoaded) {
@@ -143,91 +148,98 @@ export let startingMenu = (function () {
 
   function drawGameName() {
     ctx.save();
-    let shadowOffsets = [
-      { x: 4, y: 4 },
-      { x: -3, y: 4 },
-      { x: -3, y: -3 },
-      { x: 4, y: -3 },
-    ];
-
-    ctx.save();
-
-    // Common Styles
-    ctx.font = `${32}px RetroGaming`; // CHECK
-    ctx.lineWidth = 32;
-    ctx.fillStyle = "#4683DF"; // Text color
-    ctx.strokeStyle = "#DCEAFF"; // Border color
-    ctx.shadowColor = "#DCEAFF"; // Shadow color
-
-    // Draw "FROG"
-    shadowOffsets.forEach((offset) => {
-      ctx.shadowOffsetX = offset.x;
-      ctx.shadowOffsetY = offset.y;
-      ctx.fillText("FROG", 40, 60 + scaleFactor);
-    });
-
-    // Draw "OPS"
-    shadowOffsets.forEach((offset) => {
-      ctx.shadowOffsetX = offset.x;
-      ctx.shadowOffsetY = offset.y;
-      ctx.fillText("OPS", 40, 120 + scaleFactor);
-    });
-
+    // Styles
+    let fontSize = texts.logoStyle.fontSize * scaleFactor;
+    texts.logoStyle.applyStyle(ctx, scaleFactor);
+    const marginX = 10 * scaleFactor;
+    const marginY = 8 * scaleFactor;
+    const lineHeight = 4 * scaleFactor;
+    // Draw text
+    ctx.strokeText("FROG", marginX, marginY + fontSize);
+    ctx.fillText("FROG", marginX, marginY + fontSize);
+    ctx.strokeText("OPS", marginX, marginY + fontSize * 2 + lineHeight);
+    ctx.fillText("OPS", marginX, marginY + fontSize * 2 + lineHeight);
+    //
     ctx.restore();
   }
 
-  /* Draws the text and its corresponding 
-   invisible hitbox for menu options. */
+  /* Draws the text on center of its invisible hitbox 
+   for menu options and applies styles based on selection. */
 
-  function setTextAndHitboxProperties(index, color, borderColor) {
+  function setTextAndHitboxProperties(index) {
+    ctx.save();
     let rect = rectangles[index];
     let text = options[index];
 
-    ctx.save();
+    // Apply styles based on selection
+    let isSelected = index === selectedIndex;
+    texts.menuOptionStyle.applyStyle(ctx, scaleFactor, isSelected);
 
-    // Disable properties on rectangle & draw it
-    ctx.shadowColor = "transparent";
-    ctx.fillStyle = "transparent";
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
-    // Text style settings
-    ctx.fillStyle = index === selectedIndex ? color : c_gray;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    // Enable shadow for text
-    ctx.shadowColor = index === selectedIndex ? borderColor : c_darkGray;
-    ctx.shadowOffsetY = 4;
-    ctx.shadowOffsetX = 2;
-    // Calculate text position
+    // Center of the rectangle
     let textX = rect.x + rect.width / 2;
     let textY = rect.y + rect.height / 2;
+
     // Draw text
+    ctx.strokeText(text, textX, textY);
     ctx.fillText(text, textX, textY);
+
     ctx.restore();
   }
 
-  /* Uses 'setTextAndHitboxProperties' to draw the interactive menu options.
-  Sets up positioning and dimensions for each option. */
+  /* Draws and styles the text for a menu option, aligning it to 
+  the center of its corresponding invisible hitbox. */
 
   function drawOptions() {
     ctx.save();
-    ctx.font = `${10 * scaleFactor}px RetroGaming`;
+    ctx.font = `${texts.menuOptionStyle.fontSize * scaleFactor}px ${
+      texts.menuOptionStyle.fontFamily
+    }`;
+
+    //draw Rectangles
     for (let i = 0; i < options.length; i++) {
-      let posY = H / 2 - 50 / 2 + [-24 * scaleFactor, 0, 24 * scaleFactor][i];
-      let textWidth = ctx.measureText(options[i]).width;
-      let rectWidth = textWidth;
-      let rectPosX = W - W / 3 - textWidth / 2; // SETS THE TEXT TO 2/3 OF THE SCREEN
+      const lineHeight = 24 * scaleFactor;
+      const rectHeight = texts.menuOptionStyle.fontSize * scaleFactor;
+      const rectWidth = ctx.measureText(options[i]).width;
+      const yCenter = H / 2;
+
+      let rectPosY = yCenter - rectHeight / 2 + [-lineHeight, 0, lineHeight][i];
+      const xTwoThirds = W - W / 3 - rectWidth / 2;
+      const rectPosX = xTwoThirds;
 
       rectangles[i] = {
         x: rectPosX,
-        y: posY,
+        y: rectPosY,
         width: rectWidth,
         height: 50,
       };
 
-      let color = i === selectedIndex ? "#FFD43E" : c_gray;
-      let borderColor = i === selectedIndex ? "#2A2900" : c_darkGray;
-      setTextAndHitboxProperties(i, color, borderColor);
+      setTextAndHitboxProperties(i);
+
+      // to draw SOON text
+      if (options[i] === "AGILITY" || options[i] === "STRENGTH") {
+        const optionTextWidth = ctx.measureText(options[i]).width;
+        drawSoonText(
+          rectPosX + optionTextWidth - rectWidth + rectWidth / 1.2,
+          rectPosY - rectHeight / 1.4,
+          i
+        );
+      }
     }
+    ctx.restore();
+  }
+
+  // Will be removed when Game Modes are done
+  function drawSoonText(x, y) {
+    ctx.save();
+    // Styles
+    ctx.font = `${8 * scaleFactor}px RetroGaming`;
+    ctx.fillStyle = "#FFF";
+    ctx.strokeStyle = "#FF8B21";
+    ctx.shadowColor = "#FF8B21";
+    ctx.lineWidth = 1.5 * scaleFactor;
+    ctx.shadowOffsetY = 1 * scaleFactor;
+    ctx.strokeText("Soon", x, y + texts.menuOptionStyle.fontSize * scaleFactor);
+    ctx.fillText("Soon", x, y + texts.menuOptionStyle.fontSize * scaleFactor);
     ctx.restore();
   }
 
@@ -241,19 +253,13 @@ export let startingMenu = (function () {
     handleRectangleClick(mouseX, mouseY);
   }
 
-  /* Checks on which word the mouse is on, lets a 
-  variable used on 'handlePlaqueClick' know and changes
-  color of the selected one */
+  /* Determines which menu option's hitbox was clicked, updates the selected 
+   option, and redraws the menu to reflect the new selection. */
 
   function handleRectangleClick(mouseX, mouseY) {
     for (let i = 0; i < rectangles.length; i++) {
       let rect = rectangles[i];
-      if (
-        mouseX >= rect.x &&
-        mouseX <= rect.x + rect.width &&
-        mouseY >= rect.y &&
-        mouseY <= rect.y + rect.height
-      ) {
+      if (isClickWithinBounds(mouseX, mouseY, rect)) {
         selectedIndex = i; // Update the selected index
         drawOptions(); // Redraw options with the new selection
         return;
@@ -261,67 +267,48 @@ export let startingMenu = (function () {
     }
   }
 
-  /* Checks if mouse is on the plaques and on click sets a 
-  transition into the mode selected by 'handleRectangleClick'
-  or the gems page */
+  /* Handles clicks on the plaques. On click, it initiates a transition to 
+   either the selected game mode (determined by 'handleRectangleClick') 
+   or the gems page. */
 
   function handlePlaqueClick(mouseX, mouseY) {
-    // plaque for game modes
-
-    if (!ActiveInits.isStartingMenuActive) {
+    // Plaque | Game Mode
+    if (!ActiveInits.isStartingMenuActive || selectedIndex < 0) {
       return;
     }
-    if (
-      mouseX >= plaqueBounds.x &&
-      mouseX <= plaqueBounds.x + plaqueBounds.width &&
-      mouseY >= plaqueBounds.y &&
-      mouseY <= plaqueBounds.y + plaqueBounds.height
-    ) {
-      // Check if a game option is selected
-      if (selectedIndex >= 0) {
-        gsap.to(overlay, {
-          opacity: 1,
-          duration: 1, // duration of the fade in seconds
-          onUpdate: applyCanvasOpacity,
-          onComplete: () => {
-            if (selectedIndex === 0) {
-              ActiveInits.isCardioActive = true;
-            } else if (selectedIndex === 1) {
-              ActiveInits.isAgilityActive = true;
-            } else if (selectedIndex === 2) {
-              ActiveInits.isStrengthActive = true;
-            }
+    if (isClickWithinBounds(mouseX, mouseY, plaqueBounds)) {
+      gsap.to(overlay, {
+        opacity: 1,
+        duration: 1,
+        onUpdate: applyCanvasOpacity,
+        onComplete: () => {
+          if (selectedIndex === 0) {
+            ActiveInits.isCardioActive = true;
+          } else if (selectedIndex === 1) {
+            ActiveInits.isAgilityActive = true;
+          } else if (selectedIndex === 2) {
+            ActiveInits.isStrengthActive = true;
+          }
 
-            currentMode.mode = selectedIndex + 1;
-            ActiveInits.isStartingMenuActive = false;
-            overlay.opacity = 0;
-          },
-        });
-      }
+          currentMode.mode = selectedIndex + 1;
+          ActiveInits.isStartingMenuActive = false;
+          overlay.opacity = 0;
+        },
+      });
     }
-
-    // plaque for gems
-
-    if (
-      mouseX >= gemsPlaqueBounds.x &&
-      mouseX <= gemsPlaqueBounds.x + gemsPlaqueBounds.width &&
-      mouseY >= gemsPlaqueBounds.y &&
-      mouseY <= gemsPlaqueBounds.y + gemsPlaqueBounds.height
-    ) {
-      // Check if a game option is selected
-      if (selectedIndex >= 0) {
-        gsap.to(overlay, {
-          opacity: 1,
-          duration: 1, // duration of the fade in seconds
-          onUpdate: applyCanvasOpacity,
-          onComplete: () => {
-            currentMode.mode = 4;
-            ActiveInits.isStartingMenuActive = false;
-            ActiveInits.isGemsActive = true;
-            overlay.opacity = 0;
-          },
-        });
-      }
+    // Plaque | Gems
+    if (isClickWithinBounds(mouseX, mouseY, gemsPlaqueBounds)) {
+      gsap.to(overlay, {
+        opacity: 1,
+        duration: 1,
+        onUpdate: applyCanvasOpacity,
+        onComplete: () => {
+          currentMode.mode = Modes.GEMS;
+          ActiveInits.isStartingMenuActive = false;
+          ActiveInits.isGemsActive = true;
+          overlay.opacity = 0;
+        },
+      });
     }
   }
 

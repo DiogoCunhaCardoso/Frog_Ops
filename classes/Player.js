@@ -1,4 +1,12 @@
-import { ctx, W, H, scaleFactor, ActiveInits, currentMode } from "../main.js";
+import {
+  ctx,
+  W,
+  H,
+  scaleFactor,
+  ActiveInits,
+  currentMode,
+  Modes,
+} from "../main.js";
 import { collision } from "../utils.js";
 import { cardio } from "../gameModes/cardio.js";
 import { overlay, applyCanvasOpacity } from "../utils.js";
@@ -181,17 +189,17 @@ export class Player {
           object2: bird,
         })
       ) {
-        gsap.to(overlay, {
+        /* gsap.to(overlay, {
           opacity: 1,
           duration: 0.5, // duration of the fade in seconds
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
-            currentMode.mode = 6; // Restarting Page
+            currentMode.mode = Modes.RESTART; // Restarting Page
             ActiveInits.isCardioActive = false;
             ActiveInits.isRestartActive = true;
             overlay.opacity = 0;
           },
-        });
+        }); */
       }
     }
   }

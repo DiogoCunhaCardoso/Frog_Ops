@@ -5,11 +5,18 @@ import {
   H,
   ActiveInits,
   currentMode,
+  Modes,
   scaleFactor,
 } from "../main.js";
-import { overlay, applyCanvasOpacity, drawPlaque } from "../utils.js";
+import {
+  overlay,
+  applyCanvasOpacity,
+  drawPlaque,
+  isClickWithinBounds,
+} from "../utils.js";
 import { Player } from "../classes/Player.js";
 import { CollisionBlock } from "../classes/CollisionBlock.js";
+import { colors } from "../style.js";
 
 export let cardio = (function () {
   ("use strict");
@@ -82,7 +89,7 @@ export let cardio = (function () {
 
   function renderUI() {
     ctx.save();
-    ctx.fillStyle = "#2A2900";
+    ctx.fillStyle = colors.brown;
     const FontSize = 7 * scaleFactor;
     ctx.font = `${FontSize}px RetroGaming`;
     ctx.textAlign = "right";
@@ -105,11 +112,11 @@ export let cardio = (function () {
     const rectangleyPosition = padding + FontSize / 2 + 1 * scaleFactor;
 
     // Draw lightColor Rect
-    ctx.fillStyle = "#FFF8E0";
+    ctx.fillStyle = colors.white;
     ctx.fillRect(rectangleXPosition, rectangleyPosition, rectWidth, rectHeight);
 
     // Draw Moving Rectangle
-    ctx.fillStyle = "#FFD43E";
+    ctx.fillStyle = colors.yellow;
     ctx.fillRect(
       rectangleXPosition,
       rectangleyPosition,
@@ -118,7 +125,7 @@ export let cardio = (function () {
     );
 
     // Draw border of rectangle
-    ctx.strokeStyle = "#2A2900";
+    ctx.strokeStyle = colors.brown;
     ctx.lineWidth = 1 * scaleFactor;
     ctx.strokeRect(
       rectangleXPosition,
@@ -128,7 +135,7 @@ export let cardio = (function () {
     );
 
     // Calculate and draw Rotation
-    ctx.fillStyle = "#2A2900";
+    ctx.fillStyle = colors.brown;
     const rotationText = "ROT. " + Math.round(players[0].rotation);
     ctx.fillText(
       rotationText,
@@ -269,18 +276,13 @@ export let cardio = (function () {
     if (!ActiveInits.isCardioActive) {
       return;
     }
-    if (
-      mouseX >= backPlaqueBounds.x &&
-      mouseX <= backPlaqueBounds.x + backPlaqueBounds.width &&
-      mouseY >= backPlaqueBounds.y &&
-      mouseY <= backPlaqueBounds.y + backPlaqueBounds.height
-    ) {
+    if (isClickWithinBounds(mouseX, mouseY, backPlaqueBounds)) {
       gsap.to(overlay, {
         opacity: 1,
         duration: 1, // duration of the fade in seconds
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
-          currentMode.mode = 0;
+          currentMode.mode = Modes.STARTING_MENU;
           ActiveInits.isStartingMenuActive = true;
           ActiveInits.isCardioActive = false;
           overlay.opacity = 0;

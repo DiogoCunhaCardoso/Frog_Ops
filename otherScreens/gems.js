@@ -1,3 +1,4 @@
+// Imports
 import {
   ctx,
   canvas,
@@ -6,24 +7,35 @@ import {
   scaleFactor,
   ActiveInits,
   currentMode,
+  Modes,
 } from "../main.js";
-import { overlay, applyCanvasOpacity, drawPlaque } from "../utils.JS";
+import {
+  overlay,
+  applyCanvasOpacity,
+  drawPlaque,
+  isClickWithinBounds,
+} from "../utils.js";
+import { colors, texts } from "../style.js";
 
+// Module
 export let gems = (function () {
   ("use strict");
 
+  // Stores the status through LocalStorage.
   let hasGems = {
     cardioGem: hasGem("cardioGem"),
     agilityGem: hasGem("agilityGem"),
     strengthGem: hasGem("strengthGem"),
   };
-  let modes = ["CARDIO", "AGILITY", "STRENGTH"];
+
+  const modes = ["CARDIO", "AGILITY", "STRENGTH"];
   let goBackPlaque = new Image();
   let backPlaqueBounds = {};
 
+  // Initializes the gems module
   function init() {
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "#F1F5FF";
+    ctx.fillStyle = colors.bg_light;
     ctx.fillRect(0, 0, W, H);
     drawGemsAndText();
     drawPlaque(
@@ -39,69 +51,73 @@ export let gems = (function () {
     canvas.addEventListener("click", handleClick);
   }
 
+  // Checks if a specific gem is acquired (stored in localStorage)
   function hasGem(gemName) {
     return localStorage.getItem(gemName) !== null;
   }
 
-  // will be used when you finish a game in the future
-  /*   function NewGemAquired(gem) {
-    localStorage.setItem(gem, true);
-  }
-  NewGemAquired("agilityGem"); */
-
+  // Draws the gem images and their corresponding labels
   function drawGemsAndText() {
-    let gemImages = {
+    ctx.save();
+    const gemImages = {
       cardioGem: "../images/gems/gem_cardio.svg",
       agilityGem: "../images/gems/gem_agility.svg",
       strengthGem: "../images/gems/gem_strength.svg",
       inactiveGem: "../images/gems/gem_inactive.svg",
     };
 
-    let rectPosXOffsets = [-70 * scaleFactor, 0, 70 * scaleFactor];
-
-    ctx.save();
-
-    // Set font for text
-    ctx.font = `${7 * scaleFactor}px RetroGaming`; // Adjust font size and style as needed
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
+    texts.gemsStyle.applyStyle(ctx, scaleFactor);
+    // Conditionally change Images and colors
     for (let i = 0; i < modes.length; i++) {
       let gemImage = new Image();
-      let textColor;
+      let borderColor;
+      let color;
 
       switch (modes[i]) {
         case "CARDIO":
           gemImage.src = hasGems.cardioGem
             ? gemImages.cardioGem
             : gemImages.inactiveGem;
-          textColor = hasGems.cardioGem ? "#008C88" : "#A7A7A7";
+          borderColor = hasGems.cardioGem
+            ? colors.gem_blue
+            : colors.dark_gray_disabled;
+          color = hasGems.cardioGem ? colors.white : colors.gray_disabled;
           break;
         case "AGILITY":
           gemImage.src = hasGems.agilityGem
             ? gemImages.agilityGem
             : gemImages.inactiveGem;
-          textColor = hasGems.agilityGem ? "#FC4FA2" : "#A7A7A7"; // Updated this line
+          borderColor = hasGems.agilityGem
+            ? colors.gem_pink
+            : colors.dark_gray_disabled;
+          color = hasGems.agilityGem ? colors.white : colors.gray_disabled;
           break;
         case "STRENGTH":
           gemImage.src = hasGems.strengthGem
             ? gemImages.strengthGem
             : gemImages.inactiveGem;
-          textColor = hasGems.strengthGem ? "#9C46A5" : "#A7A7A7"; // Updated this line
+          borderColor = hasGems.strengthGem
+            ? colors.gem_purple
+            : colors.dark_gray_disabled;
+          color = hasGems.strengthGem ? colors.white : colors.gray_disabled;
           break;
         default:
           gemImage.src = gemImages.inactiveGem;
-          textColor = "#A7A7A7";
+          borderColor = colors.dark_gray_disabled;
+          color = colors.gray_disabled;
       }
 
-      // Set the fill style for the text
-      ctx.fillStyle = textColor;
+      // Set the style for the text
+      ctx.fillStyle = color;
+      ctx.strokeStyle = borderColor;
+      ctx.shadowColor = borderColor;
 
-      let gemX =
-        W / 2 - (gemImage.width * scaleFactor) / 2 + rectPosXOffsets[i];
-      let gemY = H / 2 - (gemImage.height * scaleFactor) / 2 - 7 * scaleFactor; // half of 14
+      // Position & Draw Images
+      const separation = 16 * scaleFactor;
+      const rectPosXOffsets = [-76 * scaleFactor, 0, 76 * scaleFactor];
+      const gemX = W / 2 - (gemImage.width * scaleFactor) / 2 + rectPosXOffsets[i];
+      const gemY = H / 2 - (gemImage.height * scaleFactor) / 2 - separation / 2 - (texts.gemsStyle.fontSize * scaleFactor) / 2;
 
-      // Draw the gem image
       ctx.drawImage(
         gemImage,
         gemX,
@@ -110,14 +126,17 @@ export let gems = (function () {
         gemImage.height * scaleFactor
       );
 
-      // Draw the text under the gem
-      let textY = gemY + gemImage.height * scaleFactor + 14 * scaleFactor; // 14 = separation from image
+      // Position & Draw Text
+      const textY = gemY + gemImage.height * scaleFactor + separation;
+      const textX = gemX + (gemImage.width / 2) * scaleFactor;
+      ctx.strokeText(modes[i], textX, textY);
       ctx.fillText(modes[i], gemX + (gemImage.width / 2) * scaleFactor, textY);
     }
 
     ctx.restore();
   }
 
+  // Handles click events on the canvas.
   function handleClick(event) {
     let mouseX = event.clientX - canvas.getBoundingClientRect().left;
     let mouseY = event.clientY - canvas.getBoundingClientRect().top;
@@ -125,22 +144,19 @@ export let gems = (function () {
     handlePlaqueClick(mouseX, mouseY);
   }
 
+  // Check if the click is within the bounds of the back plaque.
+  // If so, animates the overlay and switches back to the 'StartingMenu'.
   function handlePlaqueClick(mouseX, mouseY) {
     if (!ActiveInits.isGemsActive) {
       return;
     }
-    if (
-      mouseX >= backPlaqueBounds.x &&
-      mouseX <= backPlaqueBounds.x + backPlaqueBounds.width &&
-      mouseY >= backPlaqueBounds.y &&
-      mouseY <= backPlaqueBounds.y + backPlaqueBounds.height
-    ) {
+    if (isClickWithinBounds(mouseX, mouseY, backPlaqueBounds)) {
       gsap.to(overlay, {
         opacity: 1,
-        duration: 1, // duration of the fade in seconds
+        duration: 1,
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
-          currentMode.mode = 0;
+          currentMode.mode = Modes.STARTING_MENU;
           ActiveInits.isStartingMenuActive = true;
           ActiveInits.isGemsActive = false;
           overlay.opacity = 0;
@@ -153,3 +169,9 @@ export let gems = (function () {
     init: init,
   };
 })();
+
+/*// will be used when you finish a game in the future
+     function NewGemAquired(gem) {
+    localStorage.setItem(gem, true);
+  }
+  NewGemAquired("agilityGem"); */

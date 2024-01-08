@@ -1,4 +1,4 @@
-import { ctx, canvas, W, H, ActiveInits, currentMode } from "../main.js";
+import { ctx, canvas, W, H, ActiveInits, currentMode, Modes } from "../main.js";
 import { overlay, applyCanvasOpacity, drawPlaque } from "../utils.js";
 
 export let strength = (function () {
@@ -63,7 +63,7 @@ export let strength = (function () {
         duration: 1, // duration of the fade in seconds
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
-          currentMode.mode = 0;
+          currentMode.mode = Modes.STARTING_MENU;
           ActiveInits.isStartingMenuActive = true;
           ActiveInits.isStrengthActive = false;
           overlay.opacity = 0;

@@ -6,7 +6,9 @@ import {
   scaleFactor,
   ActiveInits,
   currentMode,
+  Modes
 } from "../main.js";
+import { colors } from "../style.js";
 
 export let restart = (function () {
   ("use strict");
@@ -18,9 +20,8 @@ export let restart = (function () {
 
   function init() {
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "#F1F5FF";
+    ctx.fillStyle = colors.bg_light;
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "black";
     highScoreInfo({ gameMode: "cardio", highScore: 0 });
     GameOverGroup({ score: 12, maxScore: 25 });
     PlayAgainGroup(true, arrowImage);
@@ -32,10 +33,10 @@ export let restart = (function () {
     //Global Stylings
     ctx.font = `${6 * scaleFactor}px RetroGaming`;
     ctx.lineWidth = 2 * scaleFactor;
-    ctx.strokeStyle = "#66664D";
+    ctx.strokeStyle = colors.brown_disabled;
 
     // For Text Info
-    ctx.fillStyle = "#FBFCFF";
+    ctx.fillStyle = colors.white_disabled;
 
     const marginX = 10 * scaleFactor;
     const marginY = 14 * scaleFactor;
@@ -44,7 +45,7 @@ export let restart = (function () {
     ctx.fillText(highScoreText, marginX, marginY);
 
     // For Score Value
-    ctx.fillStyle = "#FBDE78";
+    ctx.fillStyle = colors.yellow_disabled;
 
     const TextWidth = ctx.measureText(highScoreText).width;
     const padding = 4 * scaleFactor;
@@ -63,11 +64,11 @@ export let restart = (function () {
     const lineSpacing = 16 * scaleFactor;
 
     // For GameOver Text
-    ctx.strokeStyle = "#2A2900";
+    ctx.strokeStyle = colors.brown;
     ctx.font = `${12 * scaleFactor}px RetroGaming`;
-    ctx.fillStyle = "#FFF";
+    ctx.fillStyle = colors.white;
     ctx.lineWidth = 3 * scaleFactor;
-    ctx.shadowColor = "#2A2900";
+    ctx.shadowColor = colors.brown;
     ctx.shadowOffsetY = 3 * scaleFactor;
 
     let gameOverText = "GAME OVER";
@@ -77,9 +78,9 @@ export let restart = (function () {
 
     // For Score
     ctx.save();
-    ctx.strokeStyle = "#2A2900";
+    ctx.strokeStyle = colors.brown;
     ctx.font = `${8 * scaleFactor}px RetroGaming`;
-    ctx.fillStyle = "#FFD43E";
+    ctx.fillStyle = colors.yellow;
     ctx.lineWidth = 2 * scaleFactor;
 
     let scoreText = "SCORE :";
@@ -125,11 +126,11 @@ export let restart = (function () {
     const lineSpacing = 16 * scaleFactor;
 
     // For GameOver Text
-    ctx.strokeStyle = "#2A2900";
+    ctx.strokeStyle = colors.brown;
     ctx.font = `${12 * scaleFactor}px RetroGaming`;
-    ctx.fillStyle = "#FFF";
+    ctx.fillStyle = colors.white;
     ctx.lineWidth = 3 * scaleFactor;
-    ctx.shadowColor = "#2A2900";
+    ctx.shadowColor = colors.brown;
     ctx.shadowOffsetY = 3 * scaleFactor;
 
     let playAgainText = "PLAY AGAIN?";
@@ -140,8 +141,8 @@ export let restart = (function () {
     // For Score
     ctx.save();
     ctx.font = `${8 * scaleFactor}px RetroGaming`;
-    ctx.fillStyle = isYesSelected ? "#FFD43E" : "#FBDE78";
-    ctx.strokeStyle = isYesSelected ? "#2A2900" : "#66664D";
+    ctx.fillStyle = isYesSelected ? colors.yellow : colors.yellow_disabled;
+    ctx.strokeStyle = isYesSelected ? colors.brown : colors.brown_disabled;
     ctx.lineWidth = 2 * scaleFactor;
 
     let yesText = "YES";
@@ -150,8 +151,8 @@ export let restart = (function () {
 
     // For Score Info
     const TextWidth = ctx.measureText(yesText).width;
-    ctx.fillStyle = isYesSelected ? "#FBDE78" : "#FFD43E";
-    ctx.strokeStyle = isYesSelected ? "#66664D" : "#2A2900";
+    ctx.fillStyle = isYesSelected ? colors.yellow_disabled : colors.yellow;
+    ctx.strokeStyle = isYesSelected ? colors.brown_disabled : colors.brown;
     let noText = "NO";
     ctx.strokeText(
       noText,
