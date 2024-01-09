@@ -18,21 +18,24 @@ import { Player } from "../classes/Player.js";
 import { CollisionBlock } from "../classes/CollisionBlock.js";
 import { colors } from "../style.js";
 
+export let gameOverStats;
+let isGameInitialized = false;
+
 export let cardio = (function () {
   ("use strict");
 
   // for player.update()
-  let players = [];
+  let players = []; // state
 
   // for createRandomPlatforms()
-  let allPlatforms = [];
+  let allPlatforms = []; // state
   let lastPlatformCreationTime = Date.now();
-  const PLATFORM_CREATION_INTERVAL = 1500;
+  let PLATFORM_CREATION_INTERVAL = 1500;
 
   //for createRandomBirds()
-  let allBirds = [];
+  let allBirds = []; // state
   let lastBirdCreationTime = Date.now();
-  const BIRD_CREATION_INTERVAL = 3000;
+  let BIRD_CREATION_INTERVAL = 4500;
 
   // for drawPlaque()
   let goBackPlaque = new Image();
@@ -42,21 +45,19 @@ export let cardio = (function () {
   let isBgLoaded = false;
   let backgroundImage = null;
 
+  // INITIALIZATION
   function init() {
-    ctx.clearRect(0, 0, W, H);
-    // defining player here
-    let player = new Player({ x: 0, y: 0 });
-    players.push(
-      new Player({
-        position: {
-          x: 24 * scaleFactor - player.width / 2,
-          y: 0 + player.height,
-        },
-        allPlatforms,
-        allBirds,
-      })
-    );
+    if (!isGameInitialized) {
+      resetGame(); // resets game states
+      canvas.addEventListener("click", handleClick);
+      isGameInitialized = true;
+    }
+    updateGame();
+  }
 
+  // GAME MANAGEMENT
+  function updateGame() {
+    ctx.clearRect(0, 0, W, H);
     drawBgImage();
     drawPlaque(
       goBackPlaque,
@@ -69,18 +70,53 @@ export let cardio = (function () {
       }
     );
     // player
-    players[0].update();
-    // platforms
+    players[0]?.update();
+    // platform
     createRandomPlatforms();
     updatePlatforms();
     // birds
     createRandomBirds();
     updateBirds();
+    // U.I.
     renderUI();
+  }
 
-    // console.log(allPlatforms.map((platform) => platform.id));
+  function resetGame() {
+    players = [];
+    allPlatforms = [];
+    allBirds = [];
+    initPlayer();
+    lastPlatformCreationTime = Date.now();
+    lastBirdCreationTime = Date.now();
+    movingRectWidth = 45 / 2;
+    directionInc = -0.25;
+  }
 
-    canvas.addEventListener("click", handleClick);
+  function initPlayer() {
+    if (players.length === 0) {
+      let object = new Player({ x: 0, y: 0 });
+      let player = new Player({
+        position: {
+          x: 24 * scaleFactor - object.width / 2,
+          y: 0 + object.height,
+        },
+        allPlatforms,
+        allBirds,
+        getStats: sendGameOverStats,
+      });
+      players.push(player);
+    }
+  }
+
+  function sendGameOverStats() {
+    ctx.save();
+    gameOverStats = {
+      gameMode: "Cardio",
+      score: players[0]?.score,
+      maxScore: 25,
+    };
+    isGameInitialized = false;
+    ctx.restore;
   }
 
   // U.I.
@@ -154,7 +190,7 @@ export let cardio = (function () {
     ctx.restore();
   }
 
-  // FOR PLATFORMS
+  // PLATFORMS
 
   function getRandomBlockX() {
     let block = new CollisionBlock({ x: 0, y: 0 });
@@ -202,7 +238,7 @@ export let cardio = (function () {
     });
   }
 
-  // FOR BIRDS
+  // BIRDS
 
   function getRandomBirdY() {
     let bird = new CollisionBlock({ x: 0, y: 0 });
@@ -305,7 +341,7 @@ export let cardio = (function () {
   window.addEventListener("keydown", (e) => {
     // rotate
 
-    if (e.code === "KeyR") {
+    if (e.code === "KeyR" && ActiveInits.isCardioActive) {
       players[0].isRotating = !players[0].isRotating;
 
       // reset position when stopping to rotate

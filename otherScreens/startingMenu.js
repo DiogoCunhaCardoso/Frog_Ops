@@ -76,6 +76,7 @@ export let startingMenu = (function () {
         }
       );
       updateSpriteAndAnimation();
+      window.addEventListener("keydown", handleKeyPress);
     }
     //
 
@@ -309,6 +310,40 @@ export let startingMenu = (function () {
           overlay.opacity = 0;
         },
       });
+    }
+  }
+
+  function handleKeyPress(event) {
+    if (ActiveInits.isStartingMenuActive) {
+      if (event.key === "ArrowDown") {
+        selectedIndex = (selectedIndex + 1) % options.length; // THIS IS GENIUS :o
+        drawOptions();
+      } else if (event.key === "ArrowUp") {
+        selectedIndex = (selectedIndex - 1 + options.length) % options.length;
+        drawOptions();
+      } else if (event.key === "Enter") {
+        switch (selectedIndex) {
+          case 0:
+            ActiveInits.isCardioActive = true;
+            break;
+          case 1:
+            ActiveInits.isAgilityActive = true;
+            break;
+          case 2:
+            ActiveInits.isStrengthActive = true;
+            break;
+        }
+        gsap.to(overlay, {
+          opacity: 1,
+          duration: 0.5,
+          onUpdate: applyCanvasOpacity,
+          onComplete: () => {
+            currentMode.mode = selectedIndex + 1;
+            ActiveInits.isStartingMenuActive = false;
+            overlay.opacity = 0;
+          },
+        });
+      }
     }
   }
 

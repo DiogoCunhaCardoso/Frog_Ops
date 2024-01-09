@@ -14,7 +14,7 @@ import { overlay, applyCanvasOpacity } from "../utils.js";
 let gravity = 0.1;
 
 export class Player {
-  constructor({ position, allPlatforms, allBirds }) {
+  constructor({ position, allPlatforms, allBirds, getStats }) {
     this.position = position;
     this.velocity = {
       x: 0,
@@ -33,6 +33,7 @@ export class Player {
     // for collision
     this.allPlatforms = allPlatforms; // platforms
     this.allBirds = allBirds; // birds
+    this.getGameOverStats = getStats;
 
     // for points
     this.score = 0;
@@ -189,17 +190,18 @@ export class Player {
           object2: bird,
         })
       ) {
-        /* gsap.to(overlay, {
+        gsap.to(overlay, {
           opacity: 1,
-          duration: 0.5, // duration of the fade in seconds
+          duration: 0.5,
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
-            currentMode.mode = Modes.RESTART; // Restarting Page
+            currentMode.mode = Modes.RESTART;
             ActiveInits.isCardioActive = false;
             ActiveInits.isRestartActive = true;
             overlay.opacity = 0;
           },
-        }); */
+        });
+        this.getGameOverStats();
       }
     }
   }
