@@ -13,12 +13,15 @@ import {
   applyCanvasOpacity,
   drawPlaque,
   isClickWithinBounds,
+  collision,
+  NewGemAquired,
 } from "../utils.js";
 import { Player } from "../classes/Player.js";
 import { CollisionBlock } from "../classes/CollisionBlock.js";
 import { colors } from "../style.js";
 
-export let gameOverStats;
+export let gameOverStats; // to be used in 'restart.js'
+export let gameWonStats; // to be used in 'success.js'
 let isGameInitialized = false;
 
 export let cardio = (function () {
@@ -28,6 +31,7 @@ export let cardio = (function () {
   let players = []; // state
 
   // for createRandomPlatforms()
+  let stopBuilding = false;
   let allPlatforms = []; // state
   let lastPlatformCreationTime = Date.now();
   let PLATFORM_CREATION_INTERVAL = 1500;
@@ -45,6 +49,12 @@ export let cardio = (function () {
   let isBgLoaded = false;
   let backgroundImage = null;
 
+  // U.I.
+  let movingRectWidth = 45 / 2;
+  let directionInc = -0.25;
+  // Gem
+  let gem = null;
+
   // INITIALIZATION
   function init() {
     if (!isGameInitialized) {
@@ -53,6 +63,7 @@ export let cardio = (function () {
       isGameInitialized = true;
     }
     updateGame();
+    console.log(gem);
   }
 
   // GAME MANAGEMENT
@@ -72,11 +83,17 @@ export let cardio = (function () {
     // player
     players[0]?.update();
     // platform
-    createRandomPlatforms();
+    createRandomPlatformsAndGem();
     updatePlatforms();
     // birds
-    createRandomBirds();
-    updateBirds();
+    if (players[0].score >= 15) {
+      createRandomBirds();
+      updateBirds();
+    }
+    // gem
+    if (gem) gem.update();
+    checkGemCollision();
+
     // U.I.
     renderUI();
   }
@@ -90,6 +107,7 @@ export let cardio = (function () {
     lastBirdCreationTime = Date.now();
     movingRectWidth = 45 / 2;
     directionInc = -0.25;
+    gem = null;
   }
 
   function initPlayer() {
@@ -119,9 +137,15 @@ export let cardio = (function () {
     ctx.restore;
   }
 
-  // U.I.
-  let movingRectWidth = 45 / 2;
-  let directionInc = -0.25;
+  function sendGameWonStats() {
+    ctx.save();
+    gameWonStats = {
+      gameMode: "cardioGem",
+      score: 25,
+    };
+    isGameInitialized = false;
+    ctx.restore;
+  }
 
   function renderUI() {
     ctx.save();
@@ -190,7 +214,7 @@ export let cardio = (function () {
     ctx.restore();
   }
 
-  // PLATFORMS
+  // PLATFORMS & GEM
 
   function getRandomBlockX() {
     let block = new CollisionBlock({ x: 0, y: 0 });
@@ -199,11 +223,14 @@ export let cardio = (function () {
     return Math.round(xRange);
   }
 
-  function createRandomPlatforms() {
+  function createRandomPlatformsAndGem() {
     let block = new CollisionBlock({ x: 0, y: 0 });
     const currentTime = Date.now();
 
-    if (currentTime - lastPlatformCreationTime > PLATFORM_CREATION_INTERVAL) {
+    if (
+      currentTime - lastPlatformCreationTime > PLATFORM_CREATION_INTERVAL &&
+      !stopBuilding
+    ) {
       let newX;
 
       if (allPlatforms.length > 0) {
@@ -224,6 +251,19 @@ export let cardio = (function () {
           "platform"
         )
       );
+
+      //
+      if (players[0].score === 5 && !gem) {
+        // Position for the gem
+        const gemX = newX;
+        const gemY = 0 - block.height * 2 - 2 * scaleFactor;
+        gem = new CollisionBlock({ position: { x: gemX, y: gemY } }, "gem");
+      }
+      if (players[0].score === 5) {
+        stopBuilding = true;
+      }
+
+      //
       lastPlatformCreationTime = currentTime;
     }
   }
@@ -238,6 +278,26 @@ export let cardio = (function () {
     });
   }
 
+  function checkGemCollision() {
+    if (gem && players[0]) {
+      if (gem && collision({ object1: players[0], object2: gem })) {
+        gem = null;
+        NewGemAquired("cardioGem");
+        gsap.to(overlay, {
+          opacity: 1,
+          duration: 0.5,
+          onUpdate: applyCanvasOpacity,
+          onComplete: () => {
+            currentMode.mode = Modes.SUCCESS;
+            ActiveInits.isCardioActive = false;
+            ActiveInits.isSuccessActive = true;
+            overlay.opacity = 0;
+            sendGameWonStats();
+          },
+        });
+      }
+    }
+  }
   // BIRDS
 
   function getRandomBirdY() {
@@ -332,12 +392,6 @@ export let cardio = (function () {
     movingRectWidth = 45 / 2;
   }
 
-  function resetRotation() {
-    players[0].rotation = 0;
-    players[0].rotationDirection = -1;
-    movingRectWidth = 45 / 2;
-  }
-
   window.addEventListener("keydown", (e) => {
     // rotate
 
@@ -346,7 +400,9 @@ export let cardio = (function () {
 
       // reset position when stopping to rotate
       if (!players[0].isRotating) {
-        resetRotation();
+        players[0].rotation = 0;
+        players[0].rotationDirection = -1;
+        movingRectWidth = 45 / 2;
       }
     }
 

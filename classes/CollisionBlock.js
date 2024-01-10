@@ -20,6 +20,8 @@ export class CollisionBlock {
       ctx.fillStyle = "white";
     } else if (this.type === "bird") {
       ctx.fillStyle = "red";
+    } else if (this.type === "gem") {
+      ctx.fillStyle = "green";
     }
     ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
@@ -32,7 +34,7 @@ export class CollisionBlock {
   checkType() {
     if (this.type === "bird") {
       this.position.x += this.velocity.x; // Horizontal movement for birds
-    } else if (this.type === "platform") {
+    } else if (this.type === "platform" || this.type === "gem") {
       this.position.y += this.velocity.y; // Vertical movement for platforms
     }
   }

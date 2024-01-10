@@ -5,6 +5,7 @@ import { strength } from "./gameModes/strength.js";
 import { gems } from "./otherScreens/gems.js";
 import { portrait } from "./otherScreens/portrait.js";
 import { restart } from "./otherScreens/restart.js";
+import { success } from "./otherScreens/success.js";
 
 export const canvas = document.querySelector("canvas");
 export const ctx = canvas.getContext("2d");
@@ -20,6 +21,7 @@ export const ActiveInits = {
   isAgilityActive: false,
   isStrengthActive: false,
   isRestartActive: false,
+  isSuccessActive: false,
 };
 
 /* export function inverseVariable() {
@@ -109,6 +111,7 @@ export const Modes = {
   GEMS: 4,
   PORTRAIT: 5,
   RESTART: 6,
+  SUCCESS: 7,
 };
 
 export let currentMode = {
@@ -129,6 +132,7 @@ function setModeFunctions() {
     gems.init,
     portrait.init,
     restart.init,
+    success.init,
   ];
 }
 

@@ -1,7 +1,6 @@
 import { ctx, W, H, scaleFactor } from "./main.js";
 // for functions used in multiple places
 //
-//
 
 /* Loads and draws the plaques images, sets the plaqueBounds to
   be used for interaction detection in other parts of the code. */
@@ -66,4 +65,8 @@ export function collision({ object1, object2 }) {
     object1.position.x <= object2.position.x + object2.width &&
     object1.position.x + object1.width >= object2.position.x
   );
+}
+
+export function NewGemAquired(gem) {
+  localStorage.setItem(gem, true);
 }

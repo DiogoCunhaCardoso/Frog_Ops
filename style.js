@@ -70,4 +70,34 @@ export const texts = {
       ctx.shadowOffsetY = this.shadowOffsetY * scaleFactor;
     },
   },
+  highlightStyle: {
+    fontSize: 12,
+    fontFamily: "RetroGaming",
+    lineWidth: 3,
+    fillColor: colors.white,
+    strokeColor: colors.brown,
+    shadowColor: colors.brown,
+    shadowOffsetY: 3,
+    applyStyle: function (ctx, scaleFactor) {
+      ctx.font = `${this.fontSize * scaleFactor}px ${this.fontFamily}`;
+      ctx.lineWidth = this.lineWidth * scaleFactor;
+      ctx.fillStyle = this.fillColor;
+      ctx.strokeStyle = this.strokeColor;
+      ctx.shadowColor = this.shadowColor;
+      ctx.shadowOffsetY = this.shadowOffsetY * scaleFactor;
+    },
+  },
+  detailTextStyle: {
+    fontSize: 8,
+    fontFamily: "RetroGaming",
+    lineWidth: 2,
+    fillColor: colors.yellow,
+    strokeColor: colors.brown,
+    applyStyle: function (ctx, scaleFactor) {
+      ctx.font = `${this.fontSize * scaleFactor}px ${this.fontFamily}`;
+      ctx.lineWidth = this.lineWidth * scaleFactor;
+      ctx.fillStyle = this.fillColor;
+      ctx.strokeStyle = this.strokeColor;
+    },
+  },
 };

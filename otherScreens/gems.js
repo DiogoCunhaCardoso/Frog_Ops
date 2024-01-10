@@ -169,9 +169,3 @@ export let gems = (function () {
     init: init,
   };
 })();
-
-/*// will be used when you finish a game in the future
-     function NewGemAquired(gem) {
-    localStorage.setItem(gem, true);
-  }
-  NewGemAquired("agilityGem"); */

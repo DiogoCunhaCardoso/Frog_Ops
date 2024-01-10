@@ -14,7 +14,7 @@ import {
   applyCanvasOpacity,
   isClickWithinBounds,
 } from "../utils.js";
-import { colors, texts } from "../style.js";
+import { texts } from "../style.js";
 
 export let startingMenu = (function () {
   ("use strict");
