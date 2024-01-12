@@ -1,5 +1,5 @@
 import { ctx, canvas, W, H, ActiveInits, currentMode, Modes } from "../main.js";
-import { overlay, applyCanvasOpacity, drawPlaque } from "../utils.js";
+import { overlay, applyCanvasOpacity, drawPlaque } from "../utils/utils.js";
 
 export let agility = (function () {
   ("use strict");

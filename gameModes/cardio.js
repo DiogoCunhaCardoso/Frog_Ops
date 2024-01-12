@@ -15,10 +15,10 @@ import {
   isClickWithinBounds,
   collision,
   NewGemAquired,
-} from "../utils.js";
+} from "../utils/utils.js";
 import { Player } from "../classes/Player.js";
 import { CollisionBlock } from "../classes/CollisionBlock.js";
-import { colors } from "../style.js";
+import { colors } from "../utils/style.js";
 
 export let gameOverStats; // to be used in 'restart.js'
 export let gameWonStats; // to be used in 'success.js'
@@ -382,6 +382,7 @@ export let cardio = (function () {
           ActiveInits.isStartingMenuActive = true;
           ActiveInits.isCardioActive = false;
           overlay.opacity = 0;
+          isGameInitialized = false;
         },
       });
     }
@@ -420,34 +421,6 @@ export let cardio = (function () {
         case "Digit3":
         case "Numpad3":
           players[0].jump(-6);
-          break;
-        case "Digit4":
-        case "Numpad4":
-          players[0].jump(-7);
-          break;
-        case "Digit5":
-        case "Numpad5":
-          players[0].jump(-9);
-          break;
-        case "Digit6":
-        case "Numpad6":
-          players[0].jump(-10);
-          break;
-        case "Digit7":
-        case "Numpad7":
-          players[0].jump(-11);
-          break;
-        case "Digit8":
-        case "Numpad8":
-          players[0].jump(-12);
-          break;
-        case "Digit9":
-        case "Numpad9":
-          players[0].jump(-13);
-          break;
-        case "Digit0":
-        case "Numpad0":
-          players[0].jump(-14);
           break;
       }
     }

@@ -13,8 +13,8 @@ import {
   overlay,
   applyCanvasOpacity,
   isClickWithinBounds,
-} from "../utils.js";
-import { texts } from "../style.js";
+} from "../utils/utils.js";
+import { texts } from "../utils/style.js";
 
 export let startingMenu = (function () {
   ("use strict");
@@ -91,7 +91,7 @@ export let startingMenu = (function () {
     ctx.drawImage(
       sprite.image,
       sprite.currentFrame * sprite.size,
-      0,
+      0,  
       sprite.size,
       sprite.size,
       40 * scaleFactor + sprite.size, // X position
@@ -113,15 +113,15 @@ export let startingMenu = (function () {
   function updateSpriteAndAnimation() {
     switch (selectedIndex) {
       case 0:
-        sprite.image.src = "../images/startingMenu/cardioSprite.svg";
+        sprite.image.src = "../images/startingMenu/sprite_cardio.svg";
         spriteAnimation(4, 24);
         break;
       case 1:
-        sprite.image.src = "../images/startingMenu/agilitySprite.svg";
-        spriteAnimation(9, 30);
+        sprite.image.src = "../images/startingMenu/sprite_agility.svg";
+        spriteAnimation(10, 30);
         break;
       case 2:
-        sprite.image.src = "../images/startingMenu/strengthSprite.svg";
+        sprite.image.src = "../images/startingMenu/sprite_strength.svg";
         spriteAnimation(10, 30);
         break;
     }
@@ -133,7 +133,7 @@ export let startingMenu = (function () {
   function drawBgImage() {
     if (!isBgLoaded) {
       backgroundImage = new Image();
-      backgroundImage.src = "../images/startingMenu/bg.png";
+      backgroundImage.src = "../images/startingMenu/bg.svg";
 
       backgroundImage.onload = function () {
         ctx.drawImage(backgroundImage, 0, 0, W, H);

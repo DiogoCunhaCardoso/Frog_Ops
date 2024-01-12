@@ -1,4 +1,4 @@
-import { ctx, W, H, scaleFactor } from "./main.js";
+import { ctx, W, H, scaleFactor } from "../main.js";
 // for functions used in multiple places
 //
 
@@ -39,6 +39,7 @@ export function drawPlaque(image, imageSrc, position, bounds, callback) {
 
 export let overlay = {
   opacity: 0,
+  y: 0,
 };
 
 export function applyCanvasOpacity() {
@@ -46,6 +47,17 @@ export function applyCanvasOpacity() {
   ctx.globalAlpha = overlay.opacity;
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+}
+
+//
+//
+export function applyCanvasSlideOut(init, nextInit) {
+  ctx.clearRect(0, 0, W, H);
+  nextInit();
+  ctx.save();
+  ctx.translate(0, -overlay.y);
+  init();
   ctx.restore();
 }
 

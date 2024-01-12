@@ -13,7 +13,7 @@ export const colors = {
   gem_pink: "#FC4FA2",
   gem_purple: "#9C46A5",
   bg_light: "#F1F5FF",
-  green_logo: "#018552",
+  green: "#018552",
 };
 
 // TEXT PROPERTIES (only did for texts that made sense doing for)
@@ -23,8 +23,8 @@ export const texts = {
     fontFamily: "RetroGaming",
     lineWidth: 2,
     fillColor: colors.white,
-    strokeColor: colors.green_logo,
-    shadowColor: colors.green_logo,
+    strokeColor: colors.green,
+    shadowColor: colors.green,
     shadowOffsetY: 0.4,
     applyStyle: function (ctx, scaleFactor) {
       ctx.font = `${this.fontSize * scaleFactor}px ${this.fontFamily}`;
@@ -33,6 +33,25 @@ export const texts = {
       ctx.strokeStyle = this.strokeColor;
       ctx.shadowColor = this.shadowColor;
       ctx.shadowOffsetY = this.shadowOffsetY * scaleFactor;
+    },
+  },
+  logoSplashStyle: {
+    fontSize: 16,
+    fontFamily: "RetroGaming",
+    lineWidth: 3.2,
+    fillColor: colors.white,
+    strokeColor: colors.green,
+    shadowColor: colors.green,
+    shadowOffsetY: 1,
+    applyStyle: function (ctx, scaleFactor) {
+      ctx.font = `${this.fontSize * scaleFactor}px ${this.fontFamily}`;
+      ctx.lineWidth = this.lineWidth * scaleFactor;
+      ctx.fillStyle = this.fillColor;
+      ctx.strokeStyle = this.strokeColor;
+      ctx.shadowColor = this.shadowColor;
+      ctx.shadowOffsetY = this.shadowOffsetY * scaleFactor;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
     },
   },
   menuOptionStyle: {

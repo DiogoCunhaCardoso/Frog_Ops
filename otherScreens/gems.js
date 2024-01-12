@@ -14,8 +14,8 @@ import {
   applyCanvasOpacity,
   drawPlaque,
   isClickWithinBounds,
-} from "../utils.js";
-import { colors, texts } from "../style.js";
+} from "../utils/utils.js";
+import { colors, texts } from "../utils/style.js";
 
 // Module
 export let gems = (function () {
@@ -115,8 +115,13 @@ export let gems = (function () {
       // Position & Draw Images
       const separation = 16 * scaleFactor;
       const rectPosXOffsets = [-76 * scaleFactor, 0, 76 * scaleFactor];
-      const gemX = W / 2 - (gemImage.width * scaleFactor) / 2 + rectPosXOffsets[i];
-      const gemY = H / 2 - (gemImage.height * scaleFactor) / 2 - separation / 2 - (texts.gemsStyle.fontSize * scaleFactor) / 2;
+      const gemX =
+        W / 2 - (gemImage.width * scaleFactor) / 2 + rectPosXOffsets[i];
+      const gemY =
+        H / 2 -
+        (gemImage.height * scaleFactor) / 2 -
+        separation / 2 -
+        (texts.gemsStyle.fontSize * scaleFactor) / 2;
 
       ctx.drawImage(
         gemImage,

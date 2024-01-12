@@ -6,6 +6,13 @@ import { gems } from "./otherScreens/gems.js";
 import { portrait } from "./otherScreens/portrait.js";
 import { restart } from "./otherScreens/restart.js";
 import { success } from "./otherScreens/success.js";
+import { loading } from "./otherScreens/loading.js";
+import { sources } from "./utils/preloader.js";
+import {
+  applyCanvasOpacity,
+  applyCanvasSlideOut,
+  overlay,
+} from "./utils/utils.js";
 
 export const canvas = document.querySelector("canvas");
 export const ctx = canvas.getContext("2d");
@@ -15,18 +22,82 @@ export let H, W;
 /* Flags to disable or able 'pages' */
 
 export const ActiveInits = {
-  isStartingMenuActive: true,
+  isStartingMenuActive: false,
   isGemsActive: false,
   isCardioActive: false,
   isAgilityActive: false,
   isStrengthActive: false,
   isRestartActive: false,
   isSuccessActive: false,
+  isLoadingActive: true,
 };
 
-/* export function inverseVariable() {
-  isStartingMenuActive = !isStartingMenuActive;
-} */
+let assetCount = sources.length;
+let completedAssetsCount = 0;
+
+window.onload = () => {};
+
+window.onload = function () {
+  setModeFunctions();
+  setCanvasSize();
+  checkOrientation();
+  loadAssets();
+  render();
+};
+
+function loadAssets() {
+  if (!sources || sources === 0) {
+    return;
+  }
+
+  let oneSecondPassed = false;
+
+  // Check if a second has passed and assets are loaded
+  setTimeout(() => {
+    oneSecondPassed = true;
+    if (completedAssetsCount === assetCount) {
+      gsap.to(overlay, {
+        y: H,
+        duration: 0.6,
+        onUpdate: () => {
+          applyCanvasSlideOut(loading.init, startingMenu.init);
+        },
+        onComplete: () => {
+          currentMode.mode = Modes.STARTING_MENU;
+          ActiveInits.isStartingMenuActive = true;
+          ActiveInits.isLoadingActive = false;
+          overlay.y = 0;
+        },
+      });
+    }
+  }, 1000);
+
+  // Load assets
+  for (let i = 0; i < sources.length; i++) {
+    let image = new Image();
+    image.src = sources[i];
+    image.onload = function () {
+      completedAssetsCount++;
+      console.log("Loaded: " + completedAssetsCount + " " + image.src);
+      // Check both conditions
+      if (completedAssetsCount === assetCount && oneSecondPassed) {
+        gsap.to(overlay, {
+          y: H,
+          duration: 0.6,
+          onUpdate: () => {
+            applyCanvasSlideOut(loading.init, startingMenu.init);
+          },
+          onComplete: () => {
+            currentMode.mode = Modes.STARTING_MENU;
+            ActiveInits.isStartingMenuActive = true;
+            ActiveInits.isLoadingActive = false;
+            overlay.y = 0;
+          },
+        });
+      }
+    };
+  }
+}
 
 /* Scale factor, things are written as for 320px wide
    screen and they have times scale factor for every size */
@@ -112,10 +183,11 @@ export const Modes = {
   PORTRAIT: 5,
   RESTART: 6,
   SUCCESS: 7,
+  LOADING: 8,
 };
 
 export let currentMode = {
-  mode: Modes.STARTING_MENU, // Default
+  mode: Modes.LOADING, // Default
   modes: [],
   run: function () {
     this.modes[this.mode]();
@@ -133,15 +205,9 @@ function setModeFunctions() {
     portrait.init,
     restart.init,
     success.init,
+    loading.init,
   ];
 }
-
-window.onload = function () {
-  setModeFunctions();
-  setCanvasSize();
-  checkOrientation();
-  render();
-};
 
 function render() {
   window.requestAnimationFrame(render);

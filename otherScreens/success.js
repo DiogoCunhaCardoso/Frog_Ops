@@ -9,8 +9,12 @@ import {
   currentMode,
   Modes,
 } from "../main.js";
-import { colors, texts } from "../style.js";
-import { overlay, applyCanvasOpacity, isClickWithinBounds } from "../utils.js";
+import { colors, texts } from "../utils/style.js";
+import {
+  overlay,
+  applyCanvasOpacity,
+  isClickWithinBounds,
+} from "../utils/utils.js";
 export let success = (function () {
   ("use strict");
 

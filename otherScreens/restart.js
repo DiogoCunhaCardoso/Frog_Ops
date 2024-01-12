@@ -8,9 +8,13 @@ import {
   currentMode,
   Modes,
 } from "../main.js";
-import { colors } from "../style.js";
+import { colors } from "../utils/style.js";
 import { gameOverStats as stats } from "../gameModes/cardio.js";
-import { applyCanvasOpacity, isClickWithinBounds, overlay } from "../utils.js";
+import {
+  applyCanvasOpacity,
+  isClickWithinBounds,
+  overlay,
+} from "../utils/utils.js";
 
 export let restart = (function () {
   ("use strict");

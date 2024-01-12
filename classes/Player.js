@@ -7,9 +7,9 @@ import {
   currentMode,
   Modes,
 } from "../main.js";
-import { collision } from "../utils.js";
+import { collision } from "../utils/utils.js";
 import { cardio } from "../gameModes/cardio.js";
-import { overlay, applyCanvasOpacity } from "../utils.js";
+import { overlay, applyCanvasOpacity } from "../utils/utils.js";
 
 let gravity = 0.1;
 

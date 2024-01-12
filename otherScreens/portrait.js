@@ -1,5 +1,5 @@
 import { ctx, W, H, scaleFactor } from "../main.js";
-import { colors } from "../style.js";
+import { colors } from "../utils/style.js";
 
 export let portrait = (function () {
   ("use strict");
