@@ -10,12 +10,19 @@ import {
 import { collision } from "../utils/utils.js";
 import { cardio } from "../gameModes/cardio.js";
 import { overlay, applyCanvasOpacity } from "../utils/utils.js";
+import { Sprite } from "./Sprite.js";
 
-let gravity = 0.1;
-
-export class Player {
-  constructor({ position, allPlatforms, allBirds, getStats }) {
-    this.position = position;
+export class Player extends Sprite {
+  constructor({
+    position,
+    allPlatforms,
+    allBirds,
+    getStats,
+    imageSrc,
+    frameRate,
+    frameBuffer,
+  }) {
+    super({ position, imageSrc, frameRate, frameBuffer });
     this.velocity = {
       x: 0,
       y: 1,
@@ -29,6 +36,7 @@ export class Player {
     this.rotation = 0;
 
     this.isInAir = true;
+    this.gravity = 0.1;
 
     // for collision
     this.allPlatforms = allPlatforms; // platforms
@@ -41,12 +49,12 @@ export class Player {
   }
 
   draw() {
-    ctx.save(); // Save state
+    ctx.save();
 
     // set pivot point
-    ctx.translate(
+        ctx.translate(
       this.position.x + this.width / 2,
-      this.position.y + this.height / 2
+      this.position.y + this.height
     );
 
     // apply rotation
@@ -58,13 +66,14 @@ export class Player {
     this.position.x += this.velocity.x;
 
     // Draw the rectangle around the new origin
-    ctx.fillStyle = "purple";
-    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+    this.drawSprite(-this.width / 2, -this.height);
 
-    ctx.restore(); // Restore original state
+    ctx.restore();
   }
 
   update() {
+    this.updateFrames();
+    //
     this.draw();
     if (this.isRotating) {
       this.rotatePlayer();
@@ -132,7 +141,7 @@ export class Player {
   gravityAndHitGround() {
     this.position.y += this.velocity.y;
     if (this.position.y + this.height + this.velocity.y < H - 6 * scaleFactor) {
-      this.velocity.y += gravity;
+      this.velocity.y += this.gravity;
     } else {
       // hit ground
       this.isInAir = false;
@@ -213,6 +222,7 @@ export class Player {
     this.velocity.y = speed; /* scaleFactor */
     this.velocity.x = this.rotation / 10; // divide so it moves slower
     this.rotation = 0;
+    this.rotationDirection = -1;
     cardio.setMovingRectWidthToHalf();
   }
 }

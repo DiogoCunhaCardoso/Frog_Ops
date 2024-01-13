@@ -63,7 +63,6 @@ export let cardio = (function () {
       isGameInitialized = true;
     }
     updateGame();
-    console.log(gem);
   }
 
   // GAME MANAGEMENT
@@ -115,12 +114,15 @@ export let cardio = (function () {
       let object = new Player({ x: 0, y: 0 });
       let player = new Player({
         position: {
-          x: 24 * scaleFactor - object.width / 2,
-          y: 0 + object.height,
+          x: W,
+          y: 24 * scaleFactor,
         },
         allPlatforms,
         allBirds,
         getStats: sendGameOverStats,
+        imageSrc: "../images/cardio/player.svg",
+        frameRate: 7,
+        frameBuffer: 24,
       });
       players.push(player);
     }
@@ -412,15 +414,15 @@ export let cardio = (function () {
       switch (e.code) {
         case "Digit1":
         case "Numpad1":
-          players[0].jump(-3);
+          players[0].jump(-5);
           break;
         case "Digit2":
         case "Numpad2":
-          players[0].jump(-5);
+          players[0].jump(-7);
           break;
         case "Digit3":
         case "Numpad3":
-          players[0].jump(-6);
+          players[0].jump(-9);
           break;
       }
     }

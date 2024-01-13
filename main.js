@@ -24,7 +24,7 @@ export let H, W;
 export const ActiveInits = {
   isStartingMenuActive: false,
   isGemsActive: false,
-  isCardioActive: false,
+  isCardioActive: true,
   isAgilityActive: false,
   isStrengthActive: false,
   isRestartActive: false,
@@ -41,11 +41,11 @@ window.onload = function () {
   setModeFunctions();
   setCanvasSize();
   checkOrientation();
-  loadAssets();
+  /* loadAssets(); */
   render();
 };
 
-function loadAssets() {
+/* function loadAssets() {
   if (!sources || sources === 0) {
     return;
   }
@@ -78,7 +78,6 @@ function loadAssets() {
     image.src = sources[i];
     image.onload = function () {
       completedAssetsCount++;
-      console.log("Loaded: " + completedAssetsCount + " " + image.src);
       // Check both conditions
       if (completedAssetsCount === assetCount && oneSecondPassed) {
         gsap.to(overlay, {
@@ -98,12 +97,15 @@ function loadAssets() {
     };
   }
 }
-
+ */
 /* Scale factor, things are written as for 320px wide
    screen and they have times scale factor for every size */
 
 let baseWidth = 320;
 export let scaleFactor = window.innerWidth / baseWidth;
+
+/* let baseHeight = 180;
+export let scaleHeightFactor = window.innerWidth / baseHeight; */
 
 /* Ensures the canvas is always
    with the correct Ratio of 16/9 */
@@ -187,7 +189,7 @@ export const Modes = {
 };
 
 export let currentMode = {
-  mode: Modes.LOADING, // Default
+  mode: Modes.CARDIO, // LOADING
   modes: [],
   run: function () {
     this.modes[this.mode]();
