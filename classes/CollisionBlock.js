@@ -1,10 +1,9 @@
 import { ctx, scaleFactor } from "../main.js";
+import { Sprite } from "./Sprite.js";
 
-export class CollisionBlock {
-  /*  static lastId = 0; // starts at 0 */
-
-  constructor({ position }, type) {
-    /* this.id = CollisionBlock.lastId++; // maybe I need this to solve the score issue after */
+export class CollisionBlock extends Sprite {
+  constructor({ position, imageSrc, frameRate, frameBuffer }, type) {
+    super({ position, imageSrc, frameRate, frameBuffer });
     this.position = position;
     this.velocity = {
       y: 0.15 * scaleFactor,
@@ -12,28 +11,22 @@ export class CollisionBlock {
     };
     this.height = 16 * scaleFactor;
     this.width = 44 * scaleFactor;
-    this.type = type; // 'bird' or 'platform'
+    this.type = type; // 'bird' | 'platform' | 'gem'
   }
 
   draw() {
-    if (this.type === "platform") {
-      ctx.fillStyle = "white";
-    } else if (this.type === "bird") {
-      ctx.fillStyle = "red";
-    } else if (this.type === "gem") {
-      ctx.fillStyle = "green";
-    }
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    this.drawSprite();
   }
 
   update() {
+    this.updateFrames()
     this.draw();
     this.checkType();
   }
 
   checkType() {
     if (this.type === "bird") {
-      this.position.x += this.velocity.x; // Horizontal movement for birds
+      this.position.x -= this.velocity.x; // Horizontal movement for birds
     } else if (this.type === "platform" || this.type === "gem") {
       this.position.y += this.velocity.y; // Vertical movement for platforms
     }

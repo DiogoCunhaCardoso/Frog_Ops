@@ -15,8 +15,7 @@ export class Sprite {
     this.elapsedFrames = 0;
   }
 
-  drawSprite(x, y) {
-    // x, y
+  drawSprite(translate = false) {
     if (!this.image) return;
 
     const cropBox = {
@@ -28,16 +27,17 @@ export class Sprite {
       height: this.image.height,
     };
 
+    let drawX = translate ? -this.width / 2 : this.position.x;
+    let drawY = translate ? -this.height : this.position.y;
+
     ctx.drawImage(
       this.image,
       cropBox.position.x,
       cropBox.position.y,
       cropBox.width,
       cropBox.height,
-      x,
-      y,
-      //this.position.x,
-      //this.position.y,
+      drawX,
+      drawY,
       this.width,
       this.height
     );

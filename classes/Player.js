@@ -27,8 +27,6 @@ export class Player extends Sprite {
       x: 0,
       y: 1,
     };
-    this.height = 30 * scaleFactor;
-    this.width = 25 * scaleFactor;
 
     // rotating
     this.isRotating = false;
@@ -50,28 +48,26 @@ export class Player extends Sprite {
 
   draw() {
     ctx.save();
-
-    // set pivot point
-        ctx.translate(
+    // PIVOT POINT AND ROTATION
+    ctx.translate(
       this.position.x + this.width / 2,
       this.position.y + this.height
     );
-
-    // apply rotation
     if (this.isRotating) {
       ctx.rotate((this.rotation * Math.PI) / 180);
     }
 
     // move on x axis when jumping
     this.position.x += this.velocity.x;
-
-    // Draw the rectangle around the new origin
-    this.drawSprite(-this.width / 2, -this.height);
-
+    //Draw Player
+    this.drawSprite(true);
     ctx.restore();
   }
 
   update() {
+    ctx.save();
+    ctx.fillStyle = "red";
+    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
     this.updateFrames();
     //
     this.draw();
@@ -83,6 +79,7 @@ export class Player extends Sprite {
     this.gravityAndHitGround();
     this.checkForBirdCollisions();
     this.checkForVerticalPlatformCollisions();
+    ctx.restore();
   }
 
   //

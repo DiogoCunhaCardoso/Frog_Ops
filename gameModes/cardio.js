@@ -22,7 +22,7 @@ import { colors } from "../utils/style.js";
 
 export let gameOverStats; // to be used in 'restart.js'
 export let gameWonStats; // to be used in 'success.js'
-let isGameInitialized = false;
+let isGameReseted = false;
 
 export let cardio = (function () {
   ("use strict");
@@ -57,10 +57,10 @@ export let cardio = (function () {
 
   // INITIALIZATION
   function init() {
-    if (!isGameInitialized) {
+    if (!isGameReseted) {
       resetGame(); // resets game states
       canvas.addEventListener("click", handleClick);
-      isGameInitialized = true;
+      isGameReseted = true;
     }
     updateGame();
   }
@@ -97,6 +97,7 @@ export let cardio = (function () {
     renderUI();
   }
 
+  // Used everytime the game starts so it resets everything.
   function resetGame() {
     players = [];
     allPlatforms = [];
@@ -109,13 +110,13 @@ export let cardio = (function () {
     gem = null;
   }
 
+  // Initialzes Player
   function initPlayer() {
     if (players.length === 0) {
-      let object = new Player({ x: 0, y: 0 });
-      let player = new Player({
+      const player = new Player({
         position: {
-          x: W,
-          y: 24 * scaleFactor,
+          x: 9 * scaleFactor,
+          y: 0,
         },
         allPlatforms,
         allBirds,
@@ -135,7 +136,7 @@ export let cardio = (function () {
       score: players[0]?.score,
       maxScore: 25,
     };
-    isGameInitialized = false;
+    isGameReseted = false;
     ctx.restore;
   }
 
@@ -145,7 +146,7 @@ export let cardio = (function () {
       gameMode: "cardioGem",
       score: 25,
     };
-    isGameInitialized = false;
+    isGameReseted = false;
     ctx.restore;
   }
 
@@ -219,14 +220,20 @@ export let cardio = (function () {
   // PLATFORMS & GEM
 
   function getRandomBlockX() {
-    let block = new CollisionBlock({ x: 0, y: 0 });
+    let block = new CollisionBlock({
+      position: { x: 0, y: 0 },
+      imageSrc: "../images/cardio/cloud.svg",
+    });
     let xRange =
       Math.random() * (W - block.width - block.width * 2) + block.width;
     return Math.round(xRange);
   }
 
   function createRandomPlatformsAndGem() {
-    let block = new CollisionBlock({ x: 0, y: 0 });
+    let block = new CollisionBlock({
+      position: { x: 0, y: 0 },
+      imageSrc: "../images/cardio/cloud.svg",
+    });
     const currentTime = Date.now();
 
     if (
@@ -249,7 +256,10 @@ export let cardio = (function () {
 
       allPlatforms.push(
         new CollisionBlock(
-          { position: { x: newX, y: 0 - block.height } },
+          {
+            position: { x: newX, y: 0 - block.height },
+            imageSrc: "../images/cardio/cloud.svg",
+          },
           "platform"
         )
       );
@@ -259,7 +269,13 @@ export let cardio = (function () {
         // Position for the gem
         const gemX = newX;
         const gemY = 0 - block.height * 2 - 2 * scaleFactor;
-        gem = new CollisionBlock({ position: { x: gemX, y: gemY } }, "gem");
+        gem = new CollisionBlock(
+          {
+            position: { x: gemX, y: gemY },
+            imageSrc: "../images/cardio/collectible_gem.svg",
+          },
+          "gem"
+        );
       }
       if (players[0].score === 5) {
         stopBuilding = true;
@@ -303,14 +319,16 @@ export let cardio = (function () {
   // BIRDS
 
   function getRandomBirdY() {
-    let bird = new CollisionBlock({ x: 0, y: 0 });
+    let bird = new CollisionBlock({
+      position: { x: 0, y: 0 },
+      imageSrc: "../images/cardio/bird.svg",
+    });
     let yRange =
       Math.random() * (H - bird.height - bird.height * 2) + bird.height;
     return Math.round(yRange);
   }
 
   function createRandomBirds() {
-    let bird = new CollisionBlock({ x: 0, y: 0 });
     const currentTime = Date.now();
 
     if (currentTime - lastBirdCreationTime > BIRD_CREATION_INTERVAL) {
@@ -329,7 +347,15 @@ export let cardio = (function () {
       }
 
       allBirds.push(
-        new CollisionBlock({ position: { x: 0 - bird.width, y: newY } }, "bird")
+        new CollisionBlock(
+          {
+            position: { x: W, y: newY },
+            imageSrc: "../images/cardio/bird.svg",
+            frameRate: 6,
+            frameBuffer: 32,
+          },
+          "bird"
+        )
       );
       lastBirdCreationTime = currentTime;
     }
@@ -339,7 +365,7 @@ export let cardio = (function () {
     allBirds.forEach((bird, i) => {
       bird.update();
 
-      if (bird.position.x > W) {
+      if (bird.position.x < 0) {
         allBirds.splice(i, 1);
       }
     });
@@ -384,7 +410,7 @@ export let cardio = (function () {
           ActiveInits.isStartingMenuActive = true;
           ActiveInits.isCardioActive = false;
           overlay.opacity = 0;
-          isGameInitialized = false;
+          isGameReseted = false;
         },
       });
     }
