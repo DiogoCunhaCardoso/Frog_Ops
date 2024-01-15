@@ -8,16 +8,15 @@ import {
   Modes,
 } from "../main.js";
 import { collision } from "../utils/utils.js";
-import { cardio } from "../gameModes/cardio.js";
 import { overlay, applyCanvasOpacity } from "../utils/utils.js";
 import { Sprite } from "./Sprite.js";
+import { cState } from "../gameModes/Cardio/cardio_state.js";
 
 export class Player extends Sprite {
   constructor({
     position,
     allPlatforms,
     allBirds,
-    getStats,
     imageSrc,
     frameRate,
     frameBuffer,
@@ -39,7 +38,6 @@ export class Player extends Sprite {
     // for collision
     this.allPlatforms = allPlatforms; // platforms
     this.allBirds = allBirds; // birds
-    this.getGameOverStats = getStats;
 
     // for points
     this.score = 0;
@@ -66,8 +64,8 @@ export class Player extends Sprite {
 
   update() {
     ctx.save();
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    /*     ctx.fillStyle = "red";
+    ctx.fillRect(this.position.x, this.position.y, this.width, this.height); */
     this.updateFrames();
     //
     this.draw();
@@ -207,7 +205,12 @@ export class Player extends Sprite {
             overlay.opacity = 0;
           },
         });
-        this.getGameOverStats();
+        cState.stats.gameOver = {
+          gameMode: "Cardio",
+          score: cState.player.allPlayers[0]?.score,
+          maxScore: 25,
+        };
+        cState.isGameReseted = false;
       }
     }
   }
@@ -220,6 +223,6 @@ export class Player extends Sprite {
     this.velocity.x = this.rotation / 10; // divide so it moves slower
     this.rotation = 0;
     this.rotationDirection = -1;
-    cardio.setMovingRectWidthToHalf();
+    cState.ui.movingRectWidth = 45 / 2;
   }
 }

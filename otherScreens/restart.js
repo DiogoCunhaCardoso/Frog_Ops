@@ -1,3 +1,4 @@
+import { cState } from "../gameModes/Cardio/cardio_state.js";
 import {
   ctx,
   canvas,
@@ -9,15 +10,21 @@ import {
   Modes,
 } from "../main.js";
 import { colors } from "../utils/style.js";
-import { gameOverStats as stats } from "../gameModes/cardio.js";
 import {
   applyCanvasOpacity,
+  drawButton,
   isClickWithinBounds,
   overlay,
 } from "../utils/utils.js";
 
 export let restart = (function () {
   ("use strict");
+
+  const rState = {
+    ui: {
+      btnNextBounds: {},
+    },
+  };
 
   let arrowImage = new Image();
   arrowImage.src = "../images/restart/selectedIcon.svg";
@@ -44,14 +51,36 @@ export let restart = (function () {
     ctx.fillStyle = colors.bg_light;
     ctx.fillRect(0, 0, W, H);
     highScoreGroup({
-      gameMode: stats?.gameMode,
+      gameMode: cState.stats.gameOver.gameMode,
       highScore: currentCardioHighScore,
     });
-    GameOverGroup({ score: stats?.score, maxScore: stats?.maxScore });
+    GameOverGroup({
+      score: cState.stats.gameOver.score,
+      maxScore: cState.stats.gameOver.maxScore,
+    });
     PlayAgainGroup(isYesSelected, arrowImage);
     setHighScore();
-    window.addEventListener("keydown", handleKeyPress, handleButtonClick);
+    drawTouchButton();
+    window.addEventListener("keydown", handleKeyPress, handleYesNoClick);
     window.addEventListener("click", handleClick);
+  }
+
+  function drawTouchButton() {
+    const buttonHeight = 10 * scaleFactor;
+    const margin = 16 * scaleFactor;
+    const buttonWidth = 40 * scaleFactor;
+    const buttonY = H - buttonHeight - margin;
+    const buttonX = W - buttonWidth - margin;
+
+    const bounds = {
+      x: buttonX,
+      y: buttonY,
+      width: buttonWidth,
+      height: buttonHeight,
+    };
+
+    rState.ui.btnNextBounds = bounds;
+    drawButton({ text: "Next", ...bounds });
   }
 
   function toggleSelection() {
@@ -59,9 +88,12 @@ export let restart = (function () {
   }
 
   function setHighScore() {
-    if (stats?.score > currentCardioHighScore) {
-      localStorage.setItem(cardioHighScore, stats?.score.toString());
-      currentCardioHighScore = stats?.score;
+    if (cState.stats.gameOver.score > currentCardioHighScore) {
+      localStorage.setItem(
+        cardioHighScore,
+        cState.stats.gameOver.score.toString()
+      );
+      currentCardioHighScore = cState.stats.gameOver.score;
     } else if (isNaN(currentCardioHighScore)) {
       currentCardioHighScore = 0;
       localStorage.setItem(cardioHighScore, "0");
@@ -280,10 +312,11 @@ export let restart = (function () {
     let mouseX = event.clientX - canvas.getBoundingClientRect().left;
     let mouseY = event.clientY - canvas.getBoundingClientRect().top;
 
-    handleButtonClick(mouseX, mouseY);
+    handleYesNoClick(mouseX, mouseY);
+    handleNextClick(mouseX, mouseY);
   }
 
-  function handleButtonClick(mouseX, mouseY) {
+  function handleYesNoClick(mouseX, mouseY) {
     const yesButtonBounds = rectangles[0];
     const noButtonBounds = rectangles[1];
     if (ActiveInits.isRestartActive) {
@@ -291,6 +324,38 @@ export let restart = (function () {
         isYesSelected = true;
       } else if (isClickWithinBounds(mouseX, mouseY, noButtonBounds)) {
         isYesSelected = false;
+      }
+    }
+  }
+
+  function handleNextClick(mouseX, mouseY) {
+    if (ActiveInits.isRestartActive) {
+      if (isClickWithinBounds(mouseX, mouseY, rState.ui.btnNextBounds)) {
+        if (isYesSelected) {
+          gsap.to(overlay, {
+            opacity: 1,
+            duration: 0.5,
+            onUpdate: applyCanvasOpacity,
+            onComplete: () => {
+              currentMode.mode = Modes.CARDIO;
+              ActiveInits.isCardioActive = true;
+              ActiveInits.isRestartActive = false;
+              overlay.opacity = 0;
+            },
+          });
+        } else {
+          gsap.to(overlay, {
+            opacity: 1,
+            duration: 0.5,
+            onUpdate: applyCanvasOpacity,
+            onComplete: () => {
+              currentMode.mode = Modes.STARTING_MENU;
+              ActiveInits.isStartingMenuActive = true;
+              ActiveInits.isRestartActive = false;
+              overlay.opacity = 0;
+            },
+          });
+        }
       }
     }
   }

@@ -1,5 +1,5 @@
 import { startingMenu } from "./otherScreens/startingMenu.js";
-import { cardio } from "./gameModes/cardio.js";
+import { cardio } from "./gameModes/Cardio/cardio_logic.js";
 import { agility } from "./gameModes/agility.js";
 import { strength } from "./gameModes/strength.js";
 import { gems } from "./otherScreens/gems.js";
@@ -8,23 +8,21 @@ import { restart } from "./otherScreens/restart.js";
 import { success } from "./otherScreens/success.js";
 import { loading } from "./otherScreens/loading.js";
 import { sources } from "./utils/preloader.js";
-import {
-  applyCanvasOpacity,
-  applyCanvasSlideOut,
-  overlay,
-} from "./utils/utils.js";
+import { applyCanvasSlideOut, overlay } from "./utils/utils.js";
 
 export const canvas = document.querySelector("canvas");
 export const ctx = canvas.getContext("2d");
 
 export let H, W;
 
+export let isTouchDevice = null;
+
 /* Flags to disable or able 'pages' */
 
 export const ActiveInits = {
   isStartingMenuActive: false,
   isGemsActive: false,
-  isCardioActive: true,
+  isCardioActive: false,
   isAgilityActive: false,
   isStrengthActive: false,
   isRestartActive: false,
@@ -41,11 +39,12 @@ window.onload = function () {
   setModeFunctions();
   setCanvasSize();
   checkOrientation();
-  /* loadAssets(); */
+  loadAssets();
+  checkIfTouchScreenDevice();
   render();
 };
 
-/* function loadAssets() {
+function loadAssets() {
   if (!sources || sources === 0) {
     return;
   }
@@ -97,9 +96,21 @@ window.onload = function () {
     };
   }
 }
- */
+
 /* Scale factor, things are written as for 320px wide
    screen and they have times scale factor for every size */
+
+function checkIfTouchScreenDevice() {
+  if (
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0 ||
+    navigator.msMaxTouchPoints > 0
+  ) {
+    isTouchDevice = true;
+  } else {
+    isTouchDevice = false;
+  }
+}
 
 let baseWidth = 320;
 export let scaleFactor = window.innerWidth / baseWidth;
@@ -189,7 +200,7 @@ export const Modes = {
 };
 
 export let currentMode = {
-  mode: Modes.CARDIO, // LOADING
+  mode: Modes.LOADING, // LOADING
   modes: [],
   run: function () {
     this.modes[this.mode]();

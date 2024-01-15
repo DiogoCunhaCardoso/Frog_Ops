@@ -17,7 +17,7 @@ export let agility = (function () {
 
     drawPlaque(
       goBackPlaque,
-      "../images/gems/plaque_back.svg",
+      "../images/plaque_back.svg",
       { x: 0, y: 0 },
       backPlaqueBounds,
       () => {

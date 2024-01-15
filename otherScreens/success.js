@@ -1,4 +1,4 @@
-import { gameWonStats as stats } from "../gameModes/cardio.js";
+import { cState } from "../gameModes/Cardio/cardio_state.js";
 import {
   ctx,
   canvas,
@@ -9,11 +9,12 @@ import {
   currentMode,
   Modes,
 } from "../main.js";
-import { colors, texts } from "../utils/style.js";
+import { texts } from "../utils/style.js";
 import {
   overlay,
   applyCanvasOpacity,
   isClickWithinBounds,
+  drawButton,
 } from "../utils/utils.js";
 export let success = (function () {
   ("use strict");
@@ -26,24 +27,25 @@ export let success = (function () {
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = "black";
     YouWonGroup({
-      score: stats?.score,
-      maxScore: stats?.score,
-      gameName: stats?.gameMode,
+      score: cState.stats.gameWon.score,
+      maxScore: cState.stats.gameWon.score,
+      gameName: cState.stats.gameWon.gameMode,
     });
-    buttonBounds = {
+    drawGemsButton();
+    drawGem();
+    canvas.addEventListener("click", handleClick);
+  }
+
+  function drawGemsButton() {
+    const bounds = {
       x: W / 2 - (40 * scaleFactor) / 2,
       y: 132 * scaleFactor,
       width: 40 * scaleFactor,
       height: 10 * scaleFactor,
     };
-    drawButton({
-      text: "Gems",
-      x: W / 2 - (40 * scaleFactor) / 2,
-      y: 132,
-      width: 40,
-      height: 10,
-    });
-    canvas.addEventListener("click", handleClick);
+
+    buttonBounds = bounds;
+    drawButton({ text: "Next", ...bounds });
   }
 
   function YouWonGroup({ score = 0, maxScore = 0, gameName = "disabled" }) {
@@ -51,8 +53,6 @@ export let success = (function () {
 
     //Global Stylings
     const centerX = W / 2;
-    const centerY = H / 2;
-    const lineSpacing = 16 * scaleFactor;
 
     // 'For You Won' Text
     texts.highlightStyle.applyStyle(ctx, scaleFactor);
@@ -64,7 +64,7 @@ export let success = (function () {
     ctx.fillText(youWonText, youWonTextX, 105 * scaleFactor);
     ctx.restore();
 
-    drawSpecificgGem(gameName);
+    drawGem();
 
     // For Score Text
     ctx.save();
@@ -73,7 +73,6 @@ export let success = (function () {
     let resultText = `SCORE: ${score} / ${maxScore}`;
     const totalWidth = ctx.measureText(resultText).width;
     const resultTextX = centerX - totalWidth / 2;
-    const resultTextY = centerY + lineSpacing;
 
     ctx.strokeText(resultText, resultTextX, 122 * scaleFactor);
     ctx.fillText(resultText, resultTextX, 122 * scaleFactor);
@@ -81,7 +80,7 @@ export let success = (function () {
     ctx.restore();
   }
 
-  function drawSpecificgGem(gameName) {
+  function drawGem(gameName = "cardioGem") {
     const gemImages = {
       cardioGem: "../images/gems/gem_cardio.svg",
       agilityGem: "../images/gems/gem_agility.svg",
@@ -100,52 +99,6 @@ export let success = (function () {
       gemImage.width * scaleFactor,
       gemImage.height * scaleFactor
     );
-  }
-
-  function drawButton({ text, x, y, width, height }) {
-    ctx.save();
-    // Draw the button background
-    ctx.lineWidth = 2 * scaleFactor;
-    ctx.strokeStyle = colors.brown;
-    ctx.shadowColor = colors.brown;
-    ctx.fillStyle = colors.yellow;
-    ctx.shadowOffsetY = 1 * scaleFactor;
-    ctx.strokeRect(
-      x,
-      y * scaleFactor,
-      width * scaleFactor,
-      height * scaleFactor
-    );
-    ctx.fillRect(x, y * scaleFactor, width * scaleFactor, height * scaleFactor);
-    ctx.restore();
-
-    // Draw the top part of the button
-    ctx.fillStyle = "#FFE380";
-    ctx.fillRect(
-      x,
-      y * scaleFactor,
-      width * scaleFactor,
-      (height / 3) * scaleFactor
-    );
-
-    // Text styling
-    ctx.save();
-    const fontSize = 5 * scaleFactor;
-    ctx.font = `${fontSize}px RetroGaming`;
-    ctx.fillStyle = colors.white;
-    ctx.strokeStyle = colors.brown;
-    ctx.shadowColor = colors.brown;
-    ctx.lineWidth = 1.2 * scaleFactor;
-    ctx.shadowOffsetY = 0.6 * scaleFactor;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    // Calculate text position for centering
-    const textX = x + (width * scaleFactor) / 2;
-    const textY = y * scaleFactor + (height * scaleFactor) / 2;
-    // Draw the text
-    ctx.strokeText(text, textX, textY);
-    ctx.fillText(text, textX, textY);
-    ctx.restore();
   }
 
   // Handles click events on the canvas.
