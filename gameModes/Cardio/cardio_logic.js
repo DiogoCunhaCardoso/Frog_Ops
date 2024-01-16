@@ -7,6 +7,7 @@ import {
   currentMode,
   Modes,
   scaleFactor,
+  scaleHeightFactor,
 } from "../../main.js";
 import {
   overlay,
@@ -63,7 +64,7 @@ export const cardio = (function () {
     createRandomPlatformsAndGem();
     updatePlatforms();
     // birds
-    if (cState.player.allPlayers[0].score >= 15) {
+    if (cState.player.allPlayers[0].score >= 1) {
       createRandomBirds();
       updateBirds();
     }
@@ -83,15 +84,15 @@ export const cardio = (function () {
   function resetGame() {
     cState.player.allPlayers = [];
     cState.platform.allPlatforms = [];
+    cState.platform.stopBuilding = false;
     cState.bird.allBirds = [];
-    initPlayer();
     cState.platform.lastPlatformCreationTime = Date.now();
     cState.bird.lastBirdCreationTime = Date.now();
     cState.ui.movingRectWidth = 45 / 2;
     cState.ui.directionInc = -0.25;
     cState.gem.obj = null;
-    cState.stats.gameOver = {}
-    cState.stats.gameWon = {}
+    CollisionBlock.nextPlatformId = 0;
+    initPlayer();
   }
 
   /**
@@ -348,15 +349,15 @@ export const cardio = (function () {
       switch (e.code) {
         case "Digit1":
         case "Numpad1":
-          cState.player.allPlayers[0].jump(-5);
+          cState.player.allPlayers[0].jump(-2.5 * scaleHeightFactor);
           break;
         case "Digit2":
         case "Numpad2":
-          cState.player.allPlayers[0].jump(-7);
+          cState.player.allPlayers[0].jump(-4 * scaleHeightFactor);
           break;
         case "Digit3":
         case "Numpad3":
-          cState.player.allPlayers[0].jump(-9);
+          cState.player.allPlayers[0].jump(-5 * scaleHeightFactor);
           break;
       }
     }

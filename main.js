@@ -1,4 +1,4 @@
-import { startingMenu } from "./otherScreens/startingMenu.js";
+import { startingMenu } from "./otherScreens/StartingMenu/startingMenu.js";
 import { cardio } from "./gameModes/Cardio/cardio_logic.js";
 import { agility } from "./gameModes/agility.js";
 import { strength } from "./gameModes/strength.js";
@@ -9,6 +9,9 @@ import { success } from "./otherScreens/success.js";
 import { loading } from "./otherScreens/loading.js";
 import { sources } from "./utils/preloader.js";
 import { applyCanvasSlideOut, overlay } from "./utils/utils.js";
+import { cState } from "./gameModes/Cardio/cardio_state.js";
+
+let appState = {};
 
 export const canvas = document.querySelector("canvas");
 export const ctx = canvas.getContext("2d");
@@ -112,8 +115,15 @@ function checkIfTouchScreenDevice() {
   }
 }
 
+let scale = {
+  width: 320,
+  height: 180,
+};
+// Scale Factor
 let baseWidth = 320;
+let baseHeight = 180;
 export let scaleFactor = window.innerWidth / baseWidth;
+export let scaleHeightFactor = window.innerHeight / baseHeight;
 
 /* let baseHeight = 180;
 export let scaleHeightFactor = window.innerWidth / baseHeight; */
@@ -148,6 +158,7 @@ function setCanvasSize() {
 
   // Scale factor update might be necessary if you rely on it elsewhere
   scaleFactor = W / baseWidth;
+  scaleHeightFactor = H / baseHeight;
 
   render();
 }
@@ -229,9 +240,11 @@ function render() {
 
 const debouncedResize = debounce(() => {
   scaleFactor = window.innerWidth / baseWidth;
+  scaleHeightFactor = window.innerHeight / baseHeight;
   checkOrientation();
   setCanvasSize();
-  currentMode.run();
+  render();
+  if (ActiveInits.isCardioActive) cState.isGameReseted = false;
 }, 200);
 
 window.addEventListener("resize", debouncedResize);

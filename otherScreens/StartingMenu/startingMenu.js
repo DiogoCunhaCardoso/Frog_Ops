@@ -7,80 +7,99 @@ import {
   ActiveInits,
   currentMode,
   Modes,
-} from "../main.js";
+} from "../../main.js";
 import {
   drawPlaque,
   overlay,
   applyCanvasOpacity,
   isClickWithinBounds,
-} from "../utils/utils.js";
-import { texts } from "../utils/style.js";
+} from "../../utils/utils.js";
+import { texts } from "../../utils/style.js";
+import { startingMenuState as state } from "./startingMenu_state.js";
+import { Sprite } from "../../classes/Sprite.js";
 
 export let startingMenu = (function () {
   ("use strict");
 
-  /* 
-  Global Variables
-  */
-
-  const options = ["CARDIO", "AGILITY", "STRENGTH"];
-  let selectedIndex = 0;
-  let rectangles = []; // to interact with
-
-  // PLAQUES
-  let gemsPlaqueImage = new Image();
-  let gemsPlaqueBounds = {};
-  let plaqueImage = new Image();
-  let plaqueBounds = {};
-
   // BACKGROUND
   let isBgLoaded = false;
-  let backgroundImage = null;
-
-  let sprite = {
-    image: new Image(),
-    size: 32,
-    currentFrame: 0,
-    frameCount: 0,
-  };
 
   /* Initializes other functions
   all in one place to be called as 'init' */
 
   function init() {
+/*     if (!state.isPageReseted) {
+      initImages();
+      //initBounds();
+      canvas.addEventListener("click", handleClick);
+      state.isPageReseted = true;
+    } */
+    updatePage();
+    canvas.addEventListener("click", handleClick);
+  }
+
+/*   function initImages() {
+    state.background.image = new Sprite({
+      position: { x: 0, y: 0 },
+      imageSrc: "../images/startingMenu/bg.svg",
+    });
+    state.plaque.nextImage = new Sprite({
+      position: { x: 0 * scaleFactor, y: 0 },
+      imageSrc: "../images/startingMenu/plaque.svg",
+    });
+    state.plaque.gemImage = new Sprite({
+      position: { x: 14 * scaleFactor, y: 0 },
+      imageSrc: "../images/startingMenu/plaqueGems.svg",
+    });
+  }
+
+  function drawBgImage() {
+    state.background.image.drawSprite();
+  }
+  function drawNextPlaque() {
+    state.plaque.nextImage.drawSprite();
+  }
+  function drawGemsPlaque() {
+    state.plaque.gemImage.drawSprite();
+  } */
+
+  function updatePage() {
     //Clear canvas after each frame
     ctx.clearRect(0, 0, W, H);
     //Draw background Image
     drawBgImage();
-    //
-    if (isBgLoaded == true) {
-      drawGameName();
-      drawOptions();
-      drawPlaque(
-        gemsPlaqueImage,
-        "../images/startingMenu/plaqueGems.svg",
-        { x: 14 * scaleFactor, y: 0 }, // y is temporary
-        gemsPlaqueBounds,
-        () => {
-          gemsPlaqueBounds.y = H - gemsPlaqueBounds.height - 10 * scaleFactor;
-        }
-      );
-      drawPlaque(
-        plaqueImage,
-        "../images/startingMenu/plaque.svg",
-        { x: 0 * scaleFactor, y: 0 },
-        plaqueBounds,
-        () => {
-          plaqueBounds.x = W - plaqueBounds.width - 20 * scaleFactor;
-          plaqueBounds.y = H - plaqueBounds.height - 10 * scaleFactor;
-        }
-      );
-      updateSpriteAndAnimation();
-      window.addEventListener("keydown", handleKeyPress);
-    }
+/*     drawNextPlaque();
+    drawGemsPlaque(); */
     //
 
-    canvas.addEventListener("click", handleClick);
+    drawGameName();
+    drawOptions();
+    drawPlaque(
+      state.plaque.gemImage,
+      "../images/startingMenu/plaqueGems.svg",
+      { x: 14 * scaleFactor, y: 0 }, // y is temporary
+      state.plaque.gemBounds,
+      () => {
+        state.plaque.gemBounds.y =
+          H - state.plaque.gemBounds.height - 10 * scaleFactor;
+      }
+    );
+    drawPlaque(
+      state.plaque.nextImage,
+      "../images/startingMenu/plaque.svg",
+      { x: 0 * scaleFactor, y: 0 },
+      state.plaque.nextBounds,
+      () => {
+        state.plaque.nextBounds.x =
+          W - state.plaque.nextBounds.width - 20 * scaleFactor;
+        state.plaque.nextBounds.y =
+          H - state.plaque.nextBounds.height - 10 * scaleFactor;
+      }
+    );
+    updateSpriteAndAnimation();
+    if (ActiveInits.isStartingMenuActive) {
+      window.addEventListener("keydown", handleKeysPress);
+    }
   }
 
   /* Animates the sprite by cycling through frames. The function draws a portion 
@@ -89,58 +108,54 @@ export let startingMenu = (function () {
 
   function spriteAnimation(lastFrame, staggerFrames) {
     ctx.drawImage(
-      sprite.image,
-      sprite.currentFrame * sprite.size,
-      0,  
-      sprite.size,
-      sprite.size,
-      40 * scaleFactor + sprite.size, // X position
-      H - sprite.size * scaleFactor * 2.4, // Y position
-      sprite.size * scaleFactor * 2.4,
-      sprite.size * scaleFactor * 2.4
+      state.sprite.props.image,
+      state.sprite.props.currentFrame * state.sprite.props.size,
+      0,
+      state.sprite.props.size,
+      state.sprite.props.size,
+      40 * scaleFactor + state.sprite.props.size, // X position
+      H - state.sprite.props.size * scaleFactor * 2.4, // Y position
+      state.sprite.props.size * scaleFactor * 2.4,
+      state.sprite.props.size * scaleFactor * 2.4
     );
-    if (sprite.frameCount % staggerFrames == 0) {
-      if (sprite.currentFrame < lastFrame - 1) sprite.currentFrame++;
-      else sprite.currentFrame = 0;
+    if (state.sprite.props.frameCount % staggerFrames == 0) {
+      if (state.sprite.props.currentFrame < lastFrame - 1)
+        state.sprite.props.currentFrame++;
+      else state.sprite.props.currentFrame = 0;
     }
 
-    sprite.frameCount++;
+    state.sprite.props.frameCount++;
   }
 
   /* Switches between different sprites and their respective
   animations as per the user's selected game mode */
 
   function updateSpriteAndAnimation() {
-    switch (selectedIndex) {
-      case 0:
-        sprite.image.src = "../images/startingMenu/sprite_cardio.svg";
-        spriteAnimation(4, 24);
-        break;
-      case 1:
-        sprite.image.src = "../images/startingMenu/sprite_agility.svg";
-        spriteAnimation(10, 30);
-        break;
-      case 2:
-        sprite.image.src = "../images/startingMenu/sprite_strength.svg";
-        spriteAnimation(10, 30);
-        break;
+    const data = state.sprite.all[state.options.selectedIndex];
+    if (data) {
+      state.sprite.props.image.src = data.imagePath;
+      spriteAnimation(data.totalFrames, data.speed);
+    } else {
+      console.error(
+        `data doesn't exist for index ${state.options.selectedIndex}`
+      );
     }
   }
 
   /* Draws the background image. Loads the image if not already loaded, 
    and sets a flag once the image is available for rendering. */
 
-  function drawBgImage() {
+    function drawBgImage() {
     if (!isBgLoaded) {
-      backgroundImage = new Image();
-      backgroundImage.src = "../images/startingMenu/bg.svg";
+      state.background.image = new Image();
+      state.background.image.src = "../images/startingMenu/bg.svg";
 
-      backgroundImage.onload = function () {
-        ctx.drawImage(backgroundImage, 0, 0, W, H);
+      state.background.image.onload = function () {
+        ctx.drawImage(state.background.image, 0, 0, W, H);
         isBgLoaded = true;
       };
     } else {
-      ctx.drawImage(backgroundImage, 0, 0, W, H);
+      ctx.drawImage(state.background.image, 0, 0, W, H);
     }
   }
 
@@ -169,11 +184,11 @@ export let startingMenu = (function () {
 
   function setTextAndHitboxProperties(index) {
     ctx.save();
-    let rect = rectangles[index];
-    let text = options[index];
+    let rect = state.options.allBounds[index];
+    let text = state.options.all[index];
 
     // Apply styles based on selection
-    let isSelected = index === selectedIndex;
+    let isSelected = index === state.options.selectedIndex;
     texts.menuOptionStyle.applyStyle(ctx, scaleFactor, isSelected);
 
     // Center of the rectangle
@@ -197,17 +212,17 @@ export let startingMenu = (function () {
     }`;
 
     //draw Rectangles
-    for (let i = 0; i < options.length; i++) {
+    for (let i = 0; i < state.options.all.length; i++) {
       const lineHeight = 24 * scaleFactor;
       const rectHeight = texts.menuOptionStyle.fontSize * scaleFactor;
-      const rectWidth = ctx.measureText(options[i]).width;
+      const rectWidth = ctx.measureText(state.options.all[i]).width;
       const yCenter = H / 2;
 
       let rectPosY = yCenter - rectHeight / 2 + [-lineHeight, 0, lineHeight][i];
       const xTwoThirds = W - W / 3 - rectWidth / 2;
       const rectPosX = xTwoThirds;
 
-      rectangles[i] = {
+      state.options.allBounds[i] = {
         x: rectPosX,
         y: rectPosY,
         width: rectWidth,
@@ -217,8 +232,11 @@ export let startingMenu = (function () {
       setTextAndHitboxProperties(i);
 
       // to draw SOON text
-      if (options[i] === "AGILITY" || options[i] === "STRENGTH") {
-        const optionTextWidth = ctx.measureText(options[i]).width;
+      if (
+        state.options.all[i] === "AGILITY" ||
+        state.options.all[i] === "STRENGTH"
+      ) {
+        const optionTextWidth = ctx.measureText(state.options.all[i]).width;
         drawSoonText(
           rectPosX + optionTextWidth - rectWidth + rectWidth / 1.2,
           rectPosY - rectHeight / 1.4,
@@ -247,21 +265,23 @@ export let startingMenu = (function () {
   /* Handles mouse click events */
 
   function handleClick(event) {
-    let mouseX = event.clientX - canvas.getBoundingClientRect().left;
-    let mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    if (ActiveInits.isStartingMenuActive) {
+      let mouseX = event.clientX - canvas.getBoundingClientRect().left;
+      let mouseY = event.clientY - canvas.getBoundingClientRect().top;
 
-    handlePlaqueClick(mouseX, mouseY);
-    handleRectangleClick(mouseX, mouseY);
+      handlePlaqueClick(mouseX, mouseY);
+      handleRectangleClick(mouseX, mouseY);
+    }
   }
 
   /* Determines which menu option's hitbox was clicked, updates the selected 
    option, and redraws the menu to reflect the new selection. */
 
   function handleRectangleClick(mouseX, mouseY) {
-    for (let i = 0; i < rectangles.length; i++) {
-      let rect = rectangles[i];
+    for (let i = 0; i < state.options.allBounds.length; i++) {
+      let rect = state.options.allBounds[i];
       if (isClickWithinBounds(mouseX, mouseY, rect)) {
-        selectedIndex = i; // Update the selected index
+        state.options.selectedIndex = i; // Update the selected index
         drawOptions(); // Redraw options with the new selection
         return;
       }
@@ -274,31 +294,31 @@ export let startingMenu = (function () {
 
   function handlePlaqueClick(mouseX, mouseY) {
     // Plaque | Game Mode
-    if (!ActiveInits.isStartingMenuActive || selectedIndex < 0) {
+    if (!ActiveInits.isStartingMenuActive || state.options.selectedIndex < 0) {
       return;
     }
-    if (isClickWithinBounds(mouseX, mouseY, plaqueBounds)) {
+    if (isClickWithinBounds(mouseX, mouseY, state.plaque.nextBounds)) {
       gsap.to(overlay, {
         opacity: 1,
         duration: 1,
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
-          if (selectedIndex === 0) {
+          if (state.options.selectedIndex === 0) {
             ActiveInits.isCardioActive = true;
-          } else if (selectedIndex === 1) {
+          } else if (state.options.selectedIndex === 1) {
             ActiveInits.isAgilityActive = true;
-          } else if (selectedIndex === 2) {
+          } else if (state.options.selectedIndex === 2) {
             ActiveInits.isStrengthActive = true;
           }
 
-          currentMode.mode = selectedIndex + 1;
+          currentMode.mode = state.options.selectedIndex + 1;
           ActiveInits.isStartingMenuActive = false;
           overlay.opacity = 0;
         },
       });
     }
     // Plaque | Gems
-    if (isClickWithinBounds(mouseX, mouseY, gemsPlaqueBounds)) {
+    if (isClickWithinBounds(mouseX, mouseY, state.plaque.gemBounds)) {
       gsap.to(overlay, {
         opacity: 1,
         duration: 1,
@@ -313,36 +333,14 @@ export let startingMenu = (function () {
     }
   }
 
-  function handleKeyPress(event) {
-    if (ActiveInits.isStartingMenuActive) {
-      if (event.key === "ArrowDown") {
-        selectedIndex = (selectedIndex + 1) % options.length; // THIS IS GENIUS :o
-        drawOptions();
-      } else if (event.key === "ArrowUp") {
-        selectedIndex = (selectedIndex - 1 + options.length) % options.length;
+  function handleKeysPress(event) {
+    const keyAction = state.keys.actions[event.key];
+    if (keyAction) {
+      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+        state.options.selectedIndex = keyAction(state);
         drawOptions();
       } else if (event.key === "Enter") {
-        switch (selectedIndex) {
-          case 0:
-            ActiveInits.isCardioActive = true;
-            break;
-          case 1:
-            ActiveInits.isAgilityActive = true;
-            break;
-          case 2:
-            ActiveInits.isStrengthActive = true;
-            break;
-        }
-        gsap.to(overlay, {
-          opacity: 1,
-          duration: 0.5,
-          onUpdate: applyCanvasOpacity,
-          onComplete: () => {
-            currentMode.mode = selectedIndex + 1;
-            ActiveInits.isStartingMenuActive = false;
-            overlay.opacity = 0;
-          },
-        });
+        keyAction(state);
       }
     }
   }

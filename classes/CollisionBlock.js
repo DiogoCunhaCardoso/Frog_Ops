@@ -2,6 +2,8 @@ import { ctx, scaleFactor } from "../main.js";
 import { Sprite } from "./Sprite.js";
 
 export class CollisionBlock extends Sprite {
+  static nextPlatformId = 0;
+
   constructor({ position, imageSrc, frameRate, frameBuffer }, type) {
     super({ position, imageSrc, frameRate, frameBuffer });
     this.position = position;
@@ -12,6 +14,7 @@ export class CollisionBlock extends Sprite {
     this.height = 16 * scaleFactor;
     this.width = 44 * scaleFactor;
     this.type = type; // 'bird' | 'platform' | 'gem'
+    if (type === "platform") this.id = CollisionBlock.nextPlatformId++;
   }
 
   draw() {
@@ -19,7 +22,7 @@ export class CollisionBlock extends Sprite {
   }
 
   update() {
-    this.updateFrames()
+    this.updateFrames();
     this.draw();
     this.checkType();
   }

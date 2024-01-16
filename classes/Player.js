@@ -6,6 +6,7 @@ import {
   ActiveInits,
   currentMode,
   Modes,
+  scaleHeightFactor,
 } from "../main.js";
 import { collision } from "../utils/utils.js";
 import { overlay, applyCanvasOpacity } from "../utils/utils.js";
@@ -22,11 +23,11 @@ export class Player extends Sprite {
     frameBuffer,
   }) {
     super({ position, imageSrc, frameRate, frameBuffer });
+
     this.velocity = {
       x: 0,
       y: 1,
     };
-
     // rotating
     this.isRotating = false;
     this.rotationDirection = -1;
@@ -37,11 +38,11 @@ export class Player extends Sprite {
 
     // for collision
     this.allPlatforms = allPlatforms; // platforms
+    this.landedPlatforms = new Set(); // Set = stores only unique values
     this.allBirds = allBirds; // birds
 
     // for points
     this.score = 0;
-    this.hasScored = false;
   }
 
   draw() {
@@ -136,7 +137,7 @@ export class Player extends Sprite {
   gravityAndHitGround() {
     this.position.y += this.velocity.y;
     if (this.position.y + this.height + this.velocity.y < H - 6 * scaleFactor) {
-      this.velocity.y += this.gravity;
+      this.velocity.y += this.gravity * scaleHeightFactor;
     } else {
       // hit ground
       this.isInAir = false;
@@ -166,10 +167,10 @@ export class Player extends Sprite {
           this.velocity.x = 0;
           this.position.y =
             platform.position.y - this.height - 0.01 * scaleFactor;
-          if (!this.hasScored) {
+          if (!this.landedPlatforms.has(platform.id)) {
             // Increment score only if not already landed
             this.score++;
-            this.hasScored = true; // Set the flag to true
+            this.landedPlatforms.add(platform.id);
           }
           break;
         }
@@ -216,11 +217,10 @@ export class Player extends Sprite {
   }
 
   jump(speed) {
-    this.hasScored = false; // used for scoring
     this.isRotating = false;
     this.isInAir = true;
     this.velocity.y = speed; /* scaleFactor */
-    this.velocity.x = this.rotation / 10; // divide so it moves slower
+    this.velocity.x = (this.rotation / 20) * scaleFactor; // divide so it moves slower
     this.rotation = 0;
     this.rotationDirection = -1;
     cState.ui.movingRectWidth = 45 / 2;

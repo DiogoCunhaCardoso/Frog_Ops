@@ -1,5 +1,4 @@
 import {
-  canvas,
   ctx,
   W,
   H,

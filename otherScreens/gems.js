@@ -21,13 +21,6 @@ import { colors, texts } from "../utils/style.js";
 export let gems = (function () {
   ("use strict");
 
-  // Stores the status through LocalStorage.
-  let hasGems = {
-    cardioGem: hasGem("cardioGem"),
-    agilityGem: hasGem("agilityGem"),
-    strengthGem: hasGem("strengthGem"),
-  };
-
   const modes = ["CARDIO", "AGILITY", "STRENGTH"];
   let goBackPlaque = new Image();
   let backPlaqueBounds = {};
@@ -53,12 +46,18 @@ export let gems = (function () {
 
   // Checks if a specific gem is acquired (stored in localStorage)
   function hasGem(gemName) {
-    return localStorage.getItem(gemName) !== null;
+    return localStorage.getItem(gemName) === "true";
   }
 
   // Draws the gem images and their corresponding labels
   function drawGemsAndText() {
     ctx.save();
+    let hasGems = {
+      cardioGem: hasGem("cardioGem"),
+      agilityGem: hasGem("agilityGem"),
+      strengthGem: hasGem("strengthGem"),
+    };
+
     const gemImages = {
       cardioGem: "../images/gems/gem_cardio.svg",
       agilityGem: "../images/gems/gem_agility.svg",
@@ -67,6 +66,7 @@ export let gems = (function () {
     };
 
     texts.gemsStyle.applyStyle(ctx, scaleFactor);
+
     // Conditionally change Images and colors
     for (let i = 0; i < modes.length; i++) {
       let gemImage = new Image();

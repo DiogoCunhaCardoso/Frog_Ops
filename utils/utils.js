@@ -81,10 +81,6 @@ export function collision({ object1, object2 }) {
   );
 }
 
-export function NewGemAquired(gem) {
-  localStorage.setItem(gem, true);
-}
-
 export function drawButton({ text, x, y, width, height }) {
   ctx.save();
   // Draw the button background
@@ -119,4 +115,12 @@ export function drawButton({ text, x, y, width, height }) {
   ctx.strokeText(text, textX, textY);
   ctx.fillText(text, textX, textY);
   ctx.restore();
+}
+
+/**
+ * Sets Gem as true in localStorage
+ * @param {String} gem
+ */
+export function NewGemAquired(gem) {
+  localStorage.setItem(gem, true);
 }
