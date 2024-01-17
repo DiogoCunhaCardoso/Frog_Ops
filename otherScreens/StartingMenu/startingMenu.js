@@ -9,158 +9,146 @@ import {
   Modes,
 } from "../../main.js";
 import {
-  drawPlaque,
   overlay,
   applyCanvasOpacity,
   isClickWithinBounds,
 } from "../../utils/utils.js";
 import { texts } from "../../utils/style.js";
-import { startingMenuState as state } from "./startingMenu_state.js";
+import {
+  handleNextPage,
+  startingMenuState as state,
+} from "./startingMenu_state.js";
 import { Sprite } from "../../classes/Sprite.js";
 
-export let startingMenu = (function () {
+export const startingMenu = (function () {
   ("use strict");
 
-  // BACKGROUND
-  let isBgLoaded = false;
-
-  /* Initializes other functions
-  all in one place to be called as 'init' */
+  // GENERAL INIT
 
   function init() {
-/*     if (!state.isPageReseted) {
-      initImages();
-      //initBounds();
-      canvas.addEventListener("click", handleClick);
+    if (!state.isPageReseted) {
+      initSprites();
+      initFrogSprites();
+      initBounds();
+
+      document.addEventListener("click", handleClicks);
+      document.addEventListener("keydown", handleKeysPress);
+
       state.isPageReseted = true;
-    } */
+    }
     updatePage();
-    canvas.addEventListener("click", handleClick);
   }
 
-/*   function initImages() {
-    state.background.image = new Sprite({
+  // INITS
+
+  function initSprites() {
+    // BG
+    const bgSprite = state.background.bg;
+    bgSprite.image = new Sprite({
       position: { x: 0, y: 0 },
-      imageSrc: "../images/startingMenu/bg.svg",
+      imageSrc: bgSprite.imagePath,
     });
-    state.plaque.nextImage = new Sprite({
-      position: { x: 0 * scaleFactor, y: 0 },
-      imageSrc: "../images/startingMenu/plaque.svg",
+
+    const snowSprite = state.background.snow;
+    snowSprite.image = new Sprite({
+      position: { x: 0, y: 0 },
+      imageSrc: snowSprite.imagePath,
+      frameRate: snowSprite.totalFrames,
+      frameBuffer: snowSprite.speed,
     });
-    state.plaque.gemImage = new Sprite({
-      position: { x: 14 * scaleFactor, y: 0 },
-      imageSrc: "../images/startingMenu/plaqueGems.svg",
+
+    //Plaques
+    const gemsPSprite = state.plaque.gem;
+    gemsPSprite.image = new Sprite({
+      position: { x: 14 * scaleFactor, y: 142 * scaleFactor },
+      imageSrc: gemsPSprite.imagePath,
+    });
+    const nextPSprite = state.plaque.next;
+    nextPSprite.image = new Sprite({
+      position: { x: 271 * scaleFactor, y: 142 * scaleFactor },
+      imageSrc: nextPSprite.imagePath,
     });
   }
+
+  function initFrogSprites() {
+    state.sprite.all.forEach((data, i) => {
+      const sprite = new Sprite({
+        position: { x: 44 * scaleFactor, y: 97 * scaleFactor },
+        imageSrc: data.imagePath,
+        frameRate: data.totalFrames,
+        frameBuffer: data.speed,
+        scale: 2.6,
+      });
+      state.sprite.all[i].image = sprite;
+    });
+  }
+
+  function initBounds() {
+    state.plaque.nextBounds = {
+      x: 271 * scaleFactor,
+      y: 142 * scaleFactor,
+      width: 28 * scaleFactor,
+      height: 18 * scaleFactor,
+    };
+
+    state.plaque.gemBounds = {
+      x: 14 * scaleFactor,
+      y: 142 * scaleFactor,
+      width: 18 * scaleFactor,
+      height: 18 * scaleFactor,
+    };
+  }
+
+  // DRAW SPRITES
 
   function drawBgImage() {
-    state.background.image.drawSprite();
+    state.background.bg.image.drawSprite();
   }
+
   function drawNextPlaque() {
-    state.plaque.nextImage.drawSprite();
+    state.plaque.next.image.drawSprite();
   }
+
   function drawGemsPlaque() {
-    state.plaque.gemImage.drawSprite();
-  } */
+    state.plaque.gem.image.drawSprite();
+  }
+
+  function drawSnow() {
+    const snowSprite = state.background.snow;
+    snowSprite.image.drawSprite();
+    snowSprite.image.updateFrames();
+  }
+
+  // UPDATES
+
+  function updateFrogSprites() {
+    ctx.save();
+    const selectedIndex = state.options.selectedIndex;
+    const selectedSpriteData = state.sprite.all[selectedIndex];
+
+    if (selectedSpriteData) {
+      selectedSpriteData.image.drawSprite();
+      selectedSpriteData.image.updateFrames();
+    } else {
+      console.error(`Data doesn't exist for index ${selectedIndex}`);
+    }
+    ctx.restore();
+  }
 
   function updatePage() {
-    //Clear canvas after each frame
+    ctx.save();
     ctx.clearRect(0, 0, W, H);
-    //Draw background Image
     drawBgImage();
-/*     drawNextPlaque();
-    drawGemsPlaque(); */
-    //
-
+    drawGemsPlaque();
+    drawNextPlaque();
     drawGameName();
-    drawOptions();
-    drawPlaque(
-      state.plaque.gemImage,
-      "../images/startingMenu/plaqueGems.svg",
-      { x: 14 * scaleFactor, y: 0 }, // y is temporary
-      state.plaque.gemBounds,
-      () => {
-        state.plaque.gemBounds.y =
-          H - state.plaque.gemBounds.height - 10 * scaleFactor;
-      }
-    );
-    drawPlaque(
-      state.plaque.nextImage,
-      "../images/startingMenu/plaque.svg",
-      { x: 0 * scaleFactor, y: 0 },
-      state.plaque.nextBounds,
-      () => {
-        state.plaque.nextBounds.x =
-          W - state.plaque.nextBounds.width - 20 * scaleFactor;
-        state.plaque.nextBounds.y =
-          H - state.plaque.nextBounds.height - 10 * scaleFactor;
-      }
-    );
-    updateSpriteAndAnimation();
-    if (ActiveInits.isStartingMenuActive) {
-      window.addEventListener("keydown", handleKeysPress);
-    }
+    drawOptionsTextAndBounds();
+    updateFrogSprites();
+    drawSnow();
+    ctx.restore();
   }
 
-  /* Animates the sprite by cycling through frames. The function draws a portion 
-   of the sprite image corresponding to the current frame, then advances 
-   the frame index at a rate controlled by 'staggerFrames'. */
-
-  function spriteAnimation(lastFrame, staggerFrames) {
-    ctx.drawImage(
-      state.sprite.props.image,
-      state.sprite.props.currentFrame * state.sprite.props.size,
-      0,
-      state.sprite.props.size,
-      state.sprite.props.size,
-      40 * scaleFactor + state.sprite.props.size, // X position
-      H - state.sprite.props.size * scaleFactor * 2.4, // Y position
-      state.sprite.props.size * scaleFactor * 2.4,
-      state.sprite.props.size * scaleFactor * 2.4
-    );
-    if (state.sprite.props.frameCount % staggerFrames == 0) {
-      if (state.sprite.props.currentFrame < lastFrame - 1)
-        state.sprite.props.currentFrame++;
-      else state.sprite.props.currentFrame = 0;
-    }
-
-    state.sprite.props.frameCount++;
-  }
-
-  /* Switches between different sprites and their respective
-  animations as per the user's selected game mode */
-
-  function updateSpriteAndAnimation() {
-    const data = state.sprite.all[state.options.selectedIndex];
-    if (data) {
-      state.sprite.props.image.src = data.imagePath;
-      spriteAnimation(data.totalFrames, data.speed);
-    } else {
-      console.error(
-        `data doesn't exist for index ${state.options.selectedIndex}`
-      );
-    }
-  }
-
-  /* Draws the background image. Loads the image if not already loaded, 
-   and sets a flag once the image is available for rendering. */
-
-    function drawBgImage() {
-    if (!isBgLoaded) {
-      state.background.image = new Image();
-      state.background.image.src = "../images/startingMenu/bg.svg";
-
-      state.background.image.onload = function () {
-        ctx.drawImage(state.background.image, 0, 0, W, H);
-        isBgLoaded = true;
-      };
-    } else {
-      ctx.drawImage(state.background.image, 0, 0, W, H);
-    }
-  }
-
-  /* Draws the text of the game name 
-   using shadow effects for the look */
+  // DRAW U.I.
 
   function drawGameName() {
     ctx.save();
@@ -179,75 +167,47 @@ export let startingMenu = (function () {
     ctx.restore();
   }
 
-  /* Draws the text on center of its invisible hitbox 
-   for menu options and applies styles based on selection. */
-
-  function setTextAndHitboxProperties(index) {
+  function drawOptionsTextAndBounds() {
     ctx.save();
-    let rect = state.options.allBounds[index];
-    let text = state.options.all[index];
+    const allOptText = state.options.all;
+    const allBounds = (state.options.allBounds = []); // resets after every loop
+    const gap = 26 * scaleFactor;
+    const yOffset = [-gap, 0, gap];
 
-    // Apply styles based on selection
-    let isSelected = index === state.options.selectedIndex;
-    texts.menuOptionStyle.applyStyle(ctx, scaleFactor, isSelected);
+    for (let i = 0; i < allOptText.length; i++) {
+      // Apply the style
+      let isSelected = i === state.options.selectedIndex;
+      texts.menuOptionStyle.applyStyle(ctx, scaleFactor, isSelected);
 
-    // Center of the rectangle
-    let textX = rect.x + rect.width / 2;
-    let textY = rect.y + rect.height / 2;
+      // Calculate text position
+      const textX = 220 * scaleFactor;
+      const textY = H / 2 + yOffset[i];
 
-    // Draw text
-    ctx.strokeText(text, textX, textY);
-    ctx.fillText(text, textX, textY);
+      // Draw text
+      ctx.strokeText(allOptText[i], textX, textY);
+      ctx.fillText(allOptText[i], textX, textY);
 
-    ctx.restore();
-  }
-
-  /* Draws and styles the text for a menu option, aligning it to 
-  the center of its corresponding invisible hitbox. */
-
-  function drawOptions() {
-    ctx.save();
-    ctx.font = `${texts.menuOptionStyle.fontSize * scaleFactor}px ${
-      texts.menuOptionStyle.fontFamily
-    }`;
-
-    //draw Rectangles
-    for (let i = 0; i < state.options.all.length; i++) {
-      const lineHeight = 24 * scaleFactor;
-      const rectHeight = texts.menuOptionStyle.fontSize * scaleFactor;
-      const rectWidth = ctx.measureText(state.options.all[i]).width;
-      const yCenter = H / 2;
-
-      let rectPosY = yCenter - rectHeight / 2 + [-lineHeight, 0, lineHeight][i];
-      const xTwoThirds = W - W / 3 - rectWidth / 2;
-      const rectPosX = xTwoThirds;
-
-      state.options.allBounds[i] = {
-        x: rectPosX,
-        y: rectPosY,
-        width: rectWidth,
-        height: 50,
+      // Calculate and store bounds
+      const textWidth = ctx.measureText(allOptText[i]).width;
+      const textHeight = texts.menuOptionStyle.fontSize * scaleFactor;
+      const bounds = {
+        x: textX - textWidth / 2,
+        y: textY - textHeight / 2,
+        width: textWidth,
+        height: textHeight,
       };
+      allBounds.push(bounds);
 
-      setTextAndHitboxProperties(i);
-
-      // to draw SOON text
-      if (
-        state.options.all[i] === "AGILITY" ||
-        state.options.all[i] === "STRENGTH"
-      ) {
-        const optionTextWidth = ctx.measureText(state.options.all[i]).width;
-        drawSoonText(
-          rectPosX + optionTextWidth - rectWidth + rectWidth / 1.2,
-          rectPosY - rectHeight / 1.4,
-          i
-        );
+      // Draw 'soon' text
+      if (allOptText[i] === "AGILITY" || allOptText[i] === "STRENGTH") {
+        const soonYOffset = 6 * scaleFactor;
+        drawSoonText(textX + textWidth / 2, textY - soonYOffset);
       }
     }
+
     ctx.restore();
   }
 
-  // Will be removed when Game Modes are done
   function drawSoonText(x, y) {
     ctx.save();
     // Styles
@@ -257,42 +217,32 @@ export let startingMenu = (function () {
     ctx.shadowColor = "#FF8B21";
     ctx.lineWidth = 1.5 * scaleFactor;
     ctx.shadowOffsetY = 1 * scaleFactor;
-    ctx.strokeText("Soon", x, y + texts.menuOptionStyle.fontSize * scaleFactor);
-    ctx.fillText("Soon", x, y + texts.menuOptionStyle.fontSize * scaleFactor);
+    ctx.strokeText("Soon", x, y);
+    ctx.fillText("Soon", x, y);
     ctx.restore();
   }
 
-  /* Handles mouse click events */
+  //HANDLE EVENTS
 
-  function handleClick(event) {
-    if (ActiveInits.isStartingMenuActive) {
-      let mouseX = event.clientX - canvas.getBoundingClientRect().left;
-      let mouseY = event.clientY - canvas.getBoundingClientRect().top;
+  function handleClicks(event) {
+    let mouseX = event.clientX - canvas.getBoundingClientRect().left;
+    let mouseY = event.clientY - canvas.getBoundingClientRect().top;
 
-      handlePlaqueClick(mouseX, mouseY);
-      handleRectangleClick(mouseX, mouseY);
-    }
+    handlePlaqueClicks(mouseX, mouseY);
+    handleOptionsClick(mouseX, mouseY);
   }
 
-  /* Determines which menu option's hitbox was clicked, updates the selected 
-   option, and redraws the menu to reflect the new selection. */
-
-  function handleRectangleClick(mouseX, mouseY) {
+  function handleOptionsClick(mouseX, mouseY) {
     for (let i = 0; i < state.options.allBounds.length; i++) {
-      let rect = state.options.allBounds[i];
-      if (isClickWithinBounds(mouseX, mouseY, rect)) {
+      let bound = state.options.allBounds[i];
+      if (isClickWithinBounds(mouseX, mouseY, bound)) {
         state.options.selectedIndex = i; // Update the selected index
-        drawOptions(); // Redraw options with the new selection
         return;
       }
     }
   }
 
-  /* Handles clicks on the plaques. On click, it initiates a transition to 
-   either the selected game mode (determined by 'handleRectangleClick') 
-   or the gems page. */
-
-  function handlePlaqueClick(mouseX, mouseY) {
+  function handlePlaqueClicks(mouseX, mouseY) {
     // Plaque | Game Mode
     if (!ActiveInits.isStartingMenuActive || state.options.selectedIndex < 0) {
       return;
@@ -303,17 +253,7 @@ export let startingMenu = (function () {
         duration: 1,
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
-          if (state.options.selectedIndex === 0) {
-            ActiveInits.isCardioActive = true;
-          } else if (state.options.selectedIndex === 1) {
-            ActiveInits.isAgilityActive = true;
-          } else if (state.options.selectedIndex === 2) {
-            ActiveInits.isStrengthActive = true;
-          }
-
-          currentMode.mode = state.options.selectedIndex + 1;
-          ActiveInits.isStartingMenuActive = false;
-          overlay.opacity = 0;
+          handleNextPage(state);
         },
       });
     }
@@ -338,7 +278,6 @@ export let startingMenu = (function () {
     if (keyAction) {
       if (event.key === "ArrowUp" || event.key === "ArrowDown") {
         state.options.selectedIndex = keyAction(state);
-        drawOptions();
       } else if (event.key === "Enter") {
         keyAction(state);
       }
@@ -349,7 +288,3 @@ export let startingMenu = (function () {
     init: init,
   };
 })();
-
-/* window.addEventListener("resize", function () {
-  scaleFactor = window.innerWidth / baseWidth;
-}); */

@@ -10,6 +10,7 @@ import { loading } from "./otherScreens/loading.js";
 import { sources } from "./utils/preloader.js";
 import { applyCanvasSlideOut, overlay } from "./utils/utils.js";
 import { cState } from "./gameModes/Cardio/cardio_state.js";
+import { startingMenuState as sState } from "./otherScreens/StartingMenu/startingMenu_state.js";
 
 let appState = {};
 
@@ -233,10 +234,37 @@ function setModeFunctions() {
   ];
 }
 
+// FRAMERATE CONSISTENCY
+
+// https://chriscourses.com/blog/standardize-your-javascript-games-framerate-for-different-monitors
+
+let msPrev = window.performance.now();
+const fps = 60;
+const msPerFrame = 1000 / fps;
+let frames = 0; // to log frames
+
+function StandardizeFramerate() {
+  const msNow = window.performance.now();
+  const msPassed = msNow - msPrev;
+
+  if (msPassed < msPerFrame) return;
+
+  const excessTime = msPassed % msPerFrame;
+  msPrev = msNow - excessTime;
+
+  frames++; // to log frames
+}
+
 function render() {
   window.requestAnimationFrame(render);
   currentMode.run();
+  StandardizeFramerate();
 }
+
+// Log Framerate
+setInterval(() => {
+  console.log(frames);
+}, 1000);
 
 const debouncedResize = debounce(() => {
   scaleFactor = window.innerWidth / baseWidth;
@@ -245,6 +273,7 @@ const debouncedResize = debounce(() => {
   setCanvasSize();
   render();
   if (ActiveInits.isCardioActive) cState.isGameReseted = false;
+  if (ActiveInits.isStartingMenuActive) sState.isPageReseted = false;
 }, 200);
 
 window.addEventListener("resize", debouncedResize);

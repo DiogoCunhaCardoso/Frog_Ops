@@ -8,33 +8,46 @@ export const startingMenuState = {
     allBounds: [],
   },
   plaque: {
-    gemImage: new Image(),
-    gemBounds: {},
-    nextImage: new Image(),
-    nextBounds: {},
+    gem: {
+      gemImage: new Image(),
+      imagePath: "../images/startingMenu/plaqueGems.svg",
+      gemBounds: {},
+    },
+    next: {
+      nextImage: new Image(),
+      imagePath: "../images/startingMenu/plaque.svg",
+
+      nextBounds: {},
+    },
   },
   background: {
-    image: new Image(),
+    bg: {
+      image: new Image(),
+      imagePath: "../images/startingMenu/bg.svg",
+    },
+    snow: {
+      image: new Image(),
+      imagePath: "../images/startingMenu/snow.svg",
+      totalFrames: 6,
+      speed: 32,
+    },
   },
   sprite: {
-    props: {
-      image: new Image(),
-      size: 32,
-      currentFrame: 0,
-      frameCount: 0,
-    },
     all: [
       {
+        image: new Image(),
         imagePath: "../images/startingMenu/sprite_cardio.svg",
         totalFrames: 4,
         speed: 24,
       },
       {
+        image: new Image(),
         imagePath: "../images/startingMenu/sprite_agility.svg",
         totalFrames: 10,
         speed: 30,
       },
       {
+        image: new Image(),
         imagePath: "../images/startingMenu/sprite_strength.svg",
         totalFrames: 10,
         speed: 30,
@@ -50,15 +63,15 @@ export const startingMenuState = {
         state.options.all.length,
       ArrowDown: (state) =>
         (state.options.selectedIndex + 1) % state.options.all.length,
-      Enter: handleEnterKey,
+      Enter: handleNextPage,
     },
   },
   isPageReseted: false,
-};
+};                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
 
 // METHODS
 
-function handleEnterKey(state) {
+export function handleNextPage(state) {
   const selectedInit = state.keys.inits[state.options.selectedIndex];
   if (selectedInit) {
     ActiveInits[selectedInit] = true;

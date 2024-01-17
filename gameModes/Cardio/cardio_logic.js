@@ -12,8 +12,6 @@ import {
 import {
   overlay,
   applyCanvasOpacity,
-  drawPlaque,
-  isClickWithinBounds,
   collision,
   NewGemAquired,
 } from "../../utils/utils.js";
@@ -64,7 +62,7 @@ export const cardio = (function () {
     createRandomPlatformsAndGem();
     updatePlatforms();
     // birds
-    if (cState.player.allPlayers[0].score >= 1) {
+    if (cState.player.allPlayers[0].score >= 6) {
       createRandomBirds();
       updateBirds();
     }
@@ -234,6 +232,7 @@ export const cardio = (function () {
   }
 
   // BIRDS
+  
   function getRandomBirdY() {
     let bird = new CollisionBlock({
       position: { x: 0, y: 0 },

@@ -1,12 +1,12 @@
-import { ctx, W, H, scaleFactor } from "../main.js";
+import { ctx, scaleFactor } from "../main.js";
 
 export class Sprite {
-  constructor({ position, imageSrc, frameRate = 1, frameBuffer = 0 }) {
+  constructor({ position, imageSrc, frameRate = 1, frameBuffer = 0, scale = 1 }) {
     this.position = position;
     this.image = new Image();
     this.image.onload = () => {
-      this.width = (this.image.width * scaleFactor) / this.frameRate;
-      this.height = this.image.height * scaleFactor;
+      this.width = (this.image.width * scaleFactor * scale) / this.frameRate;
+      this.height = this.image.height * scaleFactor * scale;
     };
     this.image.src = imageSrc;
     this.frameRate = frameRate;
@@ -16,7 +16,10 @@ export class Sprite {
   }
 
   drawSprite(translate = false) {
-    if (!this.image) return;
+    if (!this.image) {
+      console.error("No image for drawSprite");
+      return;
+    }
 
     const cropBox = {
       position: {
