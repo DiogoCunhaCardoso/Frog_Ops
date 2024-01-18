@@ -8,14 +8,14 @@ import {
   ActiveInits,
   currentMode,
   Modes,
-} from "../main.js";
+} from "../../main.js";
 import {
   overlay,
   applyCanvasOpacity,
   drawPlaque,
   isClickWithinBounds,
-} from "../utils/utils.js";
-import { colors, texts } from "../utils/style.js";
+} from "../../utils/utils.js";
+import { colors, texts } from "../../utils/style.js";
 
 // Module
 export let gems = (function () {

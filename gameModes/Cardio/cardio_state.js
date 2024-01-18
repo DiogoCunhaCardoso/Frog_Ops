@@ -6,12 +6,12 @@ export const cState = {
     stopBuilding: false,
     allPlatforms: [],
     lastPlatformCreationTime: Date.now(),
-    PLATFORM_CREATION_INTERVAL: 1500,
+    PLATFORM_CREATION_INTERVAL: 3000,
   },
   bird: {
     allBirds: [],
     lastBirdCreationTime: Date.now(),
-    BIRD_CREATION_INTERVAL: 5000,
+    BIRD_CREATION_INTERVAL: 10000,
   },
   plaque: {
     image: new Image(),
@@ -22,7 +22,7 @@ export const cState = {
   },
   ui: {
     movingRectWidth: 45 / 2,
-    directionInc: -0.25,
+    directionInc: -0.5,
     btnRotateBounds: {},
     btnOneBounds: {},
     btnTwoBounds: {},

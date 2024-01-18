@@ -1,11 +1,7 @@
 import { ctx, W, H, scaleFactor } from "../main.js";
 import { colors } from "./style.js";
 
-// for functions used in multiple places
-//
-
-/* Loads and draws the plaques images, sets the plaqueBounds to
-  be used for interaction detection in other parts of the code. */
+// THIS FILE IS FOR FUNCTIONS USED IN VARIOUS PLACES
 
 export function drawPlaque(image, imageSrc, position, bounds, callback) {
   // Only set the source if it hasn't been set yet
@@ -36,9 +32,6 @@ export function drawPlaque(image, imageSrc, position, bounds, callback) {
   }
 }
 
-/* Draws the opacity rectangle with the 
-  variable to be changed later with GSAP */
-
 export let overlay = {
   opacity: 0,
   y: 0,
@@ -52,8 +45,6 @@ export function applyCanvasOpacity() {
   ctx.restore();
 }
 
-//
-//
 export function applyCanvasSlideOut(init, nextInit) {
   ctx.clearRect(0, 0, W, H);
   nextInit();
@@ -117,10 +108,6 @@ export function drawButton({ text, x, y, width, height }) {
   ctx.restore();
 }
 
-/**
- * Sets Gem as true in localStorage
- * @param {String} gem
- */
 export function NewGemAquired(gem) {
   localStorage.setItem(gem, true);
 }

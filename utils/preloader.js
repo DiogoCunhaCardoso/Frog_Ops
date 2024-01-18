@@ -1,3 +1,5 @@
+// THIS FILE IS FOR SETTING ALL SOURCES FROM THE GAME TO BE PRE LOADED
+
 export const sources = [
   "/images/cardio/bg.svg",
   "/images/cardio/bird.svg",

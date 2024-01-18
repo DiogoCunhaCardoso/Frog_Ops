@@ -16,7 +16,6 @@ export const startingMenuState = {
     next: {
       nextImage: new Image(),
       imagePath: "../images/startingMenu/plaque.svg",
-
       nextBounds: {},
     },
   },
@@ -29,7 +28,7 @@ export const startingMenuState = {
       image: new Image(),
       imagePath: "../images/startingMenu/snow.svg",
       totalFrames: 6,
-      speed: 32,
+      speed: 20,
     },
   },
   sprite: {
@@ -38,19 +37,19 @@ export const startingMenuState = {
         image: new Image(),
         imagePath: "../images/startingMenu/sprite_cardio.svg",
         totalFrames: 4,
-        speed: 24,
+        speed: 12,
       },
       {
         image: new Image(),
         imagePath: "../images/startingMenu/sprite_agility.svg",
         totalFrames: 10,
-        speed: 30,
+        speed: 15,
       },
       {
         image: new Image(),
         imagePath: "../images/startingMenu/sprite_strength.svg",
         totalFrames: 10,
-        speed: 30,
+        speed: 15,
       },
     ],
   },
@@ -67,7 +66,7 @@ export const startingMenuState = {
     },
   },
   isPageReseted: false,
-};                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+};
 
 // METHODS
 

@@ -1,3 +1,5 @@
+// THIS FILE IS TO ACCESS COLORS AND FONT STYLES
+
 // COLORS
 export const colors = {
   white: "#FFF",

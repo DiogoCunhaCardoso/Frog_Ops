@@ -2,7 +2,7 @@ import { startingMenu } from "./otherScreens/StartingMenu/startingMenu.js";
 import { cardio } from "./gameModes/Cardio/cardio_logic.js";
 import { agility } from "./gameModes/agility.js";
 import { strength } from "./gameModes/strength.js";
-import { gems } from "./otherScreens/gems.js";
+import { gems } from "./otherScreens/Gems/gems.js";
 import { portrait } from "./otherScreens/portrait.js";
 import { restart } from "./otherScreens/restart.js";
 import { success } from "./otherScreens/success.js";
@@ -37,7 +37,7 @@ export const ActiveInits = {
 let assetCount = sources.length;
 let completedAssetsCount = 0;
 
-window.onload = () => {};
+/* window.onload = () => {}; */
 
 window.onload = function () {
   setModeFunctions();
@@ -49,7 +49,7 @@ window.onload = function () {
 };
 
 function loadAssets() {
-  if (!sources || sources === 0) {
+  if (!sources || sources === 0 || window.innerWidth < window.innerHeight) {
     return;
   }
 
@@ -116,10 +116,10 @@ function checkIfTouchScreenDevice() {
   }
 }
 
-let scale = {
+/* let scaleFactor = {
   width: 320,
   height: 180,
-};
+}; */
 // Scale Factor
 let baseWidth = 320;
 let baseHeight = 180;
@@ -160,8 +160,6 @@ function setCanvasSize() {
   // Scale factor update might be necessary if you rely on it elsewhere
   scaleFactor = W / baseWidth;
   scaleHeightFactor = H / baseHeight;
-
-  render();
 }
 
 /* Delays the execution of a function until after a period of
@@ -182,19 +180,21 @@ function debounce(func, timeout = 200) {
    an alert to rotate into landscape mode*/
 
 let storedMode; // store mode before changing
+let isLandscape = false;
 
 function checkOrientation() {
   if (
     window.innerWidth < window.innerHeight &&
     currentMode.mode !== Modes.PORTRAIT
   ) {
+    isLandscape = false;
     storedMode = currentMode.mode; // Store current mode only when not already in portrait mode
-
-    currentMode.mode = 5;
+    currentMode.mode = Modes.PORTRAIT;
   } else if (
     window.innerWidth >= window.innerHeight &&
-    currentMode.mode === 5
+    currentMode.mode === Modes.PORTRAIT
   ) {
+    isLandscape = true;
     currentMode.mode = storedMode !== undefined ? storedMode : 0; // Return to the previous mode or default if not set
   }
 }
@@ -262,16 +262,15 @@ function render() {
 }
 
 // Log Framerate
-setInterval(() => {
+/* setInterval(() => {
   console.log(frames);
-}, 1000);
+}, 1000); */
 
 const debouncedResize = debounce(() => {
   scaleFactor = window.innerWidth / baseWidth;
   scaleHeightFactor = window.innerHeight / baseHeight;
   checkOrientation();
   setCanvasSize();
-  render();
   if (ActiveInits.isCardioActive) cState.isGameReseted = false;
   if (ActiveInits.isStartingMenuActive) sState.isPageReseted = false;
 }, 200);

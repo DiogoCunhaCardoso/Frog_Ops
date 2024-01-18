@@ -62,7 +62,7 @@ export const cardio = (function () {
     createRandomPlatformsAndGem();
     updatePlatforms();
     // birds
-    if (cState.player.allPlayers[0].score >= 6) {
+    if (cState.player.allPlayers[0].score >= 2) {
       createRandomBirds();
       updateBirds();
     }
@@ -107,7 +107,7 @@ export const cardio = (function () {
         allBirds: cState.bird.allBirds,
         imageSrc: "../images/cardio/player.svg",
         frameRate: 7,
-        frameBuffer: 24,
+        frameBuffer: 12,
       });
       cState.player.allPlayers.push(player);
     }
