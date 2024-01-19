@@ -1,13 +1,4 @@
-import {
-  ctx,
-  W,
-  H,
-  scaleFactor,
-  isTouchDevice,
-  ActiveInits,
-  currentMode,
-  Modes,
-} from "../../main.js";
+import { ctx, scaleFactor } from "../../main.js";
 import { cState } from "./cardio_state.js";
 import { colors } from "../../utils/style.js";
 import {
@@ -17,6 +8,7 @@ import {
   overlay,
 } from "../../utils/utils.js";
 import { Sprite } from "../../classes/Sprite.js";
+import { appState as app } from "../../app_state.js";
 
 export function generalUI() {
   ctx.save();
@@ -33,9 +25,14 @@ export function generalUI() {
   // Calculate and draw Score
   const scoreText = "SCORE " + cState.player.allPlayers[0].score;
   const scoreTextWidth = ctx.measureText(scoreText).width;
-  ctx.fillText(scoreText, W - padding * 2, padding + rectHeight / 2 + FontSize);
+  ctx.fillText(
+    scoreText,
+    app.canvas.W - padding * 2,
+    padding + rectHeight / 2 + FontSize
+  );
 
-  const rectangleXPosition = W - padding * 3 - scoreTextWidth - rectWidth;
+  const rectangleXPosition =
+    app.canvas.W - padding * 3 - scoreTextWidth - rectWidth;
   const rectangleyPosition = padding + FontSize / 2 + 1 * scaleFactor;
 
   // Draw lightColor Rect
@@ -62,7 +59,7 @@ export function generalUI() {
     "ROT. " + Math.round(cState.player.allPlayers[0].rotation);
   ctx.fillText(
     rotationText,
-    W - scoreTextWidth - rectWidth - padding * 3 - padding / 2, // x
+    app.canvas.W - scoreTextWidth - rectWidth - padding * 3 - padding / 2, // x
     padding + rectHeight / 2 + FontSize // y
   );
 
@@ -78,7 +75,7 @@ export function generalUI() {
 }
 
 export function touchScreenUI() {
-  if (isTouchDevice) {
+  if (app.isTouchDevice) {
     ctx.save();
     drawTouchButtons();
     ctx.restore();
@@ -87,14 +84,18 @@ export function touchScreenUI() {
 
 function drawTouchButtons() {
   const buttonSize = 16 * scaleFactor;
-  const buttonY = H - buttonSize * 2;
+  const buttonY = app.canvas.H - buttonSize * 2;
   const buttonSpacing = 8 * scaleFactor;
 
   const buttons = [
     { stateName: "Rotate", text: "R", x: buttonSize },
-    { stateName: "Three", text: "3", x: W - buttonSize * 2 },
-    { stateName: "Two", text: "2", x: W - buttonSize * 3 - buttonSpacing },
-    { stateName: "One", text: "1", x: W - buttonSize * 5 },
+    { stateName: "Three", text: "3", x: app.canvas.W - buttonSize * 2 },
+    {
+      stateName: "Two",
+      text: "2",
+      x: app.canvas.W - buttonSize * 3 - buttonSpacing,
+    },
+    { stateName: "One", text: "1", x: app.canvas.W - buttonSize * 5 },
   ];
 
   buttons.forEach((button) => {
@@ -138,7 +139,7 @@ export function checkClicksTouch(
 } */
 
 export function handlePlaqueClick(mouseX, mouseY) {
-  if (!ActiveInits.isCardioActive) {
+  if (!app.initActive.cardio) {
     return;
   }
   if (isClickWithinBounds(mouseX, mouseY, cState.plaque.bounds)) {
@@ -147,9 +148,9 @@ export function handlePlaqueClick(mouseX, mouseY) {
       duration: 1,
       onUpdate: applyCanvasOpacity,
       onComplete: () => {
-        currentMode.mode = Modes.STARTING_MENU;
-        ActiveInits.isStartingMenuActive = true;
-        ActiveInits.isCardioActive = false;
+        app.modes.current = app.modes.all.STARTING_MENU;
+        app.initActive.startingMenu = true;
+        app.initActive.cardio = false;
         overlay.opacity = 0;
         cState.isGameReseted = false;
       },

@@ -1,5 +1,6 @@
 // Imports
-import { ctx, canvas, W, H, scaleFactor } from "../main.js";
+import { appState as app } from "../app_state.js";
+import { ctx, scaleFactor } from "../main.js";
 import { colors, texts } from "../utils/style.js";
 import { overlay } from "../utils/utils.js";
 
@@ -9,9 +10,9 @@ export const loading = (function () {
 
   // Initializes the gems module
   function init() {
-    ctx.clearRect(0, 0, W, H);
+    ctx.clearRect(0, 0, app.canvas.W, app.canvas.H);
     ctx.fillStyle = colors.bg_light;
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(0, 0, app.canvas.W, app.canvas.H);
     writeLogoName();
     //loadingAnimation();
   }
@@ -27,17 +28,25 @@ export const loading = (function () {
     //
     ctx.strokeText(
       textFrog,
-      W / 2,
-      H / 2 - textHeight / 2 - padding - overlay.y
+      app.canvas.W / 2,
+      app.canvas.H / 2 - textHeight / 2 - padding - overlay.y
     );
-    ctx.fillText(textFrog, W / 2, H / 2 - textHeight / 2 - padding - overlay.y);
+    ctx.fillText(
+      textFrog,
+      app.canvas.W / 2,
+      app.canvas.H / 2 - textHeight / 2 - padding - overlay.y
+    );
     //
     ctx.strokeText(
       textOps,
-      W / 2,
-      H / 2 + textHeight / 2 + padding - overlay.y
+      app.canvas.W / 2,
+      app.canvas.H / 2 + textHeight / 2 + padding - overlay.y
     );
-    ctx.fillText(textOps, W / 2, H / 2 + textHeight / 2 + padding - overlay.y);
+    ctx.fillText(
+      textOps,
+      app.canvas.W / 2,
+      app.canvas.H / 2 + textHeight / 2 + padding - overlay.y
+    );
     ctx.restore();
   }
 

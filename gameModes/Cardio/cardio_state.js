@@ -6,7 +6,7 @@ export const cState = {
     stopBuilding: false,
     allPlatforms: [],
     lastPlatformCreationTime: Date.now(),
-    PLATFORM_CREATION_INTERVAL: 3000,
+    PLATFORM_CREATION_INTERVAL: 2800,
   },
   bird: {
     allBirds: [],
@@ -30,6 +30,7 @@ export const cState = {
   },
   gem: {
     obj: null,
+    isCatched: null,
   },
   stats: {
     gameOver: {

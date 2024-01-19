@@ -1,4 +1,4 @@
-import { ctx, scaleFactor } from "../main.js";
+import { scaleFactor } from "../main.js";
 import { Sprite } from "./Sprite.js";
 
 export class CollisionBlock extends Sprite {

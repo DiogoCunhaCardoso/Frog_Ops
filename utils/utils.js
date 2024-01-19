@@ -1,4 +1,5 @@
-import { ctx, W, H, scaleFactor } from "../main.js";
+import { appState as app } from "../app_state.js";
+import { ctx, scaleFactor } from "../main.js";
 import { colors } from "./style.js";
 
 // THIS FILE IS FOR FUNCTIONS USED IN VARIOUS PLACES
@@ -41,12 +42,12 @@ export function applyCanvasOpacity() {
   ctx.save();
   ctx.globalAlpha = overlay.opacity;
   ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillRect(0, 0, app.canvas.W, app.canvas.H);
   ctx.restore();
 }
 
 export function applyCanvasSlideOut(init, nextInit) {
-  ctx.clearRect(0, 0, W, H);
+  ctx.clearRect(0, 0, app.canvas.W, app.canvas.H);
   nextInit();
   ctx.save();
   ctx.translate(0, -overlay.y);

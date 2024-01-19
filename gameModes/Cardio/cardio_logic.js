@@ -1,14 +1,4 @@
-import {
-  ctx,
-  canvas,
-  W,
-  H,
-  ActiveInits,
-  currentMode,
-  Modes,
-  scaleFactor,
-  scaleHeightFactor,
-} from "../../main.js";
+import { ctx, canvas, scaleFactor, scaleHeightFactor } from "../../main.js";
 import {
   overlay,
   applyCanvasOpacity,
@@ -28,6 +18,7 @@ import {
   initBounds,
   handlePlaqueClick,
 } from "./cardio_ui.js";
+import { appState as app } from "../../app_state.js";
 
 export const cardio = (function () {
   ("use strict");
@@ -53,7 +44,7 @@ export const cardio = (function () {
    * and handling UI updates.
    */
   function updateGame() {
-    ctx.clearRect(0, 0, W, H);
+    ctx.clearRect(0, 0, app.canvas.W, app.canvas.H);
     drawBgImage();
     drawBackPlaque();
     // player
@@ -62,7 +53,7 @@ export const cardio = (function () {
     createRandomPlatformsAndGem();
     updatePlatforms();
     // birds
-    if (cState.player.allPlayers[0].score >= 2) {
+    if (cState.player.allPlayers[0].score >= 5) {
       createRandomBirds();
       updateBirds();
     }
@@ -123,7 +114,8 @@ export const cardio = (function () {
       imageSrc: "../images/cardio/cloud.svg",
     });
     let xRange =
-      Math.random() * (W - block.width - block.width * 2) + block.width;
+      Math.random() * (app.canvas.W - block.width - block.width * 2) +
+      block.width;
     return Math.round(xRange);
   }
 
@@ -170,7 +162,7 @@ export const cardio = (function () {
       //
       if (cState.player.allPlayers[0].score === 5 && !cState.gem.obj) {
         // Position for the gem
-        const gemX = newX;
+        const gemX = newX + block.width / 3;
         const gemY = 0 - block.height * 2 - 2 * scaleFactor;
         cState.gem.obj = new CollisionBlock(
           {
@@ -193,7 +185,7 @@ export const cardio = (function () {
     cState.platform.allPlatforms.forEach((platform, i) => {
       platform.update();
 
-      if (platform.position.y > H) {
+      if (platform.position.y > app.canvas.H) {
         cState.platform.allPlatforms.splice(i, 1);
       }
     });
@@ -215,9 +207,9 @@ export const cardio = (function () {
           duration: 0.5,
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
-            currentMode.mode = Modes.SUCCESS;
-            ActiveInits.isCardioActive = false;
-            ActiveInits.isSuccessActive = true;
+            app.modes.current = app.modes.all.SUCCESS;
+            app.initActive.cardio = false;
+            app.initActive.success = true;
             overlay.opacity = 0;
             // send stats
             cState.stats.gameWon = {
@@ -232,14 +224,15 @@ export const cardio = (function () {
   }
 
   // BIRDS
-  
+
   function getRandomBirdY() {
     let bird = new CollisionBlock({
       position: { x: 0, y: 0 },
       imageSrc: "../images/cardio/bird.svg",
     });
     let yRange =
-      Math.random() * (H - bird.height - bird.height * 2) + bird.height;
+      Math.random() * (app.canvas.H - bird.height - bird.height * 2) +
+      bird.height;
     return Math.round(yRange);
   }
 
@@ -267,7 +260,7 @@ export const cardio = (function () {
       cState.bird.allBirds.push(
         new CollisionBlock(
           {
-            position: { x: W, y: newY },
+            position: { x: app.canvas.W, y: newY },
             imageSrc: "../images/cardio/bird.svg",
             frameRate: 6,
             frameBuffer: 32,
@@ -337,7 +330,7 @@ export const cardio = (function () {
 
     if (
       e.code === "KeyR" &&
-      ActiveInits.isCardioActive &&
+      app.initActive.cardio &&
       cState.player.allPlayers[0]?.isInAir === false
     ) {
       activateRotation();

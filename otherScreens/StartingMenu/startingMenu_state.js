@@ -1,4 +1,4 @@
-import { ActiveInits, currentMode } from "../../main.js";
+import { appState as app } from "../../app_state.js";
 import { applyCanvasOpacity, overlay } from "../../utils/utils.js";
 
 export const startingMenuState = {
@@ -55,7 +55,7 @@ export const startingMenuState = {
   },
   keys: {
     all: ["ArrowUp", "ArrowDown", "Enter"],
-    inits: ["isCardioActive", "isAgilityActive", "isStrengthActive"],
+    inits: ["cardio", "agility", "strength"],
     actions: {
       ArrowUp: (state) =>
         (state.options.selectedIndex - 1 + state.options.all.length) %
@@ -73,7 +73,7 @@ export const startingMenuState = {
 export function handleNextPage(state) {
   const selectedInit = state.keys.inits[state.options.selectedIndex];
   if (selectedInit) {
-    ActiveInits[selectedInit] = true;
+    app.initActive[selectedInit] = true;
   } else {
     console.error(
       `Init doesn't exist for index ${state.options.selectedIndex}`
@@ -85,8 +85,8 @@ export function handleNextPage(state) {
     duration: 0.5,
     onUpdate: applyCanvasOpacity,
     onComplete: () => {
-      currentMode.mode = state.options.selectedIndex + 1;
-      ActiveInits.isStartingMenuActive = false;
+      app.modes.current = state.options.selectedIndex + 1;
+      app.initActive.startingMenu = false;
       overlay.opacity = 0;
       state.isPageReseted = false;
     },

@@ -1,17 +1,9 @@
-import {
-  ctx,
-  W,
-  H,
-  scaleFactor,
-  ActiveInits,
-  currentMode,
-  Modes,
-  scaleHeightFactor,
-} from "../main.js";
+import { ctx, scaleFactor, scaleHeightFactor } from "../main.js";
 import { collision } from "../utils/utils.js";
 import { overlay, applyCanvasOpacity } from "../utils/utils.js";
 import { Sprite } from "./Sprite.js";
 import { cState } from "../gameModes/Cardio/cardio_state.js";
+import { appState as app } from "../app_state.js";
 
 export class Player extends Sprite {
   constructor({
@@ -41,6 +33,15 @@ export class Player extends Sprite {
     this.landedPlatforms = new Set(); // Set = stores only unique values
     this.allBirds = allBirds; // birds
 
+    this.hitbox = {
+      position: {
+        x: this.position.x,
+        y: this.position.y,
+      },
+      width: 0,
+      height: 0,
+    };
+
     // for points
     this.score = 0;
   }
@@ -65,23 +66,43 @@ export class Player extends Sprite {
 
   update() {
     ctx.save();
-    /*     ctx.fillStyle = "red";
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height); */
+    ctx.fillStyle = "red";
+    ctx.fillRect(
+      this.hitbox.position.x,
+      this.hitbox.position.y,
+      this.hitbox.width,
+      this.hitbox.height
+    );
     this.updateFrames();
     //
+    this.updateHitbox();
     this.draw();
     if (this.isRotating) {
       this.rotatePlayer();
     }
     this.screenWrapAroundCanvas();
+    this.updateHitbox();
     this.checkForHorizontalPlatformCollisions();
     this.gravityAndHitGround();
+    this.updateHitbox();
     this.checkForBirdCollisions();
+    this.updateHitbox();
     this.checkForVerticalPlatformCollisions();
     ctx.restore();
   }
 
   //
+
+  updateHitbox() {
+    this.hitbox = {
+      position: {
+        x: this.position.x + 8.2 * scaleFactor,
+        y: this.position.y + 3 * scaleFactor,
+      },
+      width: 16 * scaleFactor,
+      height: 22 * scaleFactor,
+    };
+  }
 
   rotatePlayer() {
     let step = 0.5;
@@ -96,9 +117,26 @@ export class Player extends Sprite {
 
   screenWrapAroundCanvas() {
     if (this.position.x <= 0) {
-      this.position.x = W - this.width;
-    } else if (this.position.x >= W - this.width) {
+      this.position.x = app.canvas.W - this.width;
+    } else if (this.position.x >= app.canvas.W - this.width) {
       this.position.x = 0;
+    }
+  }
+
+  gravityAndHitGround() {
+    // gravity
+    this.position.y += this.velocity.y;
+    // collision
+    if (
+      this.position.y + this.height + this.velocity.y <
+      app.canvas.H - 6 * scaleFactor
+    ) {
+      this.velocity.y += this.gravity * scaleHeightFactor;
+    } else {
+      // hit ground
+      this.isInAir = false;
+      this.velocity.y = 0;
+      this.velocity.x = 0;
     }
   }
 
@@ -114,35 +152,31 @@ export class Player extends Sprite {
 
       if (
         collision({
-          object1: this,
+          object1: this.hitbox,
           object2: platform,
         })
       ) {
         if (this.velocity.x > 0) {
           // hit left
           this.velocity.x = 0;
-          this.position.x = platform.position.x - this.width - bounceBack;
+
+          const offset =
+            this.hitbox.position.x - this.position.x + this.hitbox.width;
+
+          this.position.x = platform.position.x - offset - bounceBack;
           break;
         }
         if (this.velocity.x < 0) {
           // hit right
           this.velocity.x = 0;
-          this.position.x = platform.position.x + platform.width + bounceBack;
+
+          const offset = this.hitbox.position.x - this.position.x;
+
+          this.position.x =
+            platform.position.x + platform.width - offset + bounceBack;
           break;
         }
       }
-    }
-  }
-
-  gravityAndHitGround() {
-    this.position.y += this.velocity.y;
-    if (this.position.y + this.height + this.velocity.y < H - 6 * scaleFactor) {
-      this.velocity.y += this.gravity * scaleHeightFactor;
-    } else {
-      // hit ground
-      this.isInAir = false;
-      this.velocity.y = 0;
-      this.velocity.x = 0;
     }
   }
 
@@ -156,7 +190,7 @@ export class Player extends Sprite {
 
       if (
         collision({
-          object1: this,
+          object1: this.hitbox,
           object2: platform,
         })
       ) {
@@ -165,8 +199,11 @@ export class Player extends Sprite {
           this.isInAir = false;
           this.velocity.y = 0;
           this.velocity.x = 0;
-          this.position.y =
-            platform.position.y - this.height - 0.01 * scaleFactor;
+
+          const offset =
+            this.hitbox.position.y - this.position.y + this.hitbox.height;
+
+          this.position.y = platform.position.y - offset - 0.01 * scaleFactor;
           if (!this.landedPlatforms.has(platform.id)) {
             // Increment score only if not already landed
             this.score++;
@@ -177,8 +214,11 @@ export class Player extends Sprite {
         if (this.velocity.y < 0) {
           // hit bottom
           this.velocity.y = 0;
+
+          const offset = this.hitbox.position.y - this.position.y;
+
           this.position.y =
-            platform.position.y + platform.height + 1 * scaleFactor; // avoid overlapping
+            platform.position.y + platform.height - offset + 1 * scaleFactor; // avoid overlapping
           break;
         }
       }
@@ -191,7 +231,7 @@ export class Player extends Sprite {
 
       if (
         collision({
-          object1: this,
+          object1: this.hitbox,
           object2: bird,
         })
       ) {
@@ -200,9 +240,9 @@ export class Player extends Sprite {
           duration: 0.5,
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
-            currentMode.mode = Modes.RESTART;
-            ActiveInits.isCardioActive = false;
-            ActiveInits.isRestartActive = true;
+            app.modes.current = app.modes.all.RESTART;
+            app.initActive.cardio = false;
+            app.initActive.restart = true;
             overlay.opacity = 0;
           },
         });

@@ -1,14 +1,6 @@
+import { appState as app } from "../app_state.js";
 import { cState } from "../gameModes/Cardio/cardio_state.js";
-import {
-  ctx,
-  canvas,
-  W,
-  H,
-  scaleFactor,
-  ActiveInits,
-  currentMode,
-  Modes,
-} from "../main.js";
+import { ctx, canvas, scaleFactor } from "../main.js";
 import { texts } from "../utils/style.js";
 import {
   overlay,
@@ -16,15 +8,16 @@ import {
   isClickWithinBounds,
   drawButton,
 } from "../utils/utils.js";
-export let success = (function () {
+
+export const success = (function () {
   ("use strict");
 
   let buttonBounds = {};
 
   function init() {
-    ctx.clearRect(0, 0, W, H);
+    ctx.clearRect(0, 0, app.canvas.W, app.canvas.H);
     ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(0, 0, app.canvas.W, app.canvas.H);
     ctx.fillStyle = "black";
     YouWonGroup({
       score: cState.stats.gameWon.score,
@@ -38,7 +31,7 @@ export let success = (function () {
 
   function drawGemsButton() {
     const bounds = {
-      x: W / 2 - (40 * scaleFactor) / 2,
+      x: app.canvas.W / 2 - (40 * scaleFactor) / 2,
       y: 132 * scaleFactor,
       width: 40 * scaleFactor,
       height: 10 * scaleFactor,
@@ -52,7 +45,7 @@ export let success = (function () {
     ctx.save();
 
     //Global Stylings
-    const centerX = W / 2;
+    const centerX = app.canvas.W / 2;
 
     // 'For You Won' Text
     texts.highlightStyle.applyStyle(ctx, scaleFactor);
@@ -94,7 +87,7 @@ export let success = (function () {
     gemImage.src = imgSrc;
     ctx.drawImage(
       gemImage,
-      W / 2 - (gemImage.width * scaleFactor) / 2,
+      app.canvas.W / 2 - (gemImage.width * scaleFactor) / 2,
       32 * scaleFactor,
       gemImage.width * scaleFactor,
       gemImage.height * scaleFactor
@@ -110,7 +103,7 @@ export let success = (function () {
   }
 
   function handleButtonClick(mouseX, mouseY) {
-    if (!ActiveInits.isSuccessActive) {
+    if (!app.initActive.success) {
       return;
     }
     if (isClickWithinBounds(mouseX, mouseY, buttonBounds)) {
@@ -119,9 +112,9 @@ export let success = (function () {
         duration: 1,
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
-          currentMode.mode = Modes.GEMS;
-          ActiveInits.isGemsActive = true;
-          ActiveInits.isSuccessActive = false;
+          app.modes.current = app.modes.all.GEMS;
+          app.initActive.gems = true;
+          app.initActive.success = false;
           overlay.opacity = 0;
         },
       });

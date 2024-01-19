@@ -1,14 +1,15 @@
-import { ctx, W, H, scaleFactor } from "../main.js";
+import { appState as app } from "../app_state.js";
+import { ctx, scaleFactor } from "../main.js";
 import { colors } from "../utils/style.js";
 
-export let portrait = (function () {
+export const portrait = (function () {
   ("use strict");
 
   let spaceBetween = 12;
 
   function init() {
     ctx.fillStyle = colors.bg_light;
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(0, 0, app.canvas.W, app.canvas.H);
     drawImage();
     drawText();
   }
@@ -33,8 +34,8 @@ export let portrait = (function () {
       ctx.fillStyle = colors.brown;
 
       // Center the text horizontally and vertically
-      let x = W / 2;
-      let y = H / 2 + posYOffsets[i];
+      let x = app.canvas.W / 2;
+      let y = app.canvas.H / 2 + posYOffsets[i];
 
       // Draw the text
       ctx.fillText(textLines[i], x, y + rotateImage.height / 2);
@@ -47,9 +48,11 @@ export let portrait = (function () {
   rotateImage.src = "../images/portrait/rotatePhone.svg";
 
   function drawImage() {
-    let x = (W - rotateImage.width * scaleFactor) / 2;
+    let x = (app.canvas.W - rotateImage.width * scaleFactor) / 2;
     let y =
-      H / 2 - rotateImage.height * scaleFactor + spaceBetween * scaleFactor;
+      app.canvas.H / 2 -
+      rotateImage.height * scaleFactor +
+      spaceBetween * scaleFactor;
 
     ctx.drawImage(
       rotateImage,

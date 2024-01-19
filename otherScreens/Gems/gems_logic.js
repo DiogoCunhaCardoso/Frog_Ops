@@ -1,47 +1,34 @@
 // Imports
-import {
-  ctx,
-  canvas,
-  W,
-  H,
-  scaleFactor,
-  ActiveInits,
-  currentMode,
-  Modes,
-} from "../../main.js";
-import {
-  overlay,
-  applyCanvasOpacity,
-  drawPlaque,
-  isClickWithinBounds,
-} from "../../utils/utils.js";
+import { ctx, canvas, scaleFactor } from "../../main.js";
 import { colors, texts } from "../../utils/style.js";
+import { drawBackPlaque, handlePlaqueClick, initBounds, initImages } from "./gems_ui.js";
+import { appState as app } from "../../app_state.js";
+import { gemsState as gState } from "./gems_state.js";
 
 // Module
-export let gems = (function () {
+export const gems = (function () {
   ("use strict");
-
-  const modes = ["CARDIO", "AGILITY", "STRENGTH"];
-  let goBackPlaque = new Image();
-  let backPlaqueBounds = {};
 
   // Initializes the gems module
   function init() {
-    ctx.clearRect(0, 0, W, H);
+    if (!gState.isGemsReseted) {
+      initImages();
+      initBounds();
+      canvas.addEventListener("click", handleClick);
+      gState.isGemsReseted = true;
+    }
+    updateGame();
+  }
+
+  // LOOP
+
+  function updateGame() {
+    const canvas = [0, 0, app.canvas.W, app.canvas.H];
+    ctx.clearRect(...canvas);
     ctx.fillStyle = colors.bg_light;
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(...canvas);
+    drawBackPlaque();
     drawGemsAndText();
-    drawPlaque(
-      goBackPlaque,
-      "../images/plaque_back.svg",
-      { x: 0, y: 0 },
-      backPlaqueBounds,
-      () => {
-        backPlaqueBounds.x = backPlaqueBounds.width / 2;
-        backPlaqueBounds.y = 0;
-      }
-    );
-    canvas.addEventListener("click", handleClick);
   }
 
   // Checks if a specific gem is acquired (stored in localStorage)
@@ -68,12 +55,12 @@ export let gems = (function () {
     texts.gemsStyle.applyStyle(ctx, scaleFactor);
 
     // Conditionally change Images and colors
-    for (let i = 0; i < modes.length; i++) {
+    for (let i = 0; i < gState.gems.names.length; i++) {
       let gemImage = new Image();
       let borderColor;
       let color;
 
-      switch (modes[i]) {
+      switch (gState.gems.names[i]) {
         case "CARDIO":
           gemImage.src = hasGems.cardioGem
             ? gemImages.cardioGem
@@ -116,9 +103,11 @@ export let gems = (function () {
       const separation = 16 * scaleFactor;
       const rectPosXOffsets = [-76 * scaleFactor, 0, 76 * scaleFactor];
       const gemX =
-        W / 2 - (gemImage.width * scaleFactor) / 2 + rectPosXOffsets[i];
+        app.canvas.W / 2 -
+        (gemImage.width * scaleFactor) / 2 +
+        rectPosXOffsets[i];
       const gemY =
-        H / 2 -
+        app.canvas.H / 2 -
         (gemImage.height * scaleFactor) / 2 -
         separation / 2 -
         (texts.gemsStyle.fontSize * scaleFactor) / 2;
@@ -134,8 +123,12 @@ export let gems = (function () {
       // Position & Draw Text
       const textY = gemY + gemImage.height * scaleFactor + separation;
       const textX = gemX + (gemImage.width / 2) * scaleFactor;
-      ctx.strokeText(modes[i], textX, textY);
-      ctx.fillText(modes[i], gemX + (gemImage.width / 2) * scaleFactor, textY);
+      ctx.strokeText(gState.gems.names[i], textX, textY);
+      ctx.fillText(
+        gState.gems.names[i],
+        gemX + (gemImage.width / 2) * scaleFactor,
+        textY
+      );
     }
 
     ctx.restore();
@@ -143,30 +136,11 @@ export let gems = (function () {
 
   // Handles click events on the canvas.
   function handleClick(event) {
-    let mouseX = event.clientX - canvas.getBoundingClientRect().left;
-    let mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    if (app.initActive.gems) {
+      let mouseX = event.clientX - canvas.getBoundingClientRect().left;
+      let mouseY = event.clientY - canvas.getBoundingClientRect().top;
 
-    handlePlaqueClick(mouseX, mouseY);
-  }
-
-  // Check if the click is within the bounds of the back plaque.
-  // If so, animates the overlay and switches back to the 'StartingMenu'.
-  function handlePlaqueClick(mouseX, mouseY) {
-    if (!ActiveInits.isGemsActive) {
-      return;
-    }
-    if (isClickWithinBounds(mouseX, mouseY, backPlaqueBounds)) {
-      gsap.to(overlay, {
-        opacity: 1,
-        duration: 1,
-        onUpdate: applyCanvasOpacity,
-        onComplete: () => {
-          currentMode.mode = Modes.STARTING_MENU;
-          ActiveInits.isStartingMenuActive = true;
-          ActiveInits.isGemsActive = false;
-          overlay.opacity = 0;
-        },
-      });
+      handlePlaqueClick(mouseX, mouseY);
     }
   }
 

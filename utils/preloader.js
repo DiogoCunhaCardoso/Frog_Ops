@@ -21,6 +21,11 @@ export const sources = [
   "/images/startingMenu/sprite_strength.svg",
 ];
 
+export const assetsState = {
+  total: sources.length,
+  complete: 0,
+};
+
 /* export const sources = {
   images: [
     "/images/cardio/bg.svg",
@@ -76,7 +81,7 @@ function launchIfReady() {
   completedAssetsCount += 1;
   if (assetsToLoad === completedAssetsCount) {
     console.log("oi");
-    currentMode.mode = Modes.STARTING_MENU;
+    mode = Modes.STARTING_MENU;
   }
 }
 

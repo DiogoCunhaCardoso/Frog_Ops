@@ -1,14 +1,6 @@
+import { appState as app } from "../app_state.js";
 import { cState } from "../gameModes/Cardio/cardio_state.js";
-import {
-  ctx,
-  canvas,
-  W,
-  H,
-  scaleFactor,
-  ActiveInits,
-  currentMode,
-  Modes,
-} from "../main.js";
+import { ctx, canvas, scaleFactor } from "../main.js";
 import { colors } from "../utils/style.js";
 import {
   applyCanvasOpacity,
@@ -17,7 +9,7 @@ import {
   overlay,
 } from "../utils/utils.js";
 
-export let restart = (function () {
+export const restart = (function () {
   ("use strict");
 
   const rState = {
@@ -47,9 +39,9 @@ export let restart = (function () {
   // for drawPlaque()
 
   function init() {
-    ctx.clearRect(0, 0, W, H);
+    ctx.clearRect(0, 0, app.canvas.W, app.canvas.H);
     ctx.fillStyle = colors.bg_light;
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(0, 0, app.canvas.W, app.canvas.H);
     highScoreGroup({
       gameMode: cState.stats.gameOver.gameMode,
       highScore: currentCardioHighScore,
@@ -69,8 +61,8 @@ export let restart = (function () {
     const buttonHeight = 10 * scaleFactor;
     const margin = 16 * scaleFactor;
     const buttonWidth = 40 * scaleFactor;
-    const buttonY = H - buttonHeight - margin;
-    const buttonX = W - buttonWidth - margin;
+    const buttonY = app.canvas.H - buttonHeight - margin;
+    const buttonX = app.canvas.W - buttonWidth - margin;
 
     const bounds = {
       x: buttonX,
@@ -132,7 +124,7 @@ export let restart = (function () {
 
     //Global Stylings
     const marginX = 47 * scaleFactor;
-    const centerY = H / 2;
+    const centerY = app.canvas.H / 2;
     const paddingX = 4 * scaleFactor;
     const lineSpacing = 16 * scaleFactor;
 
@@ -194,7 +186,7 @@ export let restart = (function () {
 
     //Global Stylings
     const marginX = 177 * scaleFactor;
-    const centerY = H / 2;
+    const centerY = app.canvas.H / 2;
     const paddingX = 14 * scaleFactor;
     const lineSpacing = 16 * scaleFactor;
 
@@ -273,7 +265,7 @@ export let restart = (function () {
   }
 
   function handleKeyPress(event) {
-    if (ActiveInits.isRestartActive) {
+    if (app.initActive.restart) {
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         toggleSelection();
       } else if (event.key === "Enter") {
@@ -283,9 +275,9 @@ export let restart = (function () {
             duration: 0.5,
             onUpdate: applyCanvasOpacity,
             onComplete: () => {
-              currentMode.mode = Modes.CARDIO;
-              ActiveInits.isCardioActive = true;
-              ActiveInits.isRestartActive = false;
+              app.modes.current = app.modes.all.CARDIO;
+              app.initActive.cardio = true;
+              app.initActive.restart = false;
               overlay.opacity = 0;
             },
           });
@@ -295,9 +287,9 @@ export let restart = (function () {
             duration: 0.5,
             onUpdate: applyCanvasOpacity,
             onComplete: () => {
-              currentMode.mode = Modes.STARTING_MENU;
-              ActiveInits.isStartingMenuActive = true;
-              ActiveInits.isRestartActive = false;
+              app.modes.current = app.modes.all.STARTING_MENU;
+              app.initActive.startingMenu = true;
+              app.initActive.restart = false;
               overlay.opacity = 0;
             },
           });
@@ -319,7 +311,7 @@ export let restart = (function () {
   function handleYesNoClick(mouseX, mouseY) {
     const yesButtonBounds = rectangles[0];
     const noButtonBounds = rectangles[1];
-    if (ActiveInits.isRestartActive) {
+    if (app.initActive.restart) {
       if (isClickWithinBounds(mouseX, mouseY, yesButtonBounds)) {
         isYesSelected = true;
       } else if (isClickWithinBounds(mouseX, mouseY, noButtonBounds)) {
@@ -329,7 +321,7 @@ export let restart = (function () {
   }
 
   function handleNextClick(mouseX, mouseY) {
-    if (ActiveInits.isRestartActive) {
+    if (app.initActive.restart) {
       if (isClickWithinBounds(mouseX, mouseY, rState.ui.btnNextBounds)) {
         if (isYesSelected) {
           gsap.to(overlay, {
@@ -337,9 +329,9 @@ export let restart = (function () {
             duration: 0.5,
             onUpdate: applyCanvasOpacity,
             onComplete: () => {
-              currentMode.mode = Modes.CARDIO;
-              ActiveInits.isCardioActive = true;
-              ActiveInits.isRestartActive = false;
+              app.modes.current = app.modes.all.CARDIO;
+              app.initActive.cardio = true;
+              app.initActive.restart = false;
               overlay.opacity = 0;
             },
           });
@@ -349,9 +341,9 @@ export let restart = (function () {
             duration: 0.5,
             onUpdate: applyCanvasOpacity,
             onComplete: () => {
-              currentMode.mode = Modes.STARTING_MENU;
-              ActiveInits.isStartingMenuActive = true;
-              ActiveInits.isRestartActive = false;
+              app.modes.current = app.modes.all.STARTING_MENU;
+              app.initActive.startingMenu = true;
+              app.initActive.restart = false;
               overlay.opacity = 0;
             },
           });

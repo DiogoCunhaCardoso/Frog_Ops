@@ -1,13 +1,4 @@
-import {
-  ctx,
-  W,
-  H,
-  scaleFactor,
-  canvas,
-  ActiveInits,
-  currentMode,
-  Modes,
-} from "../../main.js";
+import { ctx, scaleFactor, canvas } from "../../main.js";
 import {
   overlay,
   applyCanvasOpacity,
@@ -19,6 +10,7 @@ import {
   startingMenuState as state,
 } from "./startingMenu_state.js";
 import { Sprite } from "../../classes/Sprite.js";
+import { appState as app } from "../../app_state.js";
 
 export const startingMenu = (function () {
   ("use strict");
@@ -137,7 +129,7 @@ export const startingMenu = (function () {
 
   function updatePage() {
     ctx.save();
-    ctx.clearRect(0, 0, W, H);
+    ctx.clearRect(0, 0, app.canvas.W, app.canvas.H);
     drawBgImage();
     drawGemsPlaque();
     drawNextPlaque();
@@ -181,7 +173,7 @@ export const startingMenu = (function () {
 
       // Calculate text position
       const textX = 220 * scaleFactor;
-      const textY = H / 2 + yOffset[i];
+      const textY = app.canvas.H / 2 + yOffset[i];
 
       // Draw text
       ctx.strokeText(allOptText[i], textX, textY);
@@ -244,7 +236,7 @@ export const startingMenu = (function () {
 
   function handlePlaqueClicks(mouseX, mouseY) {
     // Plaque | Game Mode
-    if (!ActiveInits.isStartingMenuActive || state.options.selectedIndex < 0) {
+    if (!app.initActive.startingMenu || state.options.selectedIndex < 0) {
       return;
     }
     if (isClickWithinBounds(mouseX, mouseY, state.plaque.nextBounds)) {
@@ -264,9 +256,9 @@ export const startingMenu = (function () {
         duration: 1,
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
-          currentMode.mode = Modes.GEMS;
-          ActiveInits.isStartingMenuActive = false;
-          ActiveInits.isGemsActive = true;
+          app.modes.current = app.modes.all.GEMS;
+          app.initActive.startingMenu = false;
+          app.initActive.gems = true;
           overlay.opacity = 0;
         },
       });
