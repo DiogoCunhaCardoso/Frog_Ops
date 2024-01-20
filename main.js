@@ -4,14 +4,18 @@ import { agility } from "./gameModes/Agility/agility_logic.js";
 import { strength } from "./gameModes/Strength/strength_logic.js";
 import { gems } from "./otherScreens/Gems/gems_logic.js";
 import { portrait } from "./otherScreens/portrait.js";
-import { restart } from "./otherScreens/restart.js";
+import { restart } from "./otherScreens/Restart/restart_logic.js";
 import { success } from "./otherScreens/success.js";
+import { skins } from "./otherScreens/Skins/skins_logic.js";
 import { loading } from "./otherScreens/loading.js";
 import { applyCanvasSlideOut, overlay } from "./utils/utils.js";
 import { cState } from "./gameModes/Cardio/cardio_state.js";
 import { assetsState, sources } from "./utils/preloader.js";
 import { startingMenuState as sState } from "./otherScreens/StartingMenu/startingMenu_state.js";
 import { appState as app } from "./app_state.js";
+import { strengthState } from "./gameModes/Strength/strength_state.js";
+import { gemsState } from "./otherScreens/Gems/gems_state.js";
+import { skinsState } from "./otherScreens/Skins/skins_state.js";
 
 export const canvas = document.querySelector("canvas");
 export const ctx = canvas.getContext("2d");
@@ -179,6 +183,7 @@ const startInit = [
   portrait.init,
   restart.init,
   success.init,
+  skins.init,
   loading.init,
 ];
 
@@ -216,6 +221,9 @@ const debouncedResize = debounce(() => {
   setCanvasSize();
   if (app.initActive.cardio) cState.isGameReseted = false;
   if (app.initActive.startingMenu) sState.isPageReseted = false;
+  if (app.initActive.gems) gemsState.isGemsReseted = false;
+  if (app.initActive.strength) strengthState.isGameReseted = false;
+  if (app.initActive.skins) skinsState.isSkinsReseted = false;
 }, 200);
 
 window.addEventListener("resize", debouncedResize);

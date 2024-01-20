@@ -7,7 +7,7 @@ export const gemsState = {
 
   gems: {
     names: ["CARDIO", "AGILITY", "STRENGTH"],
-    colors: ["gemBlue", "gemPink", "gemPurple"],
+    colors: ["gem_blue", "gem_pink", "gem_purple"],
     all: [
       {
         image: new Image(),
@@ -29,4 +29,3 @@ export const gemsState = {
   },
   isGemsReseted: false,
 };
-
