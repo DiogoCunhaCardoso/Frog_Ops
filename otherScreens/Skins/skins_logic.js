@@ -1,11 +1,20 @@
 import { canvas, ctx, scaleFactor } from "../../main.js";
 import { appState as app } from "../../app_state.js";
 import { skinsState as skState } from "./skins_state.js";
-import { drawBgImage, initImages } from "./skins_ui.js";
+import {
+  drawBgImage,
+  drawActionButton,
+  drawUI,
+  initImages,
+} from "./skins_ui.js";
 import { isClickWithinBounds } from "../../utils/utils.js";
+import { texts } from "../../utils/style.js";
 
 export const skins = (function () {
   "use strict";
+
+  let coinImage = new Image();
+  coinImage.src = "../../images/coin.svg";
 
   function init() {
     app.initActive.skins = true;
@@ -22,81 +31,159 @@ export const skins = (function () {
     ctx.clearRect(0, 0, app.canvas.W, app.canvas.H);
     drawBgImage();
     selectSkin();
+    drawUI();
+    drawActionButton();
   }
 
   function selectSkin() {
-    const scale = 0.65;
-    const selectedWidth = 69 * scaleFactor;
-    const selectedHeight = 51 * scaleFactor;
+    ctx.save();
+    // SKIN DIMENSIONS & POSITIONS
+    const selectedImgW = 69 * scaleFactor;
+    const selectedImgH = 51 * scaleFactor;
 
-    const scaledWidth = selectedWidth * scale;
-    const scaledHeight = selectedHeight * scale;
+    const scaleDown = 0.65;
+    const nonSelectedImgW = selectedImgW * scaleDown;
+    const nonSelectedImgH = selectedImgH * scaleDown;
     const gap = 36 * scaleFactor;
 
     const skinPositions = [
       {
         name: "previous",
         bounds: [
-          app.canvas.W / 2 - selectedWidth / 2 - gap - scaledWidth,
-          app.canvas.H / 2 - scaledHeight / 2,
-          scaledWidth,
-          scaledHeight,
+          app.canvas.W / 2 - selectedImgW / 2 - gap - nonSelectedImgW,
+          app.canvas.H / 2 - nonSelectedImgH / 2,
+          nonSelectedImgW,
+          nonSelectedImgH,
         ],
       },
       {
         name: "selected",
         bounds: [
-          app.canvas.W / 2 - selectedWidth / 2,
-          app.canvas.H / 2 - selectedHeight / 2,
-          selectedWidth,
-          selectedHeight,
+          app.canvas.W / 2 - selectedImgW / 2,
+          app.canvas.H / 2 - selectedImgH / 2,
+          selectedImgW,
+          selectedImgH,
         ],
       },
       {
         name: "next",
         bounds: [
-          app.canvas.W / 2 + selectedWidth / 2 + gap,
-          app.canvas.H / 2 - scaledHeight / 2,
-          scaledWidth,
-          scaledHeight,
+          app.canvas.W / 2 + selectedImgW / 2 + gap,
+          app.canvas.H / 2 - nonSelectedImgH / 2,
+          nonSelectedImgW,
+          nonSelectedImgH,
         ],
       },
     ];
 
-    let displayColors = [
-      skState.skins.colors[skState.actions.GetPrevIndex(skState)], // Previous
-      skState.skins.colors[skState.skins.selectedIndex], // Selected
-      skState.skins.colors[skState.actions.GetNextIndex(skState)], // Next
+    // FETCH OF SKIN OBJECTS ACCORDING TO POSITION
+    const skins = skState.skins.all;
+    const skinObjects = [
+      skins[skState.actions.GetPrevIndex(skState)],
+      skins[skState.skins.selectedIndex],
+      skins[skState.actions.GetNextIndex(skState)],
     ];
 
-    skinPositions.forEach((skin, i) => {
-      // DON'T DRAW IF NONE ON LEFT AND NONE ON RIGHT
-      const isFirstSkin = i === 0;
-      const isLastSkin = i === skinPositions.length - 1;
+    // DRAWING SKINS ACCORDING TO POSITION
+    skinPositions.forEach((skinPos, i) => {
+      const skin = skinObjects[i];
+      const isSelectedSkin = skinPos.name === "selected";
 
+      // CHECK IF 1ST SKIN OR LAST SKIN TO NOT DRAW IT
       if (
-        (isFirstSkin && !skState.actions.IsPrevSkinAvailable(skState)) ||
-        (isLastSkin && !skState.actions.IsNextSkinAvailable(skState))
+        (i === 0 && !skState.actions.IsPrevSkinAvailable(skState)) ||
+        (i === skinPositions.length - 1 &&
+          !skState.actions.IsNextSkinAvailable(skState))
       ) {
         return;
       }
 
       // DRAW
-      ctx.fillStyle = displayColors[i];
-      ctx.fillRect(...skin.bounds);
+      _drawSkinGroup(skin, skinPos, isSelectedSkin);
     });
 
-    // Update skState.skins.bounds
-    skState.skins.bounds = skinPositions.map((skin) => ({
-      name: skin.name,
+    // SET BOUNDS FOR SKINS TO BE CLICKABLE
+    skState.skins.bounds = skinPositions.map((pos) => ({
+      name: pos.name,
       bounds: {
-        x: skin.bounds[0],
-        y: skin.bounds[1],
-        width: skin.bounds[2],
-        height: skin.bounds[3],
+        x: pos.bounds[0],
+        y: pos.bounds[1],
+        width: pos.bounds[2],
+        height: pos.bounds[3],
       },
     }));
+
+    ctx.restore();
   }
+
+  // HELPER FUNCTION
+
+  function _drawSkinGroup(skin, skinPos, isSelectedSkin) {
+    const currentScale = isSelectedSkin ? 1 : 0.65;
+    ctx.fillStyle = skin.color;
+    ctx.fillRect(...skinPos.bounds);
+
+    _drawSkinName(skin, skinPos, currentScale, isSelectedSkin);
+    _drawSkinPrice(skin, skinPos, currentScale, isSelectedSkin);
+  }
+
+  function _drawSkinName(skin, skinPos, currentScale, isSelectedSkin) {
+    // TEXT STYLE
+    texts.skinNamesStyle.applyStyle(
+      ctx,
+      scaleFactor * currentScale,
+      isSelectedSkin
+    );
+    // TEXT POSITION
+    const centerX = skinPos.bounds[0] + skinPos.bounds[2] / 2;
+    const textYOffset = 25 * scaleFactor * currentScale;
+    const textY = skinPos.bounds[1] - textYOffset;
+
+    if (skin.name) {
+      ctx.strokeText(skin.name, centerX, textY);
+      ctx.fillText(skin.name, centerX, textY);
+    }
+  }
+
+  function _drawSkinPrice(skin, skinPos, currentScale, isSelectedSkin) {
+    // TEXT STYLE
+    texts.valueStyle.applyStyle(
+      ctx,
+      scaleFactor * currentScale,
+      isSelectedSkin
+    );
+
+    // PRICE TEXT POSITION
+    const centerX = skinPos.bounds[0] + skinPos.bounds[2] / 2;
+    const priceYOffset = 12 * scaleFactor * currentScale;
+    const priceY = skinPos.bounds[1] - priceYOffset;
+
+    // DRAW PRICE & COIN
+    if (skin.price) {
+      const textWidth = ctx.measureText(skin.price).width;
+      const textX = centerX;
+      const padding = 2 * scaleFactor;
+      const imageWidth = coinImage.width * scaleFactor * currentScale;
+      const imageX = textX + textWidth / 2 + padding;
+
+      ctx.strokeText(skin.price, textX, priceY);
+      ctx.fillText(skin.price, textX, priceY);
+
+      // DRAW COIN
+      ctx.save();
+      ctx.globalAlpha = isSelectedSkin ? 1 : 0.6;
+      ctx.drawImage(
+        coinImage,
+        imageX,
+        priceY - (coinImage.height * scaleFactor * currentScale) / 2,
+        imageWidth * 0.8,
+        coinImage.height * scaleFactor * currentScale * 0.8
+      );
+      ctx.restore();
+    }
+  }
+
+  // INTERACTIVITY
 
   function handleClick(event) {
     let mouseX = event.clientX - canvas.getBoundingClientRect().left;
@@ -109,16 +196,21 @@ export const skins = (function () {
           skState.actions.IsNextSkinAvailable(skState)
         ) {
           skState.actions.ChangeToNextIndex(skState);
-
         } else if (
           skin.name === "previous" &&
           skState.actions.IsPrevSkinAvailable(skState)
         ) {
           skState.actions.ChangeToPrevIndex(skState);
-
         }
       }
     });
+    handleUseSkin(mouseX, mouseY);
+  }
+
+  function handleUseSkin(mouseX, mouseY) {
+    if (isClickWithinBounds(mouseX, mouseY, skState.ui.btn.bounds)) {
+      skState.skins.currentlyUsingIndex = skState.skins.selectedIndex;
+    }
   }
 
   function handleKeyPress(event) {

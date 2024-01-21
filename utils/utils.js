@@ -73,20 +73,28 @@ export function collision({ object1, object2 }) {
   );
 }
 
-export function drawButton({ text, x, y, width, height }) {
+export function drawButton({
+  text,
+  x,
+  y,
+  width,
+  height,
+  dark = colors.yellow,
+  light = colors.yellow_light,
+}) {
   ctx.save();
   // Draw the button background
   ctx.lineWidth = 2 * scaleFactor;
   ctx.strokeStyle = colors.brown;
   ctx.shadowColor = colors.brown;
-  ctx.fillStyle = colors.yellow;
+  ctx.fillStyle = dark;
   ctx.shadowOffsetY = 1 * scaleFactor;
   ctx.strokeRect(x, y, width, height);
   ctx.fillRect(x, y, width, height);
   ctx.restore();
 
   // Draw the top part of the button
-  ctx.fillStyle = "#FFE380";
+  ctx.fillStyle = light;
   ctx.fillRect(x, y, width, height / 3);
 
   // Text styling

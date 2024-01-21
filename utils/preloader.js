@@ -21,6 +21,8 @@ export const sources = [
   "/images/startingMenu/sprite_strength.svg",
 ];
 
+// ADD SKINS IN FUTURE
+
 export const assetsState = {
   total: sources.length,
   complete: 0,

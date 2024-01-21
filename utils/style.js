@@ -5,11 +5,14 @@ export const colors = {
   white: "#FFF",
   white_disabled: "#FBFCFF",
   yellow: "#FFD43E",
+  yellow_light: "#FFE380",
   yellow_disabled: "#FBDE78",
   brown: "#2A2900",
   brown_disabled: "#66664D",
   gray_disabled: "#C9C9C9",
   dark_gray_disabled: "#858484",
+  army_green: "#6C6B21",
+  army_green_light: "#8A8932",
   //
   gem_blue: "#008C88",
   gem_pink: "#FC4FA2",
@@ -37,6 +40,7 @@ export const texts = {
       ctx.shadowOffsetY = this.shadowOffsetY * scaleFactor;
     },
   },
+
   logoSplashStyle: {
     fontSize: 16,
     fontFamily: "RetroGaming",
@@ -56,6 +60,7 @@ export const texts = {
       ctx.textBaseline = "middle";
     },
   },
+
   menuOptionStyle: {
     defaultColor: colors.gray_disabled,
     selectedColor: colors.yellow,
@@ -78,6 +83,7 @@ export const texts = {
       ctx.textBaseline = "middle";
     },
   },
+
   gemsStyle: {
     fontSize: 8,
     fontFamily: "RetroGaming",
@@ -91,6 +97,7 @@ export const texts = {
       ctx.shadowOffsetY = this.shadowOffsetY * scaleFactor;
     },
   },
+
   highlightStyle: {
     fontSize: 12,
     fontFamily: "RetroGaming",
@@ -108,6 +115,7 @@ export const texts = {
       ctx.shadowOffsetY = this.shadowOffsetY * scaleFactor;
     },
   },
+
   detailTextStyle: {
     fontSize: 8,
     fontFamily: "RetroGaming",
@@ -119,6 +127,54 @@ export const texts = {
       ctx.lineWidth = this.lineWidth * scaleFactor;
       ctx.fillStyle = this.fillColor;
       ctx.strokeStyle = this.strokeColor;
+    },
+  },
+
+  valueStyle: {
+    fontSize: 5,
+    fontFamily: "RetroGaming",
+    lineWidth: 1.2,
+    fillColor: colors.white, // default
+    strokeColor: colors.brown, // default
+    shadowColor: colors.brown, // default
+    shadowOffsetY: 0.6,
+    applyStyle: function (ctx, scaleFactor, isSelected) {
+      const fillColor = isSelected ? colors.white : colors.white_disabled;
+      const strokeColor = isSelected ? colors.brown : colors.brown_disabled;
+      const shadowColor = isSelected ? colors.brown : colors.brown_disabled;
+
+      ctx.font = `${this.fontSize * scaleFactor}px ${this.fontFamily}`;
+      ctx.lineWidth = this.lineWidth * scaleFactor;
+      ctx.fillStyle = fillColor;
+      ctx.strokeStyle = strokeColor;
+      ctx.shadowColor = shadowColor;
+      ctx.shadowOffsetY = this.shadowOffsetY * scaleFactor;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+    },
+  },
+
+  skinNamesStyle: {
+    fontSize: 8,
+    fontFamily: "RetroGaming",
+    lineWidth: 2,
+    fillColor: colors.white, // default
+    strokeColor: colors.brown, // default
+    shadowColor: colors.brown, // default
+    shadowOffsetY: 2,
+    applyStyle: function (ctx, scaleFactor, isSelected) {
+      const fillColor = isSelected ? colors.white : colors.white_disabled;
+      const strokeColor = isSelected ? colors.brown : colors.brown_disabled;
+      const shadowColor = isSelected ? colors.brown : colors.brown_disabled;
+
+      ctx.font = `${this.fontSize * scaleFactor}px ${this.fontFamily}`;
+      ctx.lineWidth = this.lineWidth * scaleFactor;
+      ctx.fillStyle = fillColor;
+      ctx.strokeStyle = strokeColor;
+      ctx.shadowColor = shadowColor;
+      ctx.shadowOffsetY = this.shadowOffsetY * scaleFactor;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
     },
   },
 };
