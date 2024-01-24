@@ -11,6 +11,7 @@ import {
 } from "./startingMenu_state.js";
 import { Sprite } from "../../classes/Sprite.js";
 import { appState as app } from "../../app_state.js";
+import { skinsState as skState } from "../Skins/skins_state.js";
 
 export const startingMenu = (function () {
   ("use strict");
@@ -29,6 +30,7 @@ export const startingMenu = (function () {
       state.isPageReseted = true;
     }
     updatePage();
+    console.log(skState.skins.currentlyUsingIndex);
   }
 
   // INITS
@@ -63,16 +65,25 @@ export const startingMenu = (function () {
   }
 
   function initFrogSprites() {
-    state.sprite.all.forEach((data, i) => {
-      const sprite = new Sprite({
-        position: { x: 44 * scaleFactor, y: 97 * scaleFactor },
-        imageSrc: data.imagePath,
-        frameRate: data.totalFrames,
-        frameBuffer: data.speed,
-        scale: 2.6,
+    if (
+      skState.skins.currentlyUsingIndex >= 0 &&
+      skState.skins.currentlyUsingIndex < state.sprite.all.length
+    ) {
+      state.sprite.all.forEach((data, i) => {
+        const sprite = new Sprite({
+          position: { x: 44 * scaleFactor, y: 97 * scaleFactor },
+          imageSrc: data.imagePath[skState.skins.currentlyUsingIndex],
+          frameRate: data.totalFrames,
+          frameBuffer: data.speed,
+          scale: 2.6,
+        });
+        state.sprite.all[i].image = sprite;
       });
-      state.sprite.all[i].image = sprite;
-    });
+    } else {
+      console.error(
+        `No skins ImagePath for Index: ${skState.skins.currentlyUsingIndex}`
+      );
+    }
   }
 
   function initBounds() {
@@ -253,13 +264,14 @@ export const startingMenu = (function () {
     if (isClickWithinBounds(mouseX, mouseY, state.plaque.gemBounds)) {
       gsap.to(overlay, {
         opacity: 1,
-        duration: 1,
+        duration: 0.2,
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
-          app.modes.current = app.modes.all.GEMS;
+          app.modes.current = app.modes.all.OPTIONS_MENU;
           app.initActive.startingMenu = false;
-          app.initActive.gems = true;
+          app.initActive.optionsMenu = true;
           overlay.opacity = 0;
+          state.isPageReseted = false;
         },
       });
     }

@@ -35,19 +35,31 @@ export const startingMenuState = {
     all: [
       {
         image: new Image(),
-        imagePath: "../images/startingMenu/sprite_cardio.svg",
+        imagePath: [
+          "../images/startingMenu/sprite_cardio.svg",
+          "../images/startingMenu/sprite_cardio_mafia.svg",
+          "../images/startingMenu/sprite_cardio_yeehaw.svg",
+        ],
         totalFrames: 4,
         speed: 12,
       },
       {
         image: new Image(),
-        imagePath: "../images/startingMenu/sprite_agility.svg",
+        imagePath: [
+          "../images/startingMenu/sprite_agility.svg",
+          "../images/startingMenu/sprite_agility_mafia.svg",
+          "../images/startingMenu/sprite_agility_yeehaw.svg",
+        ],
         totalFrames: 10,
         speed: 15,
       },
       {
         image: new Image(),
-        imagePath: "../images/startingMenu/sprite_strength.svg",
+        imagePath: [
+          "../images/startingMenu/sprite_strength.svg",
+          "../images/startingMenu/sprite_strength_mafia.svg",
+          "../images/startingMenu/sprite_strength_yeehaw.svg",
+        ],
         totalFrames: 10,
         speed: 15,
       },

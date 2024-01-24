@@ -7,7 +7,11 @@ import { colors } from "../../utils/style.js";
 
 // IMAGES
 
+const coinCount = localStorage.getItem("coinCount") || "0";
+
 export function initImages() {
+  const coinCountLength = ctx.measureText(coinCount).width;
+  //
   const bg = skState.ui.background;
   bg.image = new Sprite({
     position: { x: 0, y: 0 },
@@ -15,7 +19,10 @@ export function initImages() {
   });
   const coin = skState.ui.coin;
   coin.image = new Sprite({
-    position: { x: 25 * scaleFactor, y: 14 * scaleFactor },
+    position: {
+      x: 12 * scaleFactor + coinCountLength * scaleFactor,
+      y: 14 * scaleFactor,
+    },
     imageSrc: coin.imagePath,
   });
   const close = skState.ui.closeIcon;
@@ -23,6 +30,15 @@ export function initImages() {
     position: { x: app.canvas.W - 23 * scaleFactor, y: 12 * scaleFactor },
     imageSrc: close.imagePath,
   });
+}
+
+export function initBounds() {
+  skState.ui.btn.closebounds = {
+    x: app.canvas.W - 23 * scaleFactor,
+    y: 12 * scaleFactor,
+    width: 11 * scaleFactor,
+    height: 11 * scaleFactor,
+  };
 }
 
 export function drawBgImage() {
@@ -34,7 +50,7 @@ export function drawUI() {
   const FontSize = 5 * scaleFactor;
   ctx.font = `${FontSize}px RetroGaming`;
   ctx.fillStyle = "black";
-  ctx.fillText("100", 12 * scaleFactor, 19 * scaleFactor);
+  ctx.fillText(coinCount, 12 * scaleFactor, 19 * scaleFactor);
 
   // Draw other UI elements
   skState.ui.coin.image.drawSprite();

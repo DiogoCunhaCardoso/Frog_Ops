@@ -6,8 +6,13 @@ import {
   drawActionButton,
   drawUI,
   initImages,
+  initBounds,
 } from "./skins_ui.js";
-import { isClickWithinBounds } from "../../utils/utils.js";
+import {
+  applyCanvasOpacity,
+  isClickWithinBounds,
+  overlay,
+} from "../../utils/utils.js";
 import { texts } from "../../utils/style.js";
 
 export const skins = (function () {
@@ -20,6 +25,7 @@ export const skins = (function () {
     app.initActive.skins = true;
     if (!skState.isSkinsReseted) {
       initImages();
+      initBounds();
       skState.isSkinsReseted = true;
     }
     canvas.addEventListener("click", handleClick);
@@ -205,11 +211,29 @@ export const skins = (function () {
       }
     });
     handleUseSkin(mouseX, mouseY);
+    handleCloseButton(mouseX, mouseY);
   }
 
   function handleUseSkin(mouseX, mouseY) {
     if (isClickWithinBounds(mouseX, mouseY, skState.ui.btn.bounds)) {
       skState.skins.currentlyUsingIndex = skState.skins.selectedIndex;
+    }
+  }
+
+  function handleCloseButton(mouseX, mouseY) {
+    if (isClickWithinBounds(mouseX, mouseY, skState.ui.btn.closebounds)) {
+      gsap.to(overlay, {
+        opacity: 1,
+        duration: 0.2,
+        onUpdate: applyCanvasOpacity,
+        onComplete: () => {
+          app.modes.current = app.modes.all.STARTING_MENU;
+          app.initActive.skins = false;
+          app.initActive.startingMenu = true;
+          overlay.opacity = 0;
+          skState.skins.selectedIndex = 0;
+        },
+      });
     }
   }
 
@@ -219,14 +243,8 @@ export const skins = (function () {
 
     if (isPrevKey && skState.actions.IsPrevSkinAvailable(skState)) {
       skState.actions.ChangeToPrevIndex(skState);
-      console.log(
-        `Pressed ${event.key} - New selectedIndex: ${skState.skins.selectedIndex}`
-      ); // Debugging
     } else if (isNextKey && skState.actions.IsNextSkinAvailable(skState)) {
       skState.actions.ChangeToNextIndex(skState);
-      console.log(
-        `Pressed ${event.key} - New selectedIndex: ${skState.skins.selectedIndex}`
-      ); // Debugging
     }
   }
 

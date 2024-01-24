@@ -42,8 +42,9 @@ export class Player extends Sprite {
       height: 0,
     };
 
-    // for points
+    // for points & coins
     this.score = 0;
+    this.coinLandings = null;
   }
 
   draw() {
@@ -207,6 +208,7 @@ export class Player extends Sprite {
           if (!this.landedPlatforms.has(platform.id)) {
             // Increment score only if not already landed
             this.score++;
+            this.incrementCoinCount();
             this.landedPlatforms.add(platform.id);
           }
           break;
@@ -222,6 +224,20 @@ export class Player extends Sprite {
           break;
         }
       }
+    }
+  }
+
+  incrementCoinCount() {
+    // Increment the landing counter
+    this.coinLandings = this.coinLandings + 1;
+
+    if (this.coinLandings % 2 === 0) {
+      let currentCoinCount = parseInt(
+        localStorage.getItem("coinCount") || "0",
+        10
+      );
+      currentCoinCount++;
+      localStorage.setItem("coinCount", currentCoinCount.toString());
     }
   }
 

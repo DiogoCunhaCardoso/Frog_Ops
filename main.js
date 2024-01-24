@@ -16,17 +16,25 @@ import { appState as app } from "./app_state.js";
 import { strengthState } from "./gameModes/Strength/strength_state.js";
 import { gemsState } from "./otherScreens/Gems/gems_state.js";
 import { skinsState } from "./otherScreens/Skins/skins_state.js";
+import { optionsMenu } from "./otherScreens/optionsMenu.js";
 
 export const canvas = document.querySelector("canvas");
 export const ctx = canvas.getContext("2d");
 
 window.onload = () => {
-  checkOrientation();
-  /* loadAssets(); */
+  initializeCoinCount();
+  checkScreenOrientation();
+  loadAssets();
   setCanvasSize();
   checkIfTouchScreen();
   render();
 };
+
+function initializeCoinCount() {
+  if (localStorage.getItem("coinCount") === null) {
+    localStorage.setItem("coinCount", "0");
+  }
+}
 
 function loadAssets() {
   if (!sources || sources === 0 /* || !app.isLandscape */) {
@@ -156,7 +164,7 @@ function debounce(func, timeout = 200) {
 /* Checks if it is in portrait mode so it gives
    an alert to rotate into landscape mode*/
 
-function checkOrientation() {
+function checkScreenOrientation() {
   if (
     window.innerWidth < window.innerHeight &&
     app.modes.current !== app.modes.all.PORTRAIT
@@ -185,6 +193,7 @@ const startInit = [
   success.init,
   skins.init,
   loading.init,
+  optionsMenu.init,
 ];
 
 // FRAMERATE CONSISTENCY
@@ -217,7 +226,7 @@ function render() {
 }, 1000); */
 
 const debouncedResize = debounce(() => {
-  checkOrientation();
+  checkScreenOrientation();
   setCanvasSize();
   if (app.initActive.cardio) cState.isGameReseted = false;
   if (app.initActive.startingMenu) sState.isPageReseted = false;

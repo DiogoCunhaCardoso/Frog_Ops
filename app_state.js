@@ -17,7 +17,7 @@ export const appState = {
   },
 
   modes: {
-    current: 8, // Loading
+    current: 9, // Loading
     previous: 0,
     all: {
       STARTING_MENU: 0,
@@ -30,6 +30,7 @@ export const appState = {
       SUCCESS: 7,
       SKINS: 8,
       LOADING: 9,
+      OPTIONS_MENU: 10,
     },
   },
 
@@ -44,6 +45,7 @@ export const appState = {
     success: false,
     skins: false,
     loading: true,
+    optionsMenu: false,
   },
 
   /* reset: {
