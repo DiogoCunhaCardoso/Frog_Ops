@@ -4,6 +4,7 @@ import { overlay, applyCanvasOpacity } from "../utils/utils.js";
 import { Sprite } from "./Sprite.js";
 import { cState } from "../gameModes/Cardio/cardio_state.js";
 import { appState as app } from "../app_state.js";
+import { skinsState } from "../otherScreens/Skins/skins_state.js";
 
 export class Player extends Sprite {
   constructor({
@@ -120,17 +121,45 @@ export class Player extends Sprite {
   gravityAndHitGround() {
     // gravity
     this.position.y += this.velocity.y;
-    // collision
-    if (
+
+    // Define the X range for stopping
+    const minX = 0;
+    const maxX = 36 * scaleFactor;
+
+    const limitYAxis =
       this.position.y + this.height + this.velocity.y <
-      app.canvas.H - 6 * scaleFactor
-    ) {
+      app.canvas.H - 4 * scaleFactor;
+    const floor = this.position.x >= minX && this.position.x <= maxX;
+    const belowCanvas = this.position.y >= app.canvas.H;
+
+    if (limitYAxis) {
       this.velocity.y += this.gravity * scaleHeightFactor;
     } else {
-      // hit ground
-      this.isInAir = false;
-      this.velocity.y = 0;
-      this.velocity.x = 0;
+      if (floor) {
+        this.isInAir = false;
+        this.velocity.y = 0;
+        this.velocity.x = 0;
+      } else {
+        if (belowCanvas) {
+          gsap.to(overlay, {
+            opacity: 1,
+            duration: 0.5,
+            onUpdate: applyCanvasOpacity,
+            onComplete: () => {
+              app.modes.current = app.modes.all.RESTART;
+              app.initActive.cardio = false;
+              app.initActive.restart = true;
+              overlay.opacity = 0;
+            },
+          });
+          cState.stats.gameOver = {
+            gameMode: "Cardio",
+            score: cState.player.allPlayers[0]?.score,
+            maxScore: 25,
+          };
+          cState.isGameReseted = false;
+        }
+      }
     }
   }
 
@@ -224,12 +253,9 @@ export class Player extends Sprite {
     // Increment the landing counter
     this.coinLandings = this.coinLandings + 1;
 
-    if (this.coinLandings % 3 === 0) {
-      let currentCoinCount = parseInt(
-        localStorage.getItem("coinCount") || "0",
-        10
-      );
-      currentCoinCount++;
+    if (this.coinLandings % 2 === 0) {
+      skinsState.coinCount++;
+      let currentCoinCount = skinsState.coinCount;
       localStorage.setItem("coinCount", currentCoinCount.toString());
     }
   }

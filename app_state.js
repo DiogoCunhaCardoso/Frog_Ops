@@ -68,5 +68,5 @@ export const appState = {
   },
 
   isTouchDevice: null,
-  isLandscape: null,
+  isLandscape: false,
 };

@@ -22,8 +22,8 @@ export const canvas = document.querySelector("canvas");
 export const ctx = canvas.getContext("2d");
 
 window.onload = () => {
-  initializeCoinCountAndSkin();
   checkScreenOrientation();
+  initializeCoinCountAndSkin();
   loadAssets();
   setCanvasSize();
   checkIfTouchScreen();
@@ -40,7 +40,11 @@ function initializeCoinCountAndSkin() {
 }
 
 function loadAssets() {
-  if (!sources || sources === 0 /* || !app.isLandscape */) {
+  if (
+    !sources ||
+    sources === 0 ||
+    app.modes.current === app.modes.all.PORTRAIT /* || !app.isLandscape */
+  ) {
     return;
   }
 
@@ -180,8 +184,8 @@ function checkScreenOrientation() {
     app.modes.current === app.modes.all.PORTRAIT
   ) {
     app.isLandscape = true;
-    app.modes.current =
-      app.modes.previous !== undefined ? app.modes.previous : 0;
+    app.modes.current = app.modes.all.STARTING_MENU;
+    /* app.modes.current = app.modes.previous; */
   }
 }
 

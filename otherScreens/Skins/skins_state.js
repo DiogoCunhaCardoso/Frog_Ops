@@ -28,16 +28,16 @@ export const skinsState = {
         imagePath: "../../images/skins/skins/default.svg",
       },
       {
-        name: "MAFIA",
-        price: "100",
-        image: new Image(),
-        imagePath: "../../images/skins/skins/mafia.svg",
-      },
-      {
         name: "YEEHAW",
-        price: "500",
+        price: "300",
         image: new Image(),
         imagePath: "../../images/skins/skins/yeehaw.svg",
+      },
+      {
+        name: "MAFIA",
+        price: "600",
+        image: new Image(),
+        imagePath: "../../images/skins/skins/mafia.svg",
       },
     ],
     // colors will be images soon

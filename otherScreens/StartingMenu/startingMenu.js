@@ -61,6 +61,16 @@ export const startingMenu = (function () {
       position: { x: 271 * scaleFactor, y: 142 * scaleFactor },
       imageSrc: nextPSprite.imagePath,
     });
+
+    const coinCountLength = ctx.measureText(skState.coinCount).width;
+    const coin = skState.ui.coin;
+    coin.image = new Sprite({
+      position: {
+        x: app.canvas.W - coinCountLength * scaleFactor,
+        y: 14 * scaleFactor,
+      },
+      imageSrc: coin.imagePath,
+    });
   }
 
   function initFrogSprites() {
@@ -147,6 +157,7 @@ export const startingMenu = (function () {
     drawOptionsTextAndBounds();
     updateFrogSprites();
     drawSnow();
+    drawCoinCount();
     ctx.restore();
   }
 
@@ -221,6 +232,23 @@ export const startingMenu = (function () {
     ctx.shadowOffsetY = 1 * scaleFactor;
     ctx.strokeText("Soon", x, y);
     ctx.fillText("Soon", x, y);
+    ctx.restore();
+  }
+
+  function drawCoinCount() {
+    ctx.save();
+    const coinCountLength = ctx.measureText(skState.coinCount).width;
+    const FontSize = 5 * scaleFactor;
+    ctx.font = `${skState.buyFail ? FontSize * 1.2 : FontSize}px RetroGaming`;
+    ctx.fillStyle = skState.buyFail ? "red" : "black";
+    ctx.fillText(
+      skState.coinCount,
+      app.canvas.W - coinCountLength * 1.8 * scaleFactor,
+      19 * scaleFactor
+    );
+
+    // Draw other UI elements
+    skState.ui.coin.image.drawSprite();
     ctx.restore();
   }
 

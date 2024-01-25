@@ -17,8 +17,17 @@ export const sources = [
   "/images/startingMenu/plaque.svg",
   "/images/startingMenu/plaqueGems.svg",
   "/images/startingMenu/sprite_agility.svg",
+  "/images/startingMenu/sprite_agility_mafia.svg",
+  "/images/startingMenu/sprite_agility_yeehaw.svg",
   "/images/startingMenu/sprite_cardio.svg",
+  "/images/startingMenu/sprite_cardio_mafia.svg",
+  "/images/startingMenu/sprite_cardio_yeehaw.svg",
   "/images/startingMenu/sprite_strength.svg",
+  "/images/startingMenu/sprite_strength_mafia.svg",
+  "/images/startingMenu/sprite_strength_yeehaw.svg",
+  "/images/skins/skins/default.svg",
+  "/images/skins/skins/mafia.svg",
+  "/images/skins/skins/yeehaw.svg",
 ];
 
 // ADD SKINS IN FUTURE

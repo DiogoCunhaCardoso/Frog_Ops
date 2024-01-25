@@ -9,6 +9,7 @@ import {
 } from "../../utils/utils.js";
 import { Sprite } from "../../classes/Sprite.js";
 import { appState as app } from "../../app_state.js";
+import { skinsState as skState } from "../../otherScreens/Skins/skins_state.js";
 
 export function generalUI() {
   ctx.save();
@@ -170,6 +171,28 @@ export function initImages() {
     position: { x: 8 * scaleFactor, y: 0 },
     imageSrc: "../images/plaque_back.svg",
   });
+
+  const coinCountLength = ctx.measureText(skState.coinCount).width;
+  const coin = skState.ui.coin;
+  coin.image = new Sprite({
+    position: {
+      x: 28 * scaleFactor + coinCountLength * scaleFactor,
+      y: 10 * scaleFactor,
+    },
+    imageSrc: coin.imagePath,
+  });
+}
+
+export function drawCoinCount() {
+  ctx.save();
+  const FontSize = 5 * scaleFactor;
+  ctx.font = `${skState.buyFail ? FontSize * 1.2 : FontSize}px RetroGaming`;
+  ctx.fillStyle = skState.buyFail ? "red" : "black";
+  ctx.fillText(skState.coinCount, 33 * scaleFactor, 16 * scaleFactor);
+
+  // Draw other UI elements
+  skState.ui.coin.image.drawSprite();
+  ctx.restore();
 }
 
 export function drawBgImage() {

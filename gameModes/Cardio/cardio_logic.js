@@ -17,6 +17,7 @@ import {
   drawBackPlaque,
   initBounds,
   handlePlaqueClick,
+  drawCoinCount,
 } from "./cardio_ui.js";
 import { appState as app } from "../../app_state.js";
 
@@ -53,7 +54,7 @@ export const cardio = (function () {
     createRandomPlatformsAndGem();
     updatePlatforms();
     // birds
-    if (cState.player.allPlayers[0].score >= 5) {
+    if (cState.player.allPlayers[0].score >= 10) {
       createRandomBirds();
       updateBirds();
     }
@@ -64,6 +65,7 @@ export const cardio = (function () {
     // U.I.
     generalUI();
     touchScreenUI();
+    drawCoinCount();
   }
 
   /**
@@ -160,7 +162,7 @@ export const cardio = (function () {
       );
 
       //
-      if (cState.player.allPlayers[0].score === 5 && !cState.gem.obj) {
+      if (cState.player.allPlayers[0].score === 25 && !cState.gem.obj) {
         // Position for the gem
         const gemX = newX + block.width / 3;
         const gemY = 0 - block.height * 2 - 2 * scaleFactor;
@@ -172,7 +174,7 @@ export const cardio = (function () {
           "gem"
         );
       }
-      if (cState.player.allPlayers[0].score === 5) {
+      if (cState.player.allPlayers[0].score === 25) {
         cState.platform.stopBuilding = true;
       }
 
