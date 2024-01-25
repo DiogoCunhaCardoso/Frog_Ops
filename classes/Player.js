@@ -231,7 +231,7 @@ export class Player extends Sprite {
     // Increment the landing counter
     this.coinLandings = this.coinLandings + 1;
 
-    if (this.coinLandings % 2 === 0) {
+    if (this.coinLandings % 3 === 0) {
       let currentCoinCount = parseInt(
         localStorage.getItem("coinCount") || "0",
         10

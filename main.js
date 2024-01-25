@@ -22,17 +22,20 @@ export const canvas = document.querySelector("canvas");
 export const ctx = canvas.getContext("2d");
 
 window.onload = () => {
-  initializeCoinCount();
+  initializeCoinCountAndSkin();
   checkScreenOrientation();
-  loadAssets();
+  /* loadAssets(); */
   setCanvasSize();
   checkIfTouchScreen();
   render();
 };
 
-function initializeCoinCount() {
+function initializeCoinCountAndSkin() {
   if (localStorage.getItem("coinCount") === null) {
     localStorage.setItem("coinCount", "0");
+  }
+  if (localStorage.getItem("skinNo0") === null) {
+    localStorage.setItem("skinNo0", "purchased");
   }
 }
 

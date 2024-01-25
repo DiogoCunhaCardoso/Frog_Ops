@@ -24,37 +24,20 @@ export const skinsState = {
       {
         name: "DEFAULT",
         price: "0",
-        color: "red",
         image: new Image(),
         imagePath: "../../images/skins/skins/default.svg",
       },
       {
         name: "MAFIA",
-        price: "200",
-        color: "blue",
+        price: "100",
         image: new Image(),
         imagePath: "../../images/skins/skins/mafia.svg",
       },
       {
         name: "YEEHAW",
         price: "500",
-        color: "green",
         image: new Image(),
         imagePath: "../../images/skins/skins/yeehaw.svg",
-      },
-      {
-        name: "PIRATE",
-        price: "700",
-        color: "purple",
-        image: new Image(),
-        imagePath: "../../images/skins/skins/default.svg",
-      },
-      {
-        name: "CYFROG",
-        price: "1000",
-        color: "yellow",
-        image: new Image(),
-        imagePath: "../../images/skins/skins/mafia.svg",
       },
     ],
     // colors will be images soon
@@ -90,4 +73,6 @@ export const skinsState = {
     },
   },
   isSkinsReseted: false,
+  buyFail: false,
+  coinCount: localStorage.getItem("coinCount") || "0",
 };

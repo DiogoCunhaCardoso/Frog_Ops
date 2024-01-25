@@ -44,20 +44,21 @@ export const skins = (function () {
   function selectSkin() {
     ctx.save();
     // SKIN DIMENSIONS & POSITIONS
-    const selectedImgW = 69 * scaleFactor;
-    const selectedImgH = 51 * scaleFactor;
+    const selectedImgW = 90 * scaleFactor;
+    const selectedImgH = 90 * scaleFactor;
 
     const scaleDown = 0.65;
     const nonSelectedImgW = selectedImgW * scaleDown;
     const nonSelectedImgH = selectedImgH * scaleDown;
     const gap = 36 * scaleFactor;
+    const gapY = 7 * scaleFactor;
 
     const skinPositions = [
       {
         name: "previous",
         bounds: [
           app.canvas.W / 2 - selectedImgW / 2 - gap - nonSelectedImgW,
-          app.canvas.H / 2 - nonSelectedImgH / 2,
+          app.canvas.H / 2 - nonSelectedImgH / 2 - gapY,
           nonSelectedImgW,
           nonSelectedImgH,
         ],
@@ -66,7 +67,7 @@ export const skins = (function () {
         name: "selected",
         bounds: [
           app.canvas.W / 2 - selectedImgW / 2,
-          app.canvas.H / 2 - selectedImgH / 2,
+          app.canvas.H / 2 - selectedImgH / 2 - gapY,
           selectedImgW,
           selectedImgH,
         ],
@@ -75,7 +76,7 @@ export const skins = (function () {
         name: "next",
         bounds: [
           app.canvas.W / 2 + selectedImgW / 2 + gap,
-          app.canvas.H / 2 - nonSelectedImgH / 2,
+          app.canvas.H / 2 - nonSelectedImgH / 2 - gapY,
           nonSelectedImgW,
           nonSelectedImgH,
         ],
@@ -125,15 +126,31 @@ export const skins = (function () {
   // HELPER FUNCTION
 
   function _drawSkinGroup(skin, skinPos, isSelectedSkin) {
+    ctx.save();
     const currentScale = isSelectedSkin ? 1 : 0.65;
-    ctx.fillStyle = skin.color;
-    ctx.fillRect(...skinPos.bounds);
+    const imgX = skinPos.bounds[0];
+    const imgY = skinPos.bounds[1];
+    const imgW = skinPos.bounds[2];
+    const imgH = skinPos.bounds[3];
+
+    if (skin.image.complete && skin.image.naturalHeight !== 0) {
+      ctx.drawImage(skin.image, imgX, imgY, imgW, imgH);
+    } else {
+      skin.image.onload = () => {
+        ctx.drawImage(skin.image, imgX, imgY, imgW, imgH);
+      };
+      skin.image.src = skin.imagePath;
+    }
 
     _drawSkinName(skin, skinPos, currentScale, isSelectedSkin);
     _drawSkinPrice(skin, skinPos, currentScale, isSelectedSkin);
+    ctx.restore();
   }
 
+  function _drawSkinImages() {}
+
   function _drawSkinName(skin, skinPos, currentScale, isSelectedSkin) {
+    ctx.save();
     // TEXT STYLE
     texts.skinNamesStyle.applyStyle(
       ctx,
@@ -142,13 +159,14 @@ export const skins = (function () {
     );
     // TEXT POSITION
     const centerX = skinPos.bounds[0] + skinPos.bounds[2] / 2;
-    const textYOffset = 25 * scaleFactor * currentScale;
+    const textYOffset = -6 * scaleFactor * currentScale;
     const textY = skinPos.bounds[1] - textYOffset;
 
     if (skin.name) {
       ctx.strokeText(skin.name, centerX, textY);
       ctx.fillText(skin.name, centerX, textY);
     }
+    ctx.restore();
   }
 
   function _drawSkinPrice(skin, skinPos, currentScale, isSelectedSkin) {
@@ -161,7 +179,7 @@ export const skins = (function () {
 
     // PRICE TEXT POSITION
     const centerX = skinPos.bounds[0] + skinPos.bounds[2] / 2;
-    const priceYOffset = 12 * scaleFactor * currentScale;
+    const priceYOffset = -20 * scaleFactor * currentScale;
     const priceY = skinPos.bounds[1] - priceYOffset;
 
     // DRAW PRICE & COIN
@@ -189,6 +207,50 @@ export const skins = (function () {
     }
   }
 
+  // BUYING LOGIC
+
+  function isSkinPurchased(index) {
+    return localStorage.getItem(`skinNo${index}`) !== null;
+  }
+
+  function purchaseSkin(index) {
+    const skinPrice = parseInt(skState.skins.all[index].price, 10);
+    skState.coinCount = parseInt(localStorage.getItem("coinCount"), 10) || 0;
+    //
+    const boughtSkin = skState.coinCount >= skinPrice;
+
+    if (boughtSkin) {
+      localStorage.setItem(`skinNo${index}`, "purchased");
+      const futureCoinCount = skState.coinCount - skinPrice;
+
+      animateCounter(futureCoinCount, () => {
+        localStorage.setItem("coinCount", skState.coinCount);
+      });
+    } else {
+      skState.buyFail = true;
+      drawUI();
+      setTimeout(() => {
+        skState.buyFail = false;
+        drawUI();
+      }, 1000);
+    }
+  }
+
+  // ANIMATION
+
+  function animateCounter(targetCount, callback) {
+    const interval = 8;
+    const timer = setInterval(() => {
+      if (skState.coinCount > targetCount) {
+        skState.coinCount--;
+        drawUI();
+      } else {
+        clearInterval(timer);
+        if (callback) callback();
+      }
+    }, interval);
+  }
+
   // INTERACTIVITY
 
   function handleClick(event) {
@@ -210,13 +272,20 @@ export const skins = (function () {
         }
       }
     });
-    handleUseSkin(mouseX, mouseY);
+    handleEquipOrBuySkin(mouseX, mouseY);
     handleCloseButton(mouseX, mouseY);
   }
 
-  function handleUseSkin(mouseX, mouseY) {
+  function handleEquipOrBuySkin(mouseX, mouseY) {
     if (isClickWithinBounds(mouseX, mouseY, skState.ui.btn.bounds)) {
-      skState.skins.currentlyUsingIndex = skState.skins.selectedIndex;
+      const index = skState.skins.selectedIndex;
+      if (skState.skins.currentlyUsingIndex !== index) {
+        if (isSkinPurchased(index)) {
+          skState.skins.currentlyUsingIndex = index; // Equip the skin
+        } else {
+          purchaseSkin(index); // Try to purchase the skin
+        }
+      }
     }
   }
 
@@ -250,5 +319,6 @@ export const skins = (function () {
 
   return {
     init: init,
+    isSkinPurchased: isSkinPurchased,
   };
 })();

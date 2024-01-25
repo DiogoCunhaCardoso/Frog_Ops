@@ -30,7 +30,6 @@ export const startingMenu = (function () {
       state.isPageReseted = true;
     }
     updatePage();
-    console.log(skState.skins.currentlyUsingIndex);
   }
 
   // INITS
@@ -278,12 +277,14 @@ export const startingMenu = (function () {
   }
 
   function handleKeysPress(event) {
-    const keyAction = state.keys.actions[event.key];
-    if (keyAction) {
-      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-        state.options.selectedIndex = keyAction(state);
-      } else if (event.key === "Enter") {
-        keyAction(state);
+    if (app.initActive.startingMenu) {
+      const keyAction = state.keys.actions[event.key];
+      if (keyAction) {
+        if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+          state.options.selectedIndex = keyAction(state);
+        } else if (event.key === "Enter") {
+          keyAction(state);
+        }
       }
     }
   }
