@@ -24,7 +24,7 @@ export const ctx = canvas.getContext("2d");
 window.onload = () => {
   initializeCoinCountAndSkin();
   checkScreenOrientation();
-  /* loadAssets(); */
+  loadAssets();
   setCanvasSize();
   checkIfTouchScreen();
   render();

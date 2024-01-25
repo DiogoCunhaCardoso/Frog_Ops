@@ -67,13 +67,6 @@ export class Player extends Sprite {
 
   update() {
     ctx.save();
-    ctx.fillStyle = "red";
-    ctx.fillRect(
-      this.hitbox.position.x,
-      this.hitbox.position.y,
-      this.hitbox.width,
-      this.hitbox.height
-    );
     this.updateFrames();
     //
     this.updateHitbox();

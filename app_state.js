@@ -17,7 +17,7 @@ export const appState = {
   },
 
   modes: {
-    current: 8, // Loading
+    current: 9, // Loading
     previous: 0,
     all: {
       STARTING_MENU: 0,
