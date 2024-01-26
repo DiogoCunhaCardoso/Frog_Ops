@@ -27,7 +27,7 @@ export class Player extends Sprite {
     this.rotation = 0;
 
     this.isInAir = true;
-    this.gravity = 0.1;
+    this.gravity = 0.4;
 
     // for collision
     this.allPlatforms = allPlatforms; // platforms
@@ -100,7 +100,7 @@ export class Player extends Sprite {
   }
 
   rotatePlayer() {
-    let step = 0.5;
+    let step = 2;
     if (this.rotation < -45 || this.rotation > 45) {
       this.rotationDirection *= -1;
     }
@@ -130,7 +130,7 @@ export class Player extends Sprite {
       this.position.y + this.height + this.velocity.y <
       app.canvas.H - 4 * scaleFactor;
     const floor = this.position.x >= minX && this.position.x <= maxX;
-    const belowCanvas = this.position.y >= app.canvas.H;
+    const belowCanvas = this.position.y + this.height >= app.canvas.H;
 
     if (limitYAxis) {
       this.velocity.y += this.gravity * scaleHeightFactor;
@@ -295,7 +295,7 @@ export class Player extends Sprite {
     this.isRotating = false;
     this.isInAir = true;
     this.velocity.y = speed; /* scaleFactor */
-    this.velocity.x = (this.rotation / 20) * scaleFactor; // divide so it moves slower
+    this.velocity.x = (this.rotation / 12) * scaleFactor; // divide so it moves slower
     this.rotation = 0;
     this.rotationDirection = -1;
     cState.ui.movingRectWidth = 45 / 2;

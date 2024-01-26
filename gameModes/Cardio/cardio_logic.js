@@ -18,6 +18,9 @@ import {
   initBounds,
   handlePlaqueClick,
   drawCoinCount,
+  drawQuestion,
+  handleQuestionClick,
+  drawSideBar,
 } from "./cardio_ui.js";
 import { appState as app } from "../../app_state.js";
 
@@ -48,6 +51,7 @@ export const cardio = (function () {
     ctx.clearRect(0, 0, app.canvas.W, app.canvas.H);
     drawBgImage();
     drawBackPlaque();
+    drawQuestion();
     // player
     cState.player.allPlayers[0]?.update();
     // platform
@@ -66,6 +70,7 @@ export const cardio = (function () {
     generalUI();
     touchScreenUI();
     drawCoinCount();
+    drawSideBar();
   }
 
   /**
@@ -80,7 +85,7 @@ export const cardio = (function () {
     cState.platform.lastPlatformCreationTime = Date.now();
     cState.bird.lastBirdCreationTime = Date.now();
     cState.ui.movingRectWidth = 45 / 2;
-    cState.ui.directionInc = -0.25;
+    cState.ui.directionInc = -1;
     cState.gem.obj = null;
     CollisionBlock.nextPlatformId = 0;
     initPlayer();
@@ -100,7 +105,7 @@ export const cardio = (function () {
         allBirds: cState.bird.allBirds,
         imageSrc: "../images/cardio/player.svg",
         frameRate: 7,
-        frameBuffer: 12,
+        frameBuffer: 4,
       });
       cState.player.allPlayers.push(player);
     }
@@ -265,7 +270,7 @@ export const cardio = (function () {
             position: { x: app.canvas.W, y: newY },
             imageSrc: "../images/cardio/bird.svg",
             frameRate: 6,
-            frameBuffer: 32,
+            frameBuffer: 6,
           },
           "bird"
         )
@@ -293,6 +298,7 @@ export const cardio = (function () {
     let mouseY = event.clientY - canvas.getBoundingClientRect().top;
 
     handlePlaqueClick(mouseX, mouseY);
+    handleQuestionClick(mouseX, mouseY);
     checkClicksTouch(mouseX, mouseY, {
       rotateCb: activateRotation,
       oneCb: activateJump(1),
@@ -317,11 +323,17 @@ export const cardio = (function () {
     return () => {
       if (cState.player.allPlayers[0]?.isInAir === false) {
         if (key === 1) {
-          cState.player.allPlayers[0].jump(-5);
+          cState.player.allPlayers[0].jump(
+            cState.player.jumpForce[0] * scaleHeightFactor
+          );
         } else if (key === 2) {
-          cState.player.allPlayers[0].jump(-7);
+          cState.player.allPlayers[0].jump(
+            cState.player.jumpForce[1] * scaleHeightFactor
+          );
         } else if (key === 3) {
-          cState.player.allPlayers[0].jump(-9);
+          cState.player.allPlayers[0].jump(
+            cState.player.jumpForce[2] * scaleHeightFactor
+          );
         }
       }
     };
@@ -333,25 +345,32 @@ export const cardio = (function () {
     if (
       e.code === "KeyR" &&
       app.initActive.cardio &&
-      cState.player.allPlayers[0]?.isInAir === false
+      cState.player.allPlayers[0]?.isInAir === false &&
+      !cState.isModalOpen
     ) {
       activateRotation();
     }
 
     // jump
-    if (cState.player.allPlayers[0]?.isInAir === false) {
+    if (cState.player.allPlayers[0]?.isInAir === false && !cState.isModalOpen) {
       switch (e.code) {
         case "Digit1":
         case "Numpad1":
-          cState.player.allPlayers[0].jump(-2.5 * scaleHeightFactor);
+          cState.player.allPlayers[0].jump(
+            cState.player.jumpForce[0] * scaleHeightFactor
+          );
           break;
         case "Digit2":
         case "Numpad2":
-          cState.player.allPlayers[0].jump(-4 * scaleHeightFactor);
+          cState.player.allPlayers[0].jump(
+            cState.player.jumpForce[1] * scaleHeightFactor
+          );
           break;
         case "Digit3":
         case "Numpad3":
-          cState.player.allPlayers[0].jump(-5 * scaleHeightFactor);
+          cState.player.allPlayers[0].jump(
+            cState.player.jumpForce[2] * scaleHeightFactor
+          );
           break;
       }
     }

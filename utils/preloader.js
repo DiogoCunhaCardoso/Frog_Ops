@@ -5,6 +5,8 @@ export const sources = [
   "/images/cardio/bird.svg",
   "/images/cardio/cloud.svg",
   "/images/cardio/player.svg",
+  "/images/cardio/question.svg",
+  "/images/cardio/tutorial.svg",
   "/images/cardio/collectible_gem.svg",
   "/images/gems/gem_agility.svg",
   "/images/gems/gem_cardio.svg",

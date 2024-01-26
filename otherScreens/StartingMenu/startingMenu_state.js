@@ -28,7 +28,7 @@ export const startingMenuState = {
       image: new Image(),
       imagePath: "../images/startingMenu/snow.svg",
       totalFrames: 6,
-      speed: 20,
+      speed: 10,
     },
   },
   sprite: {
@@ -41,7 +41,7 @@ export const startingMenuState = {
           "../images/startingMenu/sprite_cardio_yeehaw.svg",
         ],
         totalFrames: 4,
-        speed: 12,
+        speed: 5,
       },
       {
         image: new Image(),
@@ -51,7 +51,7 @@ export const startingMenuState = {
           "../images/startingMenu/sprite_agility_yeehaw.svg",
         ],
         totalFrames: 10,
-        speed: 15,
+        speed: 6,
       },
       {
         image: new Image(),
@@ -61,7 +61,7 @@ export const startingMenuState = {
           "../images/startingMenu/sprite_strength_yeehaw.svg",
         ],
         totalFrames: 10,
-        speed: 15,
+        speed: 7,
       },
     ],
   },

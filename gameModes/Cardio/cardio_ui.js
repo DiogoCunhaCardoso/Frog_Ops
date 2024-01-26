@@ -132,13 +132,6 @@ export function checkClicksTouch(
   }
 }
 
-/* export function handleClick(event) {
-  let mouseX = event.clientX - canvas.getBoundingClientRect().left;
-  let mouseY = event.clientY - canvas.getBoundingClientRect().top;
-
-  handlePlaqueClick(mouseX, mouseY);
-} */
-
 export function handlePlaqueClick(mouseX, mouseY) {
   if (!app.initActive.cardio) {
     return;
@@ -159,6 +152,41 @@ export function handlePlaqueClick(mouseX, mouseY) {
   }
 }
 
+export function handleQuestionClick(mouseX, mouseY) {
+  if (!app.initActive.cardio) {
+    return;
+  }
+
+  if (
+    !cState.isModalOpen &&
+    isClickWithinBounds(mouseX, mouseY, cState.ui.btnQuestionBounds)
+  ) {
+    cState.isModalOpen = true;
+    gsap.to(cState, {
+      translateX: app.canvas.W / 3,
+      duration: 0.4,
+    });
+  }
+
+  if (
+    cState.isModalOpen &&
+    isClickWithinBounds(mouseX, mouseY, {
+      x: 0,
+      y: 0,
+      width: app.canvas.W - app.canvas.W / 3,
+      height: app.canvas.H,
+    })
+  ) {
+    gsap.to(cState, {
+      translateX: 0,
+      duration: 0.4,
+      onComplete: () => {
+        cState.isModalOpen = false;
+      },
+    });
+  }
+}
+
 // Images
 
 export function initImages() {
@@ -172,26 +200,35 @@ export function initImages() {
     imageSrc: "../images/plaque_back.svg",
   });
 
+  if (!app.isTouchDevice) {
+    cState.ui.questionImage = new Sprite({
+      position: {
+        x: app.canvas.W - 18 * scaleFactor,
+        y: app.canvas.H - 18 * scaleFactor,
+      },
+      imageSrc: "../images/cardio/question.svg",
+    });
+  }
+
   const coinCountLength = ctx.measureText(skState.coinCount).width;
-  const coin = skState.ui.coin;
-  coin.image = new Sprite({
+  const coin = cState.ui;
+  coin.coinImage = new Sprite({
     position: {
       x: 28 * scaleFactor + coinCountLength * scaleFactor,
       y: 10 * scaleFactor,
     },
-    imageSrc: coin.imagePath,
+    imageSrc: cState.ui.coinImagepath,
   });
 }
 
 export function drawCoinCount() {
   ctx.save();
   const FontSize = 5 * scaleFactor;
-  ctx.font = `${skState.buyFail ? FontSize * 1.2 : FontSize}px RetroGaming`;
-  ctx.fillStyle = skState.buyFail ? "red" : "black";
+  ctx.font = `${FontSize}px RetroGaming`;
+  ctx.fillStyle = "black";
   ctx.fillText(skState.coinCount, 33 * scaleFactor, 16 * scaleFactor);
 
-  // Draw other UI elements
-  skState.ui.coin.image.drawSprite();
+  cState.ui.coinImage.drawSprite();
   ctx.restore();
 }
 
@@ -203,7 +240,35 @@ export function drawBackPlaque() {
   cState.plaque.image.drawSprite();
 }
 
-//
+export function drawQuestion() {
+  if (!app.isTouchDevice) {
+    cState.ui.questionImage.drawSprite();
+  }
+}
+
+let sidebarImage = new Image();
+sidebarImage.src = "../../images/cardio/tutorial.svg";
+export function drawSideBar() {
+  if (cState.isModalOpen) {
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, app.canvas.W, app.canvas.H);
+
+    ctx.globalAlpha = 1;
+
+    if (sidebarImage.complete) {
+      ctx.drawImage(
+        sidebarImage,
+        app.canvas.W - cState.translateX,
+        0,
+        app.canvas.W / 3,
+        app.canvas.H
+      );
+    }
+  }
+}
+
+// BOUNDS
 
 export function initBounds() {
   cState.plaque.bounds = {
@@ -212,6 +277,13 @@ export function initBounds() {
     width: 20 * scaleFactor,
     height: 13 * scaleFactor,
   };
-}
 
-function checkPlaqueClicks() {}
+  if (!app.isTouchDevice) {
+    cState.ui.btnQuestionBounds = {
+      x: app.canvas.W - 18 * scaleFactor,
+      y: app.canvas.H - 18 * scaleFactor,
+      width: 11 * scaleFactor,
+      height: 12 * scaleFactor,
+    };
+  }
+}

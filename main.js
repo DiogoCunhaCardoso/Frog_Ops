@@ -24,7 +24,7 @@ export const ctx = canvas.getContext("2d");
 window.onload = () => {
   checkScreenOrientation();
   initializeCoinCountAndSkin();
-  loadAssets();
+ /*  loadAssets(); */
   setCanvasSize();
   checkIfTouchScreen();
   render();
@@ -184,8 +184,8 @@ function checkScreenOrientation() {
     app.modes.current === app.modes.all.PORTRAIT
   ) {
     app.isLandscape = true;
-    app.modes.current = app.modes.all.STARTING_MENU;
-    /* app.modes.current = app.modes.previous; */
+    app.modes.current =
+      app.modes.previous !== undefined ? app.modes.previous : 0;
   }
 }
 
@@ -206,30 +206,33 @@ const startInit = [
 // FRAMERATE CONSISTENCY
 // https://chriscourses.com/blog/standardize-your-javascript-games-framerate-for-different-monitors
 
-let msPrev = window.performance.now();
+let lastTime = window.performance.now();
 let frames = 0; // to log frames
 
 function StandardizeFramerate() {
-  const msNow = window.performance.now();
-  const msPassed = msNow - msPrev;
+  const now = window.performance.now();
+  const msPassed = now - lastTime;
 
-  if (msPassed < app.frames.msPerFrame) return;
+  if (msPassed < app.frames.msPerFrame) {
+    return false;
+  }
 
   const excessTime = msPassed % app.frames.msPerFrame;
-  msPrev = msNow - excessTime;
-
-  frames++; // to log frames
+  lastTime = now - excessTime;
+  frames++;
+  return true;
 }
 
 function render() {
-  StandardizeFramerate();
-  startInit[app.modes.current]();
+  if (StandardizeFramerate()) {
+    startInit[app.modes.current]();
+  }
   window.requestAnimationFrame(render);
 }
 
-// Log Framerate
 /* setInterval(() => {
   console.log(frames);
+  frames = 0;
 }, 1000); */
 
 const debouncedResize = debounce(() => {
