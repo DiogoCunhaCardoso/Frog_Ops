@@ -58,7 +58,7 @@ export const cardio = (function () {
     createRandomPlatformsAndGem();
     updatePlatforms();
     // birds
-    if (cState.player.allPlayers[0].score >= 10) {
+    if (cState.player.allPlayers[0].score >= 1) {
       createRandomBirds();
       updateBirds();
     }
@@ -338,6 +338,14 @@ export const cardio = (function () {
       }
     };
   }
+
+  window.addEventListener("dblclick", (e) => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  });
 
   window.addEventListener("keydown", (e) => {
     // rotate

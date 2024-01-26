@@ -37,8 +37,8 @@ export const startingMenuState = {
         image: new Image(),
         imagePath: [
           "../images/startingMenu/sprite_cardio.svg",
-          "../images/startingMenu/sprite_cardio_mafia.svg",
           "../images/startingMenu/sprite_cardio_yeehaw.svg",
+          "../images/startingMenu/sprite_cardio_mafia.svg",
         ],
         totalFrames: 4,
         speed: 5,
@@ -47,8 +47,8 @@ export const startingMenuState = {
         image: new Image(),
         imagePath: [
           "../images/startingMenu/sprite_agility.svg",
-          "../images/startingMenu/sprite_agility_mafia.svg",
           "../images/startingMenu/sprite_agility_yeehaw.svg",
+          "../images/startingMenu/sprite_agility_mafia.svg",
         ],
         totalFrames: 10,
         speed: 6,
@@ -57,8 +57,8 @@ export const startingMenuState = {
         image: new Image(),
         imagePath: [
           "../images/startingMenu/sprite_strength.svg",
-          "../images/startingMenu/sprite_strength_mafia.svg",
           "../images/startingMenu/sprite_strength_yeehaw.svg",
+          "../images/startingMenu/sprite_strength_mafia.svg",
         ],
         totalFrames: 10,
         speed: 7,

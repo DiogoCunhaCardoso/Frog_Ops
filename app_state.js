@@ -17,7 +17,7 @@ export const appState = {
   },
 
   modes: {
-    current: 1, // Loading
+    current: 9, // Loading
     previous: 0,
     all: {
       STARTING_MENU: 0,
@@ -36,7 +36,7 @@ export const appState = {
 
   initActive: {
     startingMenu: false,
-    cardio: true,
+    cardio: false,
     agility: false,
     strength: false,
     gems: false,

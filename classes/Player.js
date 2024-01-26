@@ -142,14 +142,10 @@ export class Player extends Sprite {
       } else {
         if (belowCanvas) {
           gsap.to(overlay, {
-            opacity: 1,
-            duration: 0.5,
-            onUpdate: applyCanvasOpacity,
             onComplete: () => {
               app.modes.current = app.modes.all.RESTART;
               app.initActive.cardio = false;
               app.initActive.restart = true;
-              overlay.opacity = 0;
             },
           });
           cState.stats.gameOver = {

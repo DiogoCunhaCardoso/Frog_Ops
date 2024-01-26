@@ -8,7 +8,7 @@ export class CollisionBlock extends Sprite {
     super({ position, imageSrc, frameRate, frameBuffer });
     this.position = position;
     this.velocity = {
-      y: 0.4 * scaleFactor,
+      y: 0.6 * scaleFactor,
       x: 0.3 * scaleFactor,
     };
     this.height = 16 * scaleFactor;

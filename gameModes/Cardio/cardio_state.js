@@ -1,18 +1,18 @@
 export const cState = {
   player: {
     allPlayers: [],
-    jumpForce: [-6.6, -8.6, -10.2],
+    jumpForce: [-5, -8.2, -10.2],
   },
   platform: {
     stopBuilding: false,
     allPlatforms: [],
     lastPlatformCreationTime: Date.now(),
-    PLATFORM_CREATION_INTERVAL: 3000,
+    PLATFORM_CREATION_INTERVAL: 2800,
   },
   bird: {
     allBirds: [],
     lastBirdCreationTime: Date.now(),
-    BIRD_CREATION_INTERVAL: 10500,
+    BIRD_CREATION_INTERVAL: 8000,
   },
   plaque: {
     image: new Image(),
