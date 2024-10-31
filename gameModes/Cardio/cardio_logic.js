@@ -58,7 +58,7 @@ export const cardio = (function () {
     createRandomPlatformsAndGem();
     updatePlatforms();
     // birds
-    if (cState.player.allPlayers[0].score >= 1) {
+    if (cState.player.allPlayers[0].score >= 5) {
       createRandomBirds();
       updateBirds();
     }
@@ -167,7 +167,7 @@ export const cardio = (function () {
       );
 
       //
-      if (cState.player.allPlayers[0].score === 25 && !cState.gem.obj) {
+      if (cState.player.allPlayers[0].score === 10 && !cState.gem.obj) {
         // Position for the gem
         const gemX = newX + block.width / 3;
         const gemY = 0 - block.height * 2 - 2 * scaleFactor;
@@ -179,7 +179,7 @@ export const cardio = (function () {
           "gem"
         );
       }
-      if (cState.player.allPlayers[0].score === 25) {
+      if (cState.player.allPlayers[0].score === 10) {
         cState.platform.stopBuilding = true;
       }
 
@@ -211,7 +211,7 @@ export const cardio = (function () {
         NewGemAquired("cardioGem");
         gsap.to(overlay, {
           opacity: 1,
-          duration: 0.5,
+          duration: 0.2,
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
             app.modes.current = app.modes.all.SUCCESS;
@@ -221,7 +221,7 @@ export const cardio = (function () {
             // send stats
             cState.stats.gameWon = {
               gameMode: "cardioGem",
-              score: 25,
+              score: 10,
             };
             cState.isGameReseted = false;
           },

@@ -94,7 +94,7 @@ export function handleNextPage(state) {
 
   gsap.to(overlay, {
     opacity: 1,
-    duration: 0.5,
+    duration: 0.2,
     onUpdate: applyCanvasOpacity,
     onComplete: () => {
       app.modes.current = state.options.selectedIndex + 1;

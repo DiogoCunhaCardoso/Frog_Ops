@@ -12,7 +12,7 @@ export const cState = {
   bird: {
     allBirds: [],
     lastBirdCreationTime: Date.now(),
-    BIRD_CREATION_INTERVAL: 8000,
+    BIRD_CREATION_INTERVAL: 9000,
   },
   plaque: {
     image: new Image(),

@@ -77,7 +77,7 @@ export const optionsMenu = (function () {
     if (isClickWithinBounds(mouseX, mouseY, buttonGemsBounds)) {
       gsap.to(overlay, {
         opacity: 1,
-        duration: 1,
+        duration: 0.2,
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
           app.modes.current = app.modes.all.GEMS;
@@ -92,7 +92,7 @@ export const optionsMenu = (function () {
     if (isClickWithinBounds(mouseX, mouseY, buttonSkinsBounds)) {
       gsap.to(overlay, {
         opacity: 1,
-        duration: 1,
+        duration: 0.2,
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
           app.modes.current = app.modes.all.SKINS;

@@ -41,7 +41,7 @@ export let overlay = {
 export function applyCanvasOpacity() {
   ctx.save();
   ctx.globalAlpha = overlay.opacity;
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "white";
   ctx.fillRect(0, 0, app.canvas.W, app.canvas.H);
   ctx.restore();
 }

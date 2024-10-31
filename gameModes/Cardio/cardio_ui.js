@@ -139,7 +139,7 @@ export function handlePlaqueClick(mouseX, mouseY) {
   if (isClickWithinBounds(mouseX, mouseY, cState.plaque.bounds)) {
     gsap.to(overlay, {
       opacity: 1,
-      duration: 1,
+      duration: 0.2,
       onUpdate: applyCanvasOpacity,
       onComplete: () => {
         app.modes.current = app.modes.all.STARTING_MENU;

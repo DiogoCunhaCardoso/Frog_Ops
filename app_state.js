@@ -48,18 +48,6 @@ export const appState = {
     optionsMenu: false,
   },
 
-  /* reset: {
-    startingMenu: false,
-    cardio: false,
-    agility: false,
-    strength: false,
-    gems: false,
-    portrait: false,
-    restart: false,
-    success: false,
-    loading: false,
-  }, */
-
   frames: {
     fps: 60,
     get msPerFrame() {

@@ -86,7 +86,7 @@ export const restart = (function () {
         if (rState.options.isYesSelected) {
           gsap.to(overlay, {
             opacity: 1,
-            duration: 0.5,
+            duration: 0.2,
             onUpdate: applyCanvasOpacity,
             onComplete: () => {
               app.modes.current = app.modes.all.CARDIO;
@@ -98,7 +98,7 @@ export const restart = (function () {
         } else {
           gsap.to(overlay, {
             opacity: 1,
-            duration: 0.5,
+            duration: 0.2,
             onUpdate: applyCanvasOpacity,
             onComplete: () => {
               app.modes.current = app.modes.all.STARTING_MENU;
@@ -140,7 +140,7 @@ export const restart = (function () {
       if (rState.options.isYesSelected) {
         gsap.to(overlay, {
           opacity: 1,
-          duration: 0.5,
+          duration: 0.2,
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
             app.modes.current = app.modes.all.CARDIO;
@@ -152,7 +152,7 @@ export const restart = (function () {
       } else {
         gsap.to(overlay, {
           opacity: 1,
-          duration: 0.5,
+          duration: 0.2,
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
             app.modes.current = app.modes.all.STARTING_MENU;

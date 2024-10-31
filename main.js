@@ -63,7 +63,7 @@ function loadAssets() {
     if (assetsState.complete === assetsState.total) {
       gsap.to(overlay, {
         y: app.canvas.H,
-        duration: 0.6,
+        duration: 0.2,
         onUpdate: () => {
           applyCanvasSlideOut(loading.init, startingMenu.init);
         },
@@ -84,7 +84,7 @@ function loadAssets() {
       if (assetsState.complete === assetsState.total && oneSecondPassed) {
         gsap.to(overlay, {
           y: app.canvas.H,
-          duration: 0.6,
+          duration: 0.2,
           onUpdate: () => {
             applyCanvasSlideOut(loading.init, startingMenu.init);
           },
@@ -186,6 +186,7 @@ function checkScreenOrientation() {
     app.isLandscape = true;
     app.modes.current =
       app.modes.previous !== undefined ? app.modes.previous : 0;
+    location.reload();
   }
 }
 

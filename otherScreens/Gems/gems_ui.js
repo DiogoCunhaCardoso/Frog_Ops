@@ -46,7 +46,6 @@ export function initImages() {
   } */
 }
 
-
 export function initBounds() {
   gState.plaque.bounds = {
     x: 8 * scaleFactor,
@@ -66,7 +65,7 @@ export function handlePlaqueClick(mouseX, mouseY) {
   if (isClickWithinBounds(mouseX, mouseY, gState.plaque.bounds)) {
     gsap.to(overlay, {
       opacity: 1,
-      duration: 1,
+      duration: 0.2,
       onUpdate: applyCanvasOpacity,
       onComplete: () => {
         app.modes.current = app.modes.all.STARTING_MENU;

@@ -29,13 +29,13 @@ export const skinsState = {
       },
       {
         name: "YEEHAW",
-        price: "300",
+        price: "30",
         image: new Image(),
         imagePath: "../../images/skins/skins/yeehaw.svg",
       },
       {
         name: "MAFIA",
-        price: "600",
+        price: "60",
         image: new Image(),
         imagePath: "../../images/skins/skins/mafia.svg",
       },

@@ -87,7 +87,7 @@ export function PlayAgainGroup(isYesSelected = true, image) {
   // PLAY AGAIN TEXT
   texts.highlightStyle.applyStyle(ctx, scaleFactor);
   const playAgainText = "PLAY AGAIN?";
-  
+
   ctx.strokeText(playAgainText, marginX, centerY);
   ctx.fillText(playAgainText, marginX, centerY);
   ctx.restore();
@@ -210,7 +210,7 @@ export function handlePlaqueClick(mouseX, mouseY) {
   if (isClickWithinBounds(mouseX, mouseY, gState.plaque.bounds)) {
     gsap.to(overlay, {
       opacity: 1,
-      duration: 1,
+      duration: 0.2,
       onUpdate: applyCanvasOpacity,
       onComplete: () => {
         app.modes.current = app.modes.all.STARTING_MENU;

@@ -151,7 +151,7 @@ export class Player extends Sprite {
           cState.stats.gameOver = {
             gameMode: "Cardio",
             score: cState.player.allPlayers[0]?.score,
-            maxScore: 25,
+            maxScore: 10,
           };
           cState.isGameReseted = false;
         }
@@ -268,7 +268,7 @@ export class Player extends Sprite {
       ) {
         gsap.to(overlay, {
           opacity: 1,
-          duration: 0.5,
+          duration: 0.2,
           onUpdate: applyCanvasOpacity,
           onComplete: () => {
             app.modes.current = app.modes.all.RESTART;
@@ -280,7 +280,7 @@ export class Player extends Sprite {
         cState.stats.gameOver = {
           gameMode: "Cardio",
           score: cState.player.allPlayers[0]?.score,
-          maxScore: 25,
+          maxScore: 10,
         };
         cState.isGameReseted = false;
       }

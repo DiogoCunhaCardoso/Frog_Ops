@@ -109,7 +109,7 @@ export const success = (function () {
     if (isClickWithinBounds(mouseX, mouseY, buttonBounds)) {
       gsap.to(overlay, {
         opacity: 1,
-        duration: 1,
+        duration: 0.2,
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
           app.modes.current = app.modes.all.GEMS;

@@ -280,7 +280,7 @@ export const startingMenu = (function () {
     if (isClickWithinBounds(mouseX, mouseY, state.plaque.nextBounds)) {
       gsap.to(overlay, {
         opacity: 1,
-        duration: 1,
+        duration: 0.2,
         onUpdate: applyCanvasOpacity,
         onComplete: () => {
           handleNextPage(state);
